@@ -8,6 +8,10 @@ youngsanpo_1 <- read.csv("C:/Users/HSY/Desktop/논문분석요청/전처리 후 
 
 install.packages('corrplot') 
 library(corrplot)
+install.packages('ggplot2')
+library(ggplot2)
+install.packages('ggcorrplot')
+library(ggcorrplot)
 X <- round(cor(youngsanpo_1[,3:13]),4)
 pairs(X) # Correlation plot 1
 corrplot(X) # Correlation plot 2
@@ -17,10 +21,6 @@ p.mat <- cor_pmat(youngsanpo_1[,3:13])
 p.mat
 
 ## Using ggplot2, ggcorrplot
-install.packages('ggplot2')
-library(ggplot2)
-install.packages('ggcorrplot')
-library(ggcorrplot)
 ggcorrplot(X) # method = "square" (default)
 ggcorrplot(X, method = "circle") # method = "circle"
 
