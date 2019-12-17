@@ -69,5 +69,5 @@ plot.ts(ECTN$diff1_영산포_1.EC, main="영산포-1(EC) 1시차 차분")
 plot.ts(ECTN$diff1_영산포_1.TN, main="영산포-1(T-N) 1시차 차분")
 
 # 인과관계 검정 (결과 ~ 원인)
-grangertest(ECTN$고막원천2_1.EC ~ ECTN$영산포_1.EC, order=1)
-grangertest(ECTN$고막원천2_1.TN ~ ECTN$영산포_1.TN, order=1)
+grangertest(ECTN$고막원천2_1.EC ~ ECTN$영산포_1.EC, order=5)
+grangertest(ECTN$고막원천2_1.TN ~ ECTN$영산포_1.TN, order=5)
