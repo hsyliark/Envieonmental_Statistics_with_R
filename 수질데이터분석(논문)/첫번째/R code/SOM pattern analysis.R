@@ -2,7 +2,7 @@
 # reference : https://www.shanelynn.ie/self-organising-maps-for-customer-segmentation-using-r/
 
 # Data loading
-df <- read.csv("D:/Workplace/Environmental_Statistics_with_R/수질데이터분석/전처리 후 데이터/SOM 패턴분석 월별 (영산포-1, 고막원천2-1).csv", 
+df <- read.csv("D:/Workplace/Environmental_Statistics_with_R/수질데이터분석(논문)/첫번째/전처리 후 데이터/데이터 (2014~2018)/SOM 패턴분석 월별 (영산포-1, 고막원천2-1) (2014~2018).csv", 
                header=T, sep=",")
 rownames(df) <- df[,1]
 ECTN <- data.frame(df[,-(1:3)])
@@ -18,7 +18,7 @@ ECTN_scale_matrix <- as.matrix(ECTN_scale)
 # Original
 ECTN_matrix <- as.matrix(ECTN)
 
-som_grid <- somgrid(xdim=7, ydim=12, topo="hexagonal")
+som_grid <- somgrid(xdim=5, ydim=12, topo="hexagonal")
 som_model <- som(ECTN_matrix, grid=som_grid)
 
 coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
@@ -41,10 +41,10 @@ library(lmtest)
 # Drawing graph
 par(mfrow=c(2,2))
 attach(ECTN)
-plot.ts(고막원천2_1.EC, main="고막원천2-1(EC)")
-plot.ts(고막원천2_1.TN, main="고막원천2-1(T-N)")
 plot.ts(영산포_1.EC, main="영산포-1(EC)")
 plot.ts(영산포_1.TN, main="영산포-1(T-N)")
+plot.ts(고막원천2_1.EC, main="고막원천2-1(EC)")
+plot.ts(고막원천2_1.TN, main="고막원천2-1(T-N)")
 par(mfrow=c(1,1))
 
 # Time series
@@ -69,5 +69,5 @@ plot.ts(ECTN$diff1_영산포_1.EC, main="영산포-1(EC) 1시차 차분")
 plot.ts(ECTN$diff1_영산포_1.TN, main="영산포-1(T-N) 1시차 차분")
 
 # 인과관계 검정 (결과 ~ 원인)
-grangertest(ECTN$고막원천2_1.EC ~ ECTN$영산포_1.EC, order=5)
-grangertest(ECTN$고막원천2_1.TN ~ ECTN$영산포_1.TN, order=5)
+grangertest(ECTN$고막원천2_1.EC ~ ECTN$영산포_1.EC, order=3)
+grangertest(ECTN$고막원천2_1.TN ~ ECTN$영산포_1.TN, order=3)
