@@ -2,10 +2,10 @@
 # reference : https://woosa7.github.io/R-Clustering-Kmens-SOM/
 
 # Data loading
-month <- read.csv("D:/Workplace/Environmental_Statistics_with_R/수질데이터분석/전처리 후 데이터/월별 평균 데이터.csv", 
+region <- read.csv("D:/Workplace/Environmental_Statistics_with_R/수질데이터분석(논문)/1번째/전처리 후 데이터/지점별 평균 데이터.csv", 
                    header=T, sep=",")
-rownames(month) <- month[,1]
-month <- data.frame(month[,-1])
+rownames(region) <- region[,1]
+region <- data.frame(region[,-1])
 
 # Install packages
 install.packages("SOMbrero")
@@ -14,14 +14,14 @@ install.packages("kohonen")
 library(kohonen)
 
 # Normalization of data
-month_scale <- data.frame(scale(month))
-month_scale_matrix <- as.matrix(month_scale)
+region_scale <- data.frame(scale(region))
+region_scale_matrix <- as.matrix(region_scale)
 
 # Training the SOM model
-som_grid <- somgrid(xdim=3, ydim=4, topo="hexagonal")
-som_model1 <- som(month_scale_matrix, grid=som_grid)
+som_grid <- somgrid(xdim=3, ydim=1, topo="hexagonal")
+som_model1 <- som(region_scale_matrix, grid=som_grid)
 str(som_model1)
-som_model2 <- trainSOM(x.data=month_scale, dimension=c(4,3),
+som_model2 <- trainSOM(x.data=region_scale, dimension=c(1,3),
                        nb.save=10, maxit=2000, scaling="none",
                        radius.type="letremy")
 str(som_model2)

@@ -2,7 +2,7 @@
 # reference : https://www.shanelynn.ie/self-organising-maps-for-customer-segmentation-using-r/
 
 # Data loading
-df <- read.csv("D:/Workplace/Environmental_Statistics_with_R/수질데이터분석(논문)/첫번째/전처리 후 데이터/데이터 (2014~2018)/SOM 패턴분석 월별 (영산포-1, 고막원천2-1) (2014~2018).csv", 
+df <- read.csv("D:/Workplace/Environmental_Statistics_with_R/수질데이터분석(논문)/1번째/전처리 후 데이터/SOM 패턴분석 월별 (영산포-1, 고막원천2-1).csv", 
                header=T, sep=",")
 rownames(df) <- df[,1]
 ECTN <- data.frame(df[,-(1:3)])
@@ -18,7 +18,7 @@ ECTN_scale_matrix <- as.matrix(ECTN_scale)
 # Original
 ECTN_matrix <- as.matrix(ECTN)
 
-som_grid <- somgrid(xdim=5, ydim=12, topo="hexagonal")
+som_grid <- somgrid(xdim=7, ydim=12, topo="hexagonal")
 som_model <- som(ECTN_matrix, grid=som_grid)
 
 coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}

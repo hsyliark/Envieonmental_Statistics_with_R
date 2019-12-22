@@ -1,7 +1,7 @@
 ### Reference : http://www.sthda.com/english/wiki/ggcorrplot-visualization-of-a-correlation-matrix-using-ggplot2
 
 ## Reading data
-youngsanpo_1 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/수질데이터분석(논문)/첫번째/전처리 후 데이터/데이터 (2014~2018)/상관분석(영산포-1) (2014~2018).csv",
+youngsanpo_1 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/수질데이터분석(논문)/1번째/전처리 후 데이터/상관분석(영산포-1).csv",
                          header=T, sep=',')
 
 ## Correlation analysis
