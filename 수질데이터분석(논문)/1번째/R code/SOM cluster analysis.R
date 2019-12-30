@@ -2,7 +2,7 @@
 # reference : https://woosa7.github.io/R-Clustering-Kmens-SOM/
 
 # Data loading
-region <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ìˆ˜ì§ˆë°ì´í„°ë¶„ì„(ë…¼ë¬¸)/1ë²ˆì§¸/ì „ì²˜ë¦¬ í›„ ë°ì´í„°/ì§€ì ë³„ í‰ê·  ë°ì´í„°.csv", 
+region <- read.csv("C:/Users/Nier/Desktop/¼öÁúµ¥ÀÌÅÍºÐ¼®(³í¹®)/1¹øÂ°/ÀüÃ³¸® ÈÄ µ¥ÀÌÅÍ/ÁöÁ¡º° Æò±Õ µ¥ÀÌÅÍ.csv", 
                    header=T, sep=",")
 rownames(region) <- region[,1]
 region <- data.frame(region[,-1])

@@ -2,10 +2,10 @@
 # reference : https://www.shanelynn.ie/self-organising-maps-for-customer-segmentation-using-r/
 
 # Data loading
-df <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ìˆ˜ì§ˆë°ì´í„°ë¶„ì„(ë…¼ë¬¸)/1ë²ˆì§¸/ì „ì²˜ë¦¬ í›„ ë°ì´í„°/SOM íŒ¨í„´ë¶„ì„ ì›”ë³„ (ì˜ì‚°í¬-1, ê³ ë§‰ì›ì²œ2-1).csv", 
+df <- read.csv("C:/Users/Nier/Desktop/¼öÁúµ¥ÀÌÅÍºÐ¼®(³í¹®)/1¹øÂ°/ºÐ¼®µ¥ÀÌÅÍ/ºÐ¼®ÀÚ·á(³«µ¿°­)/½Å¹ÝÃµ ÇÕ·ùºÎ/½Å¹ÝÃµ ÇÕ·ùºÎ ÆÐÅÏºÐ¼®.csv", 
                header=T, sep=",")
 rownames(df) <- df[,1]
-ECTN <- data.frame(df[,-(1:3)])
+ECTN <- data.frame(df[,-1])
 
 # Install packages
 install.packages("kohonen")
@@ -18,7 +18,7 @@ ECTN_scale_matrix <- as.matrix(ECTN_scale)
 # Original
 ECTN_matrix <- as.matrix(ECTN)
 
-som_grid <- somgrid(xdim=7, ydim=12, topo="hexagonal")
+som_grid <- somgrid(xdim=4, ydim=12, topo="hexagonal")
 som_model <- som(ECTN_matrix, grid=som_grid)
 
 coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
@@ -41,33 +41,37 @@ library(lmtest)
 # Drawing graph
 par(mfrow=c(2,2))
 attach(ECTN)
-plot.ts(ì˜ì‚°í¬_1.EC, main="ì˜ì‚°í¬-1(EC)")
-plot.ts(ì˜ì‚°í¬_1.TN, main="ì˜ì‚°í¬-1(T-N)")
-plot.ts(ê³ ë§‰ì›ì²œ2_1.EC, main="ê³ ë§‰ì›ì²œ2-1(EC)")
-plot.ts(ê³ ë§‰ì›ì²œ2_1.TN, main="ê³ ë§‰ì›ì²œ2-1(T-N)")
+plot.ts(ÇÕÃµ_TN, main="ÇÕÃµ(T_N)")
+plot.ts(ÇÕÃµ_EC, main="ÇÕÃµ(EC)")
+plot.ts(½Å¹ÝÃµ_TN, main="½Å¹ÝÃµ(T_N)")
+plot.ts(½Å¹ÝÃµ_EC, main="½Å¹ÝÃµ(EC)")
 par(mfrow=c(1,1))
 
 # Time series
 install.packages("forecast")
 require(forecast)
 
-# KPSS test (ì •ìƒì‹œê³„ì—´ì„ ìœ„í•œ ì°¨ë¶„ì‹œì°¨ ì‚°ì¶œ)
-ndiffs(ECTN$ê³ ë§‰ì›ì²œ2_1.EC, alpha=0.05, test=c("kpss")) 
-ndiffs(ECTN$ê³ ë§‰ì›ì²œ2_1.TN, alpha=0.05, test=c("kpss")) 
-ndiffs(ECTN$ì˜ì‚°í¬_1.EC, alpha=0.05, test=c("kpss")) 
-ndiffs(ECTN$ì˜ì‚°í¬_1.TN, alpha=0.05, test=c("kpss")) 
+# KPSS test (Á¤»ó½Ã°è¿­À» À§ÇÑ Â÷ºÐ½ÃÂ÷ °áÁ¤)
+ndiffs(ECTN$ÇÕÃµ_TN, alpha=0.05, test=c("kpss")) 
+ndiffs(ECTN$ÇÕÃµ_EC, alpha=0.05, test=c("kpss")) 
+ndiffs(ECTN$½Å¹ÝÃµ_TN, alpha=0.05, test=c("kpss")) 
+ndiffs(ECTN$½Å¹ÝÃµ_EC, alpha=0.05, test=c("kpss")) 
 
-# ì°¨ë¶„ì´ í•„ìš”í•œ ê²½ìš°ì— í•´ë‹¹
-ECTN$diff1_ê³ ë§‰ì›ì²œ2_1.EC <- diff(ECTN$ê³ ë§‰ì›ì²œ2_1.EC, 1)
-ECTN$diff1_ê³ ë§‰ì›ì²œ2_1.TN <- diff(ECTN$ê³ ë§‰ì›ì²œ2_1.TN, 1)
-ECTN$diff1_ì˜ì‚°í¬_1.EC <- diff(ECTN$ì˜ì‚°í¬_1.EC, 1)
-ECTN$diff1_ì˜ì‚°í¬_1.TN <- diff(ECTN$ì˜ì‚°í¬_1.TN, 1)
+# Â÷ºÐ½ÃÂ÷°¡ ³ª¿Â °æ¿ì¿¡¸¸ ÇØ´ç
+diff1_ÇÕÃµ_TN <- as.data.frame(diff(ECTN$ÇÕÃµ_TN, 1))
+diff1_ÇÕÃµ_EC <- as.data.frame(diff(ECTN$ÇÕÃµ_EC, 1))
+diff1_½Å¹ÝÃµ_TN <- as.data.frame(diff(ECTN$½Å¹ÝÃµ_TN, 1))
+diff1_½Å¹ÝÃµ_EC <- as.data.frame(diff(ECTN$½Å¹ÝÃµ_EC, 1))
+ECTN_diff1 <- cbind(diff1_ÇÕÃµ_TN, diff1_ÇÕÃµ_EC, diff1_½Å¹ÝÃµ_TN, diff1_½Å¹ÝÃµ_EC)
+colnames(ECTN_diff1) <- c('diff1_ÇÕÃµ_TN', 'diff1_ÇÕÃµ_EC', 'diff1_½Å¹ÝÃµ_TN', 'diff1_½Å¹ÝÃµ_EC')
+
 par(mfrow=c(2,2))
-plot.ts(ECTN$diff1_ê³ ë§‰ì›ì²œ2_1.EC, main="ê³ ë§‰ì›ì²œ2-1(EC) 1ì‹œì°¨ ì°¨ë¶„")
-plot.ts(ECTN$diff1_ê³ ë§‰ì›ì²œ2_1.TN, main="ê³ ë§‰ì›ì²œ2-1(T-N) 1ì‹œì°¨ ì°¨ë¶„")
-plot.ts(ECTN$diff1_ì˜ì‚°í¬_1.EC, main="ì˜ì‚°í¬-1(EC) 1ì‹œì°¨ ì°¨ë¶„")
-plot.ts(ECTN$diff1_ì˜ì‚°í¬_1.TN, main="ì˜ì‚°í¬-1(T-N) 1ì‹œì°¨ ì°¨ë¶„")
+plot.ts(ECTN_diff1$diff1_ÇÕÃµ_TN, main="ÇÕÃµ(T_N) 1½ÃÂ÷ Â÷ºÐ")
+plot.ts(ECTN_diff1$diff1_ÇÕÃµ_EC, main="ÇÕÃµ(EC) 1½ÃÂ÷ Â÷ºÐ")
+plot.ts(ECTN_diff1$diff1_½Å¹ÝÃµ_TN, main="½Å¹ÝÃµ(T_N) 1½ÃÂ÷ Â÷ºÐ")
+plot.ts(ECTN_diff1$diff1_½Å¹ÝÃµ_EC, main="½Å¹ÝÃµ(EC) 1½ÃÂ÷ Â÷ºÐ")
+par(mfrow=c(1,1))
 
-# ì¸ê³¼ê´€ê³„ ê²€ì • (ê²°ê³¼ ~ ì›ì¸)
-grangertest(ECTN$ê³ ë§‰ì›ì²œ2_1.EC ~ ECTN$ì˜ì‚°í¬_1.EC, order=3)
-grangertest(ECTN$ê³ ë§‰ì›ì²œ2_1.TN ~ ECTN$ì˜ì‚°í¬_1.TN, order=3)
+# ÀÎ°ú°ü°è ºÐ¼® (°á°ú ~ ¿øÀÎ)
+grangertest(ECTN_diff1$diff1_½Å¹ÝÃµ_TN ~ ECTN_diff1$diff1_ÇÕÃµ_TN, order=3)
+grangertest(ECTN_diff1$diff1_½Å¹ÝÃµ_EC ~ ECTN_diff1$diff1_ÇÕÃµ_EC, order=3)
