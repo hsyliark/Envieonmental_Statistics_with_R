@@ -2,10 +2,10 @@
 # reference : https://www.shanelynn.ie/self-organising-maps-for-customer-segmentation-using-r/
 
 # Data loading
-df <- read.csv("C:/Users/Nier/Desktop/수질데이터분석(논문)/1번째/분석데이터/분석자료(낙동강)/신반천 합류부/신반천 합류부 패턴분석.csv", 
+df <- read.csv("C:/Users/Nier/Desktop/수질데이터분석(논문)/1번째/전처리 후 데이터/SOM 패턴분석 월별 (영산포-1, 고막원천2-1).csv", 
                header=T, sep=",")
 rownames(df) <- df[,1]
-ECTN <- data.frame(df[,-1])
+ECTN <- data.frame(df[,-(1:3)])
 
 # Install packages
 install.packages("kohonen")
@@ -18,7 +18,7 @@ ECTN_scale_matrix <- as.matrix(ECTN_scale)
 # Original
 ECTN_matrix <- as.matrix(ECTN)
 
-som_grid <- somgrid(xdim=4, ydim=12, topo="hexagonal")
+som_grid <- somgrid(xdim=7, ydim=12, topo="hexagonal")
 som_model <- som(ECTN_matrix, grid=som_grid)
 
 coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
@@ -41,10 +41,10 @@ library(lmtest)
 # Drawing graph
 par(mfrow=c(2,2))
 attach(ECTN)
-plot.ts(합천_TN, main="합천(T_N)")
-plot.ts(합천_EC, main="합천(EC)")
-plot.ts(신반천_TN, main="신반천(T_N)")
-plot.ts(신반천_EC, main="신반천(EC)")
+plot.ts(영산포_1.EC, main="영산포-1(EC)")
+plot.ts(영산포_1.TN, main="영산포-1(T-N)")
+plot.ts(고막원천2_1.EC, main="고막원천2-1(EC)")
+plot.ts(고막원천2_1.TN, main="고막원천2-1(T-N)")
 par(mfrow=c(1,1))
 
 # Time series
@@ -52,26 +52,23 @@ install.packages("forecast")
 require(forecast)
 
 # KPSS test (정상시계열을 위한 차분시차 결정)
-ndiffs(ECTN$합천_TN, alpha=0.05, test=c("kpss")) 
-ndiffs(ECTN$합천_EC, alpha=0.05, test=c("kpss")) 
-ndiffs(ECTN$신반천_TN, alpha=0.05, test=c("kpss")) 
-ndiffs(ECTN$신반천_EC, alpha=0.05, test=c("kpss")) 
+ndiffs(ECTN$영산포_1.EC, alpha=0.05, test=c("kpss")) 
+ndiffs(ECTN$영산포_1.TN, alpha=0.05, test=c("kpss")) 
+ndiffs(ECTN$고막원천2_1.EC, alpha=0.05, test=c("kpss")) 
+ndiffs(ECTN$고막원천2_1.TN, alpha=0.05, test=c("kpss")) 
 
 # 차분시차가 나온 경우에만 해당
-diff1_합천_TN <- as.data.frame(diff(ECTN$합천_TN, 1))
-diff1_합천_EC <- as.data.frame(diff(ECTN$합천_EC, 1))
-diff1_신반천_TN <- as.data.frame(diff(ECTN$신반천_TN, 1))
-diff1_신반천_EC <- as.data.frame(diff(ECTN$신반천_EC, 1))
-ECTN_diff1 <- cbind(diff1_합천_TN, diff1_합천_EC, diff1_신반천_TN, diff1_신반천_EC)
-colnames(ECTN_diff1) <- c('diff1_합천_TN', 'diff1_합천_EC', 'diff1_신반천_TN', 'diff1_신반천_EC')
-
+ECTN$diff1_영산포_1.EC <- diff(ECTN$영산포_1.EC, 1)
+ECTN$diff1_영산포_1.TN <- diff(ECTN$영산포_1.TN, 1)
+ECTN$diff1_고막원천2_1.EC <- diff(ECTN$고막원천2_1.EC, 1)
+ECTN$diff1_고막원천2_1.TN <- diff(ECTN$고막원천2_1.TN, 1)
 par(mfrow=c(2,2))
-plot.ts(ECTN_diff1$diff1_합천_TN, main="합천(T_N) 1시차 차분")
-plot.ts(ECTN_diff1$diff1_합천_EC, main="합천(EC) 1시차 차분")
-plot.ts(ECTN_diff1$diff1_신반천_TN, main="신반천(T_N) 1시차 차분")
-plot.ts(ECTN_diff1$diff1_신반천_EC, main="신반천(EC) 1시차 차분")
+plot.ts(ECTN$diff1_영산포_1.EC, main="영산포-1(EC) 1시차 차분")
+plot.ts(ECTN$diff1_영산포_1.TN, main="영산포-1(T-N) 1시차 차분")
+plot.ts(ECTN$diff1_고막원천2_1.EC, main="고막원천2-1(EC) 1시차 차분")
+plot.ts(ECTN$diff1_고막원천2_1.TN, main="고막원천2-1(T-N) 1시차 차분")
 par(mfrow=c(1,1))
 
 # 인과관계 분석 (결과 ~ 원인)
-grangertest(ECTN_diff1$diff1_신반천_TN ~ ECTN_diff1$diff1_합천_TN, order=3)
-grangertest(ECTN_diff1$diff1_신반천_EC ~ ECTN_diff1$diff1_합천_EC, order=3)
+grangertest(ECTN$고막원천2_1.EC ~ ECTN$영산포_1.EC, order=3)
+grangertest(ECTN$고막원천2_1.TN ~ ECTN$영산포_1.TN, order=3)
