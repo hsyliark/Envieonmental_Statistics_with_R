@@ -1,5 +1,5 @@
 ### Reading data
-water1 <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºĞ¼®_hsy/ºĞ¼®ÀÚ·á/csvÀÚ·á/8_¿µ»êÆ÷(5³â).csv", sep=",", header=T)
+water1 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„/ë¶„ì„ìë£Œ/csvìë£Œ/1_ë‹´ì–‘(5ë…„).csv", sep=",", header=T)
 water1_date <- water1[,1:3]
 water1_quality <- water1[,-(1:3)]
 
@@ -11,12 +11,12 @@ water1_quality_1 <- water1_quality_1[,-14]
 water_scale <- scale(water1_quality_1)
 water1_scale <- cbind(water1_date, water_scale)
 
-setwd('C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºĞ¼®_hsy/ºĞ¼®ÀÚ·á/Ç¥ÁØÈ­')
-write.csv(water1_scale, file='8_¿µ»êÆ÷(5³â)_Ç¥ÁØÈ­.csv', row.names=F)
+setwd('D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„/ë¶„ì„ìë£Œ/í‘œì¤€í™”')
+write.csv(water1_scale, file='2_ìš°ì¹˜(5ë…„)_í‘œì¤€í™”.csv', row.names=F)
 
 water_scale <- as.data.frame(water_scale)
 
-all_site <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºĞ¼®_hsy/Åë°è°ü·ÃÀÚ·á/ÀüÃ¼ÁöÁ¡.csv", sep=",", header=T)
+all_site <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„/í†µê³„ê´€ë ¨ìë£Œ/ì „ì²´ì§€ì .csv", sep=",", header=T)
 all_site <- all_site[,-11]
 all_site <- all_site[,-14]
 all_site <- all_site[,-(18:19)]

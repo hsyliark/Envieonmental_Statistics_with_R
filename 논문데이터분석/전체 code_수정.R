@@ -42,14 +42,14 @@ library(psych)
 describe(water_scale_1)
 
 # Correlation
-round(cor(water5_2),3) # pearson
-round(cor(water5_2, method="spearman"),3) # spearman
+round(cor(water_scale_1),3) # pearson
+round(cor(water_scale_1, method="spearman"),3) # spearman
 
 # KMO and Bartlett's test
 KMO(water_scale_1)
 cortest.bartlett(cor(water_scale_1, method="spearman"), n=nrow(water_scale_1))
 
-# Number of principal components (주성분분석)
+# Number of principal components 
 water_pca <- prcomp(water_scale_1, center=T, scale.=T)
 water_pca
 screeplot(water_pca, type="l")
@@ -57,18 +57,17 @@ biplot(water_pca, main="Biplot")
 summary(water_pca)
 water_pca$sdev^2 # Eigenvalue with respect to principal components
 
-# Component matrix (주성분회전)
+# Component matrix 
 PCA <- principal(water_scale_1, nfactor=3, rotate="none", score=T) # The factor is the number of PC
 PCA
-PCA_rot <- principal(water_scale_1, nfactor=2, rotate="varimax", score=T) # varimax rotate 
+PCA_rot <- principal(water_scale_1, nfactor=3, rotate="varimax", score=T) # varimax rotate 
 PCA_rot
 biplot(PCA_rot, main="Biplot")
 
 
+
 ## normalization
 water_scale <- scale(water)
-setwd('C:/Users/Nier/Desktop/논문데이터분석_hsy/분석자료 송부/표준화')
-write.csv(water, file='water.csv', row.names=F)
 
 
 
@@ -110,7 +109,7 @@ coef_lars2
 # Select regression model with Cp
 plot(object, plottype="Cp")
 round(object$beta, 4)
-coef(object, s=5)
+coef(object, s=11)
 
 # Calculate R-square
 beta_list <- predict(object, s=16, newdata=X, type="coefficients")
@@ -151,8 +150,8 @@ library(lmtest)
 # Drawing graph
 par(mfrow=c(1,2))
 attach(water1_scale)
-plot.ts(pH, main="담양(pH)")
-plot.ts(BOD, main="담양(BOD)")
+plot.ts(pH, main="????(pH)")
+plot.ts(BOD, main="????(BOD)")
 par(mfrow=c(1,1))
 
 # Install packages
@@ -167,8 +166,8 @@ ndiffs(water1_scale$BOD, alpha=0.05, test=c("kpss")) # 1
 diff_pH <- diff(water1_scale$pH, 1)
 diff_BOD <- diff(water1_scale$BOD, 1)
 par(mfrow=c(1,2))
-plot.ts(diff_pH, main="담양(pH) 시차1 차분")
-plot.ts(diff_BOD, main="담양(BOD) 시차1 차분")
+plot.ts(diff_pH, main="????(pH) ????1 ????")
+plot.ts(diff_BOD, main="????(BOD) ????1 ????")
 par(mfrow=c(1,1))
 
 grangertest(diff_BOD ~ diff_pH, order=1)
