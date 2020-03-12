@@ -1,0 +1,84 @@
+> # KMO and Bartlett's test
+> KMO(water_scale_1)
+Kaiser-Meyer-Olkin factor adequacy
+Call: KMO(r = water_scale_1)
+Overall MSA =  0.67
+MSA for each item = 
+  BOD   COD    SS   T_N   T_P   TOC NH3_N PO4_P Chl_a logTC logFC 
+ 0.79  0.62  0.75  0.60  0.54  0.69  0.60  0.62  0.86  0.60  0.65 
+> cortest.bartlett(cor(water_scale_1, method="spearman"), n=nrow(water_scale_1))
+$chisq
+[1] 573.9433
+
+$p.value
+[1] 1.679366e-87
+
+$df
+[1] 55
+
+
+
+
+Principal Components Analysis
+Call: principal(r = water_scale_1, nfactors = 2, rotate = "varimax", 
+    scores = T)
+Standardized loadings (pattern matrix) based upon correlation matrix
+        RC1   RC2   h2   u2 com
+BOD    0.70 -0.53 0.76 0.24 1.9
+COD    0.84 -0.25 0.76 0.24 1.2
+SS     0.84  0.17 0.73 0.27 1.1
+T_N    0.24 -0.68 0.52 0.48 1.2
+T_P    0.72  0.38 0.66 0.34 1.5
+TOC    0.89 -0.19 0.83 0.17 1.1
+NH3_N  0.47 -0.51 0.48 0.52 2.0
+PO4_P -0.20  0.71 0.55 0.45 1.2
+Chl_a  0.63 -0.57 0.72 0.28 2.0
+logTC  0.17  0.82 0.71 0.29 1.1
+logFC  0.13  0.89 0.80 0.20 1.0
+
+                       RC1  RC2
+SS loadings           3.95 3.56
+Proportion Var        0.36 0.32
+Cumulative Var        0.36 0.68
+Proportion Explained  0.53 0.47
+Cumulative Proportion 0.53 1.00
+
+Mean item complexity =  1.4
+Test of the hypothesis that 2 components are sufficient.
+
+The root mean square of the residuals (RMSR) is  0.12 
+ with the empirical chi square  90.5  with prob <  5e-07 
+
+Fit based upon off diagonal values = 0.93
+
+
+
+
+> set.seed(1)
+> cv.lasso <- cv.glmnet(X, y, alpha=1)
+> plot(cv.lasso)
+> bestlam.lasso <- cv.lasso$lambda.min
+> bestlam.lasso
+[1] 0.03889828
+> 
+> best.lasso <- glmnet(X, y, alpha=1, lambda=sh)
+> predict(best.lasso, s=bestlam.lasso, type="coefficients")
+17 x 1 sparse Matrix of class "dgCMatrix"
+                        1
+(Intercept)  5.841518e-18
+pH          -7.480909e-02
+DO           .           
+Temp         2.256905e-03
+EC           7.554594e-02
+BOD          .           
+COD          6.219125e-01
+SS           5.562622e-02
+T_N          .           
+T_P          2.614016e-01
+NH3_N        .           
+PO4_P       -2.081985e-01
+Chl_a        .           
+Flow         1.078436e-03
+Rain         .           
+logTC        .           
+logFC        2.412017e-02

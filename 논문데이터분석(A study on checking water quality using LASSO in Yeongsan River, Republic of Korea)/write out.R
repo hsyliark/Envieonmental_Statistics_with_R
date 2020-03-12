@@ -1,5 +1,5 @@
 ### Reading data
-water1 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„/ë¶„ì„ìë£Œ/csvìë£Œ/12_ë¬´ì•ˆ1(5ë…„).csv", sep=",", header=T)
+water1 <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºĞ¼®(¸Ş¸ğÃß°¡)/ºĞ¼®ÀÚ·á/csvÀÚ·á/11_ÇÔÆò(5³â).csv", sep=",", header=T)
 water1_date <- water1[,1:3]
 water1_quality <- water1[,-(1:3)]
 
@@ -11,16 +11,18 @@ water1_quality_1 <- water1_quality_1[,-14]
 water_scale <- scale(water1_quality_1)
 water1_scale <- cbind(water1_date, water_scale)
 
-setwd('D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„/ë¶„ì„ìë£Œ/í‘œì¤€í™”')
-write.csv(water1_scale, file='2_ìš°ì¹˜(5ë…„)_í‘œì¤€í™”.csv', row.names=F)
-
 water_scale <- as.data.frame(water_scale)
 
-all_site <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„/í†µê³„ê´€ë ¨ìë£Œ/ì „ì²´ì§€ì .csv", sep=",", header=T)
+water_scale_1 <- water_scale[,-(1:4)]
+water_scale_1 <- water_scale_1[,-(10:11)] # Delete (pH, DO, EC, Temp, Flow, Rain) for PCA
+
+
+
+setwd('C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºĞ¼®(A study on checking water quality using LASSO in Yeongsan River  Republic of Korea)/ºĞ¼®ÀÚ·á/Ç¥ÁØÈ­')
+write.csv(water1_scale, file='12_¹«¾È1(5³â)_Ç¥ÁØÈ­.csv', row.names=F)
+
+all_site <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºĞ¼®(A study on checking water quality using LASSO in Yeongsan River  Republic of Korea)/Åë°è°ü·ÃÀÚ·á/ÀüÃ¼ÁöÁ¡.csv", sep=",", header=T)
 all_site <- all_site[,-11]
 all_site <- all_site[,-14]
 all_site <- all_site[,-(18:19)]
 all_site_scale <- as.data.frame(scale(all_site))
-
-water_scale_1 <- water_scale[,-(1:4)]
-water_scale_1 <- water_scale_1[,-(10:11)] # Delete (pH, DO, EC, Temp, Flow, Rain) for PCA

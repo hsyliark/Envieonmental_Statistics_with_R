@@ -60,7 +60,7 @@ water_pca$sdev^2 # Eigenvalue with respect to principal components
 # Component matrix 
 PCA <- principal(water_scale_1, nfactor=3, rotate="none", score=T) # The factor is the number of PC
 PCA
-PCA_rot <- principal(water_scale_1, nfactor=3, rotate="varimax", score=T) # varimax rotate 
+PCA_rot <- principal(water_scale_1, nfactor=2, rotate="varimax", score=T) # varimax rotate 
 PCA_rot
 biplot(PCA_rot, main="Biplot")
 
@@ -94,8 +94,8 @@ library(lars)
 colnames(water_scale)
 
 # Lasso (Variation of coefficient with s(threshold))
-X <- as.matrix(water_scale[,-6])
-y <- as.matrix(water_scale[,6])
+X <- as.matrix(water_scale[,-12])
+y <- as.matrix(water_scale[,12])
 object <- lars(X, y, type="lasso")
 plot(object) 
 
