@@ -1,0 +1,16 @@
+SPSS와 R의 결과는 완벽하게 동일함...
+
+
+
+reference :
+ 
+An Introduction to Statistical Learning with Applications in R
+(http://faculty.marshall.usc.edu/gareth-james/ISL/)
+
+Statistical Learning with Sparsity: The Lasso and Generalization
+(https://books.google.co.kr/books?hl=ko&lr=&id=f-A_CQAAQBAJ&oi=fnd&pg=PP1&dq=tibshirani+lasso&ots=G4ZNz1jVW3&sig=GUn56PH31_KV2gBBFHbivWL9sv4&redir_esc=y#v=onepage&q=tibshirani%20lasso&f=false)
+
+
+
+
+
