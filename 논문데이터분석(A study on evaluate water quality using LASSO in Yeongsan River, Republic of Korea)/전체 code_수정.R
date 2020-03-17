@@ -94,8 +94,8 @@ library(lars)
 colnames(water_scale)
 
 # Lasso (Variation of coefficient with s(threshold))
-X <- as.matrix(water_scale[,-12])
-y <- as.matrix(water_scale[,12])
+X <- as.matrix(water_scale[,-6])
+y <- as.matrix(water_scale[,6])
 object <- lars(X, y, type="lasso")
 plot(object) 
 
@@ -137,6 +137,23 @@ bestlam.lasso
 
 best.lasso <- glmnet(X, y, alpha=1, lambda=sh)
 predict(best.lasso, s=bestlam.lasso, type="coefficients")
+
+
+# Elastic-net regression
+# reference : https://daviddalpiaz.github.io/r4sl/elastic-net.html
+install.packages("caret")
+library(caret)
+set.seed(42)
+cv_10 = trainControl(method = "cv", number = 10)
+hit_elnet = train(COD ~ ., data = water_scale, method = "glmnet", trControl = cv_10)
+hit_elnet
+plot(hit_elnet)
+
+sh <- 10^seq(10,-2,length=100)
+X <- as.matrix(water_scale[,-6])
+y <- as.matrix(water_scale[,6])
+best.elastic <- glmnet(X, y, alpha=1, lambda=sh)
+predict(best.elastic, s=0.01781786, type="coefficients")
 
 
 

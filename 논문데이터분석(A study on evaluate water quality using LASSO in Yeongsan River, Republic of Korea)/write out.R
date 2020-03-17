@@ -1,5 +1,5 @@
 ### Reading data
-water1 <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(메모추가)/분석자료/csv자료/11_함평(5년).csv", sep=",", header=T)
+water1 <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(Elastic 추가)/분석자료/csv자료/3_광주1(5년).csv", sep=",", header=T)
 water1_date <- water1[,1:3]
 water1_quality <- water1[,-(1:3)]
 
