@@ -30,7 +30,7 @@ som_model <- som(ECTN_matrix, grid=som_grid)
 
 coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
 
-par(mfrow=c(2,2))
+par(mfrow=c(3,3))
 for (i in 1:4) {
   plot(som_model, type="property", property=getCodes(som_model)[,i], 
        main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}

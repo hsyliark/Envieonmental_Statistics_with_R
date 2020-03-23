@@ -1,0 +1,60 @@
+광산 결과
+
+1) : TC~ ...
+
+9 x 1 sparse Matrix of class "dgCMatrix"
+                        1
+(Intercept) -2.981630e-17
+DO          -3.690628e-02
+SS           5.723443e-02
+WT          -2.809849e-01
+EC          -9.116514e-02
+PO4P         9.676222e-02
+FC           7.841713e-01
+Flow        -1.943556e-02
+Rain         6.379462e-02
+
+2) : FC~ ...
+
+9 x 1 sparse Matrix of class "dgCMatrix"
+                        1
+(Intercept) -3.269691e-17
+DO          -7.974276e-02
+SS           3.315846e-02
+WT           1.643963e-01
+EC           1.205349e-02
+TC           7.673806e-01
+PO4P         2.275488e-03
+Flow         9.250976e-02
+Rain        -1.008623e-02
+
+
+우치 결과
+
+1) : TC~ ...
+
+9 x 1 sparse Matrix of class "dgCMatrix"
+                        1
+(Intercept) -9.376784e-17
+DO          -3.778429e-02
+SS          -4.190026e-02
+WT           .           
+EC           .           
+PO4P         .           
+FC           4.993701e-01
+Flow         2.830659e-01
+Rain         5.177629e-02
+
+2) : FC~ ...
+
+9 x 1 sparse Matrix of class "dgCMatrix"
+                        1
+(Intercept) -4.279671e-17
+DO          -3.512270e-02
+SS           1.522455e-02
+WT           .           
+EC          -2.439031e-02
+TC           5.177673e-01
+PO4P         7.359391e-02
+Flow         2.154645e-01
+Rain        -2.718760e-02
