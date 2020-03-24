@@ -1,0 +1,115 @@
+# ±¤»ê
+
+> # KMO and Bartlett's test
+> KMO(water1_boxcox_scale)
+Kaiser-Meyer-Olkin factor adequacy
+Call: KMO(r = water1_boxcox_scale)
+Overall MSA =  0.81
+MSA for each item = 
+ p.H   DO  BOD  COD   SS   TN  T.P  TOC   WT   EC   TC NH3N PO4P Chla   FC Flow Rain 
+0.85 0.80 0.88 0.84 0.74 0.80 0.70 0.85 0.72 0.90 0.69 0.82 0.66 0.87 0.76 0.93 0.89 
+> cortest.bartlett(cor(water1_boxcox_scale), n=nrow(water1_boxcox_scale))
+$chisq
+[1] 7263.191
+$p.value
+[1] 0
+$df
+[1] 136
+
+Principal Components Analysis
+Call: principal(r = water1_boxcox_scale, nfactors = 2, rotate = "varimax", 
+    scores = T)
+Standardized loadings (pattern matrix) based upon correlation matrix
+       RC1   RC2   h2   u2 com
+p.H   0.44 -0.18 0.22 0.78 1.3
+DO    0.36 -0.64 0.53 0.47 1.6
+BOD   0.86  0.08 0.75 0.25 1.0
+COD   0.85  0.13 0.74 0.26 1.0
+SS    0.48  0.55 0.54 0.46 2.0
+TN    0.70 -0.46 0.70 0.30 1.7
+T.P   0.48  0.57 0.56 0.44 1.9
+TOC   0.84  0.04 0.71 0.29 1.0
+WT   -0.23  0.47 0.27 0.73 1.4
+EC    0.63 -0.55 0.70 0.30 2.0
+TC   -0.03  0.74 0.55 0.45 1.0
+NH3N  0.74 -0.32 0.66 0.34 1.4
+PO4P  0.10  0.58 0.35 0.65 1.1
+Chla  0.62 -0.28 0.46 0.54 1.4
+FC   -0.11  0.82 0.68 0.32 1.0
+Flow -0.47  0.62 0.60 0.40 1.9
+Rain -0.15  0.46 0.23 0.77 1.2
+
+                       RC1  RC2
+SS loadings           5.11 4.16
+Proportion Var        0.30 0.24
+Cumulative Var        0.30 0.55
+Proportion Explained  0.55 0.45
+Cumulative Proportion 0.55 1.00
+
+Mean item complexity =  1.4
+Test of the hypothesis that 2 components are sufficient.
+
+The root mean square of the residuals (RMSR) is  0.13 
+ with the empirical chi square  2506.55  with prob <  0 
+
+Fit based upon off diagonal values = 0.87
+
+
+
+# ¿ìÄ¡
+
+> # KMO and Bartlett's test
+> KMO(water1_boxcox_scale)
+Kaiser-Meyer-Olkin factor adequacy
+Call: KMO(r = water1_boxcox_scale)
+Overall MSA =  0.84
+MSA for each item = 
+ p.H   DO  BOD  COD   SS   TN  T.P  TOC   WT   EC   TC NH3N PO4P Chla   FC Flow Rain 
+0.92 0.82 0.85 0.86 0.83 0.72 0.85 0.85 0.76 0.88 0.80 0.76 0.83 0.89 0.84 0.84 0.89 
+> cortest.bartlett(cor(water1_boxcox_scale), n=nrow(water1_boxcox_scale))
+$chisq
+[1] 6121.493
+$p.value
+[1] 0
+$df
+[1] 136
+
+Principal Components Analysis
+Call: principal(r = water1_boxcox_scale, nfactors = 2, rotate = "varimax", 
+    scores = T)
+Standardized loadings (pattern matrix) based upon correlation matrix
+       RC1   RC2    h2   u2 com
+p.H  -0.62  0.15 0.404 0.60 1.1
+DO   -0.57 -0.52 0.598 0.40 2.0
+BOD  -0.34  0.79 0.743 0.26 1.4
+COD  -0.06  0.92 0.854 0.15 1.0
+SS    0.08  0.77 0.595 0.41 1.0
+TN   -0.05 -0.45 0.204 0.80 1.0
+T.P   0.22  0.71 0.553 0.45 1.2
+TOC  -0.15  0.87 0.772 0.23 1.1
+WT    0.54  0.60 0.661 0.34 2.0
+EC   -0.77 -0.05 0.602 0.40 1.0
+TC    0.71  0.04 0.511 0.49 1.0
+NH3N  0.30  0.00 0.088 0.91 1.0
+PO4P  0.73  0.00 0.532 0.47 1.0
+Chla -0.61  0.62 0.751 0.25 2.0
+FC    0.71  0.08 0.510 0.49 1.0
+Flow  0.85  0.01 0.730 0.27 1.0
+Rain  0.36 -0.01 0.128 0.87 1.0
+
+                       RC1  RC2
+SS loadings           4.66 4.58
+Proportion Var        0.27 0.27
+Cumulative Var        0.27 0.54
+Proportion Explained  0.50 0.50
+Cumulative Proportion 0.50 1.00
+
+Mean item complexity =  1.2
+Test of the hypothesis that 2 components are sufficient.
+
+The root mean square of the residuals (RMSR) is  0.11 
+ with the empirical chi square  1661.06  with prob <  2.7e-279 
+
+Fit based upon off diagonal values = 0.9
+
+

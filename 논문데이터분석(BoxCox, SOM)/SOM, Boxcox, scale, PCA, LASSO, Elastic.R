@@ -1,5 +1,32 @@
 water <- read.csv("C:/Users/Nier/Desktop/논문데이터분석/논문데이터분석(BoxCox, SOM)/데이터(표준화 요청)/csv 파일/우치rawdata.csv", sep=",", header=T)
-water1 <- water[,c(2,5,9,10,11,13,15,16,17)]
+water1 <- water[1:510,1:17]
+water1 <- water
+
+
+## SOM(Self-Organizing-Map)
+# Install packages
+install.packages("kohonen")
+library(kohonen)
+
+# Normalization of data
+water_scale <- data.frame(scale(water))
+water_scale_matrix <- as.matrix(water_scale)
+
+# Original
+water_matrix <- as.matrix(water)
+water1_matrix <- water_matrix[,c(2,5,9,10,11,13,15,16,17)]
+
+som_grid <- somgrid(xdim=22, ydim=22, topo="hexagonal")
+som_model <- som(water1_matrix, grid=som_grid)
+
+coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
+
+par(mfrow=c(3,3))
+for (i in 1:9) {
+  plot(som_model, type="property", property=getCodes(som_model)[,i], 
+       main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}
+par(mfrow=c(1,1))
+
 
 ## Box-Cox Transformation
 # reference : https://otexts.com/fppkr/transformations.html
@@ -27,6 +54,38 @@ water1_boxcox_scale <- scale(water1_boxcox)
 # Checking normality
 qqnorm(water1_boxcox_scale[,2]) ; qqline(water1_boxcox_scale[,2])
 shapiro.test(water1_boxcox_scale[,2])
+
+
+## Principal Component Analysis
+# Install and Attach required library
+install.packages("psych") # for descriptive statistics
+library(psych)
+
+# Descriptive statistics
+describe(water5[,-(1:3)])
+
+# Correlation
+round(cor(water1_boxcox_scale),3) # pearson
+round(cor(water1_boxcox_scale, method="spearman"),3) # spearman
+
+# KMO and Bartlett's test
+KMO(water1_boxcox_scale)
+cortest.bartlett(cor(water1_boxcox_scale), n=nrow(water1_boxcox_scale))
+
+# Number of principal components (주성분분석)
+water_pca <- prcomp(water1_boxcox_scale, center=T, scale.=T)
+water_pca
+screeplot(water_pca, type="l")
+biplot(water_pca, main="Biplot")
+summary(water_pca)
+water_pca$sdev^2 # Eigenvalue with respect to principal components
+
+# Component matrix (주성분회전)
+PCA <- principal(water1_boxcox_scale, nfactor=3, rotate="none", score=T) # The factor is the number of PC
+PCA
+PCA_rot <- principal(water1_boxcox_scale, nfactor=2, rotate="varimax", score=T) # varimax rotate 
+PCA_rot
+biplot(PCA_rot)
 
 
 ## Lasso Regression
