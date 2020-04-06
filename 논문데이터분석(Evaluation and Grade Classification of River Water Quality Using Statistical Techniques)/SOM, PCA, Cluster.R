@@ -1,5 +1,5 @@
 ## PCA
-data_all <- read.csv("C:/Users/HSY/Desktop/ë…¼ë¬¸ë¶„ì„ìžë£Œ ì†¡ë¶€_hsy/ì£¼ì„±ë¶„ë¶„ì„.csv", sep=",", header=T)
+data_all <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºÐ¼®_hsy/³í¹®µ¥ÀÌÅÍºÐ¼®(Evaluation and Grade Classification of River Water Quality Using Statistical Techniques)/ÁÖ¼ººÐºÐ¼®.csv", sep=",", header=T)
 data_all_scale <- scale(data_all)
 
 ## Principal Component Analysis
@@ -61,7 +61,7 @@ par(mfrow=c(1,1))
 # reference1 : https://data-make.tistory.com/91
 # reference2 : https://www.statmethods.net/advstats/cluster.html
 
-water <- read.csv("C:/Users/HSY/Desktop/ë…¼ë¬¸ë¶„ì„ìžë£Œ ì†¡ë¶€_hsy/êµ°ì§‘ë¶„ì„.csv", sep=",", header=T)
+water <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºÐ¼®_hsy/³í¹®µ¥ÀÌÅÍºÐ¼®(Evaluation and Grade Classification of River Water Quality Using Statistical Techniques)/cluster.csv", sep=",", header=T)
 water_name <- water[,1]
 water <- water[,-1]
 rownames(water) <- water_name
@@ -82,3 +82,46 @@ nc <- NbClust(water_scale, distance="euclidean", method="ward.D")
 par(mfrow=c(1,1))
 plot(fit)
 rect.hclust(fit, k=2)
+
+
+
+## SOM cluster
+# reference : https://woosa7.github.io/R-Clustering-Kmens-SOM/
+
+# Install packages
+install.packages("SOMbrero")
+library(SOMbrero)
+install.packages("kohonen")
+library(kohonen)
+
+# Normalization of data
+water_scale <- data.frame(scale(water))
+water_scale_matrix <- as.matrix(water_scale)
+
+# Training the SOM model
+som_grid <- somgrid(xdim=1, ydim=4, topo="hexagonal")
+som_model1 <- som(water_scale_matrix, grid=som_grid)
+str(som_model1)
+som_model2 <- trainSOM(x.data=water_scale, dimension=c(4,1),
+                       nb.save=10, maxit=2000, scaling="none",
+                       radius.type="letremy")
+str(som_model2)
+
+# Visualization
+plot(som_model1, main="feature distribution")
+table(som_model2$clustering)
+plot(som_model2, what="prototypes", type="umatrix", print.title=T)
+plot(som_model2, what="obs", type="names", print.title=T, scale=c(1,1))
+plot(som_model1, type="counts", main="cluster size")
+
+par(mfrow=c(1,2))
+plot(som_model1, main="feature distribution")
+plot(som_model2, what="obs", type="names", print.title=T, scale=c(1,1))
+par(mfrow=c(1,1))
+
+# Clustering results
+clusters <- superClass(model, k=5)
+summary(clusters)
+plot(clusters)
+plot(clusters, type="dendro3d")
+
