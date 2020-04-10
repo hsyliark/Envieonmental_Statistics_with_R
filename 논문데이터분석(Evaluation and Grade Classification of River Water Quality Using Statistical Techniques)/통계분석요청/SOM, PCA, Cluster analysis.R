@@ -1,5 +1,6 @@
 ## PCA
-data_all <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºÐ¼®_hsy/³í¹®µ¥ÀÌÅÍºÐ¼®(Evaluation and Grade Classification of River Water Quality Using Statistical Techniques)/ÁÖ¼ººÐºÐ¼®.csv", sep=",", header=T)
+data_all <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(Evaluation and Grade Classification of River Water Quality Using Statistical Techniques)/í†µê³„ë¶„ì„ìš”ì²­/ìš”ì¸ë¶„ì„,íŒ¨í„´ë¶„ì„.csv", sep=",", header=T)
+data_all <- data_all[,-12]
 data_all_scale <- scale(data_all)
 
 ## Principal Component Analysis
@@ -30,7 +31,7 @@ water_pca$sdev^2 # Eigenvalue with respect to principal components
 # Component matrix 
 PCA <- principal(data_all_scale, nfactor=3, rotate="none", score=T) # The factor is the number of PC
 PCA
-PCA_rot <- principal(data_all_scale, nfactor=3, rotate="varimax", score=T) # varimax rotate 
+PCA_rot <- principal(data_all_scale, nfactor=4, rotate="varimax", score=T) # varimax rotate 
 PCA_rot
 biplot(PCA_rot)
 
@@ -44,12 +45,12 @@ library(kohonen)
 
 data_all_matrix <- as.matrix(data_all)
 
-som_grid <- somgrid(xdim=40, ydim=40, topo="hexagonal")
+som_grid <- somgrid(xdim=70, ydim=70, topo="hexagonal")
 som_model <- som(data_all_matrix, grid=som_grid)
 
 coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
 
-par(mfrow=c(2,2))
+par(mfrow=c(1,1))
 for (i in 1:11) {
   plot(som_model, type="property", property=getCodes(som_model)[,i], 
        main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}
@@ -61,7 +62,7 @@ par(mfrow=c(1,1))
 # reference1 : https://data-make.tistory.com/91
 # reference2 : https://www.statmethods.net/advstats/cluster.html
 
-water <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºÐ¼®_hsy/³í¹®µ¥ÀÌÅÍºÐ¼®(Evaluation and Grade Classification of River Water Quality Using Statistical Techniques)/cluster.csv", sep=",", header=T)
+water <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(Evaluation and Grade Classification of River Water Quality Using Statistical Techniques)/í†µê³„ë¶„ì„ìš”ì²­/êµ°ì§‘ë¶„ì„.csv", sep=",", header=T)
 water_name <- water[,1]
 water <- water[,-1]
 rownames(water) <- water_name
