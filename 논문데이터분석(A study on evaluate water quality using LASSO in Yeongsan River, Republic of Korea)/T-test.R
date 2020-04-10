@@ -1,19 +1,33 @@
-## Making data
-# ¿ìÄ¡, È²·æ°­3-1, ±¤»ê, Áö¼®Ãµ4, ³ªÁÖ, ¹«¾È2, Å½Áø°­3, ÁÖ¾Ï´ï, ¿äÃµ-1 ¼øÀ¸·Î ÀÔ·Â
-before_BOD <- c(1.4, 2.8, 4.7, 2.1, 5.1, 1.6, 1.2, 0.7, 1.2) # 2020³â 1¿ù
-after_BOD <- c(2.0, 3.1, 6.1, 1.7, 6.0, 1.6, 1.0, 0.7, 1.4) # 2020³â 2¿ù
+## Test with BOD
+before_BOD <- c(3.8, 3.8, 3.9, 6.2, 5.4, 5.2, 4.4, 2.2) # ì˜ˆë…„ë™ì›”(2010~2019)
+after_BOD <- c(2.9, 3.4, 2.9, 6.6, 6.0, 6.9, 5.0, 2.5) # 2020ë…„ 3ì›”
 BOD <- data.frame(before_BOD, after_BOD)
-rownames(BOD) <- c('¿ìÄ¡', 'È²·æ°­3-1', '±¤»ê', 'Áö¼®Ãµ4', '³ªÁÖ', 
-                   '¹«¾È2', 'Å½Áø°­3', 'ÁÖ¾Ï´ï', '¿äÃµ-1')
-
+rownames(BOD) <- c('ìš°ì¹˜','í™©ë£¡ê°•3-1','ì§€ì„ì²œ4','ê´‘ì‚°','ë‚˜ì£¼',
+                   'ì£½ì‚°','ê³ ë§‰ì›ì²œ2-1','ë¬´ì•ˆ2')
 # difference
 BOD$diff <- BOD$before_BOD - BOD$after_BOD
-
 # Checking normality
 # Q-Q plot
 qqnorm(BOD$diff); qqline(BOD$diff,col=2)
 # Shapiro-Wilk test
 shapiro.test(BOD$diff)
-
 # Paired t-test
 t.test(BOD$before_BOD,BOD$after_BOD,paired=T,alternative="less")
+
+## Test with T-P
+before_TP <- c(0.101, 0.137, 0.202, 0.260, 0.207,
+               0.144, 0.114, 0.060) # ì˜ˆë…„ë™ì›”(2010~2019)
+after_TP <- c(0.107, 0.077, 0.087, 0.147, 0.128,
+              0.105, 0.105, 0.036) # 2020ë…„ 3ì›”
+TP <- data.frame(before_TP, after_TP)
+rownames(TP) <- c('ìš°ì¹˜','í™©ë£¡ê°•3-1','ì§€ì„ì²œ4','ê´‘ì‚°','ë‚˜ì£¼',
+                   'ì£½ì‚°','ê³ ë§‰ì›ì²œ2-1','ë¬´ì•ˆ2')
+# difference
+TP$diff <- TP$before_TP - TP$after_TP
+# Checking normality
+# Q-Q plot
+qqnorm(TP$diff); qqline(TP$diff,col=2)
+# Shapiro-Wilk test
+shapiro.test(TP$diff)
+# Paired t-test
+t.test(TP$before_TP,TP$after_TP,paired=T,alternative="greater")
