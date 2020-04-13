@@ -1,5 +1,5 @@
 ## PCA
-data_all <- read.csv("C:/Users/Nier/Desktop/논문데이터분석_hsy/논문데이터분석(Evaluation and Grade Classification of River Water Quality Using Statistical Techniques)/주성분분석.csv", sep=",", header=T)
+data_all <- read.csv("C:/Users/Nier/Desktop/논문관련분석_hsy/논문데이터분석(Evaluation and Grade Classification of River Water Quality Using Statistical Techniques)/주성분분석.csv", sep=",", header=T)
 data_all_scale <- scale(data_all)
 
 ## Principal Component Analysis
@@ -61,7 +61,7 @@ par(mfrow=c(1,1))
 # reference1 : https://data-make.tistory.com/91
 # reference2 : https://www.statmethods.net/advstats/cluster.html
 
-water <- read.csv("C:/Users/Nier/Desktop/논문데이터분석_hsy/논문데이터분석(Evaluation and Grade Classification of River Water Quality Using Statistical Techniques)/cluster.csv", sep=",", header=T)
+water <- read.csv("C:/Users/Nier/Desktop/논문관련분석_hsy/논문데이터분석(Evaluation and Grade Classification of River Water Quality Using Statistical Techniques)/cluster.csv", sep=",", header=T)
 water_name <- water[,1]
 water <- water[,-1]
 rownames(water) <- water_name
@@ -81,7 +81,7 @@ library(NbClust)
 nc <- NbClust(water_scale, distance="euclidean", method="ward.D")
 par(mfrow=c(1,1))
 plot(fit)
-rect.hclust(fit, k=2)
+rect.hclust(fit, k=5)
 
 
 
@@ -99,10 +99,10 @@ water_scale <- data.frame(scale(water))
 water_scale_matrix <- as.matrix(water_scale)
 
 # Training the SOM model
-som_grid <- somgrid(xdim=1, ydim=4, topo="hexagonal")
+som_grid <- somgrid(xdim=1, ydim=5, topo="hexagonal")
 som_model1 <- som(water_scale_matrix, grid=som_grid)
 str(som_model1)
-som_model2 <- trainSOM(x.data=water_scale, dimension=c(4,1),
+som_model2 <- trainSOM(x.data=water_scale, dimension=c(5,1),
                        nb.save=10, maxit=2000, scaling="none",
                        radius.type="letremy")
 str(som_model2)
