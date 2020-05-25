@@ -1,0 +1,28 @@
+> set.seed(1)
+> cv.lasso <- cv.glmnet(X, y, alpha=1)
+> plot(cv.lasso)
+> bestlam.lasso <- cv.lasso$lambda.min
+> bestlam.lasso
+[1] 0.01144002
+> 
+> best.lasso <- glmnet(X, y, alpha=1, lambda=sh)
+> predict(best.lasso, s=bestlam.lasso, type="coefficients")
+17 x 1 sparse Matrix of class "dgCMatrix"
+                        1
+(Intercept) -8.429716e-16
+pH           1.089947e-01
+DO           .           
+Temp         1.710508e-01
+EC           2.070496e-01
+BOD          1.125466e-01
+SS           1.840011e-01
+T_N          .           
+T_P          .           
+TOC          6.403098e-01
+NH3_N        2.553298e-02
+PO4_P        5.649873e-02
+Chl_a        .           
+Flow         .           
+Rain         2.138460e-02
+logTC        8.673312e-03
+logFC       -6.711825e-02

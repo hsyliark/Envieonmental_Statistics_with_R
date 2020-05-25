@@ -37,13 +37,13 @@ ggcorrplot(X, hc.order=T, type="lower", p.mat=p.mat) +
 # Install and Attach required library
 install.packages("psych") # for descriptive statistics
 library(psych)
-water <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/í†µê³„ê´€ë ¨ìžë£Œ/ì „ì²´ì§€ì .csv", header=T, sep=',')
+water <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºÐ¼®/³í¹®µ¥ÀÌÅÍºÐ¼®(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/Åë°è°ü·ÃÀÚ·á/ÀüÃ¼ÁöÁ¡.csv", header=T, sep=',')
 water <- water[,-11]
 water <- water[,-14]
-water <- water[,-(14:15)]
+water <- water[,-(18:19)]
 water_scale <- scale(water)
 water <- water[,-(1:4)]
-water <- water[,-(12:13)]
+water <- water[,-(10:11)]
 water_scale_1 <- scale(water)
 
 # Descriptive statistics
@@ -72,7 +72,7 @@ PCA_rot <- principal(water_scale_1, nfactor=2, rotate="varimax", score=T) # vari
 PCA_rot
 biplot(PCA_rot, main="Biplot")
 
-water_scale <- water_scale_1
+
 
 ## normalization
 water_scale <- scale(water)

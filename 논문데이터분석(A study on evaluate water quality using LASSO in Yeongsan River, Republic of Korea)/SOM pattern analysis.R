@@ -22,16 +22,20 @@ library(kohonen)
 ECTN_scale <- data.frame(scale(ECTN))
 ECTN_scale_matrix <- as.matrix(ECTN_scale)
 
-# Original
-ECTN_matrix <- as.matrix(ECTN)
 
-som_grid <- somgrid(xdim=7, ydim=12, topo="hexagonal")
-som_model <- som(ECTN_matrix, grid=som_grid)
+# Original
+water_matrix <- as.matrix(water)
+
+T_P <- read.csv("C:/Users/Nier/Desktop/전체지점/T-P.csv", sep=",", header=T)
+T_P_matrix <- as.matrix(T_P)
+
+som_grid <- somgrid(xdim=25, ydim=24, topo="hexagonal")
+som_model <- som(T_P_matrix, grid=som_grid)
 
 coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
 
-par(mfrow=c(2,2))
-for (i in 1:4) {
+par(mfrow=c(1,1))
+for (i in 1:1) {
   plot(som_model, type="property", property=getCodes(som_model)[,i], 
        main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}
 par(mfrow=c(1,1))

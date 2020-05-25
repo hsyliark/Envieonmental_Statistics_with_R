@@ -18,6 +18,7 @@ $df
 
 
 
+
 > PCA_rot <- principal(water_scale_1, nfactor=2, rotate="varimax", score=T) # varimax rotate 
 > PCA_rot
 Principal Components Analysis
@@ -59,39 +60,26 @@ Fit based upon off diagonal values = 0.89
 > plot(cv.lasso)
 > bestlam.lasso <- cv.lasso$lambda.min
 > bestlam.lasso
-[1] 0.0005933018
+[1] 0.001248843
 > 
 > best.lasso <- glmnet(X, y, alpha=1, lambda=sh)
 > predict(best.lasso, s=bestlam.lasso, type="coefficients")
 17 x 1 sparse Matrix of class "dgCMatrix"
                         1
-(Intercept) -3.765373e-16
-pH           1.646083e-01
-DO           4.245577e-02
-Temp         3.132911e-01
-EC           6.897970e-02
-BOD          3.644288e-01
-SS           1.194048e-01
+(Intercept) -3.147621e-16
+pH           1.666903e-01
+DO           3.644554e-02
+Temp         3.053055e-01
+EC           6.238245e-02
+BOD          3.653341e-01
+SS           1.237516e-01
 T_N          .           
 T_P          .           
-TOC          3.762891e-01
-NH3_N        8.226408e-02
-PO4_P        8.674272e-03
-Chl_a        3.885529e-02
+TOC          3.714377e-01
+NH3_N        9.042125e-02
+PO4_P        2.101958e-03
+Chl_a        3.573449e-02
+Flow        -9.263931e-02
+Rain         .           
 log.TC       .           
-log.FC      -8.143291e-03
-log.Flow    -9.157582e-02
-log.Rain     .           
-
-
-
-
-
-
-
-
-
-
-
-
-
+log.FC       .           
