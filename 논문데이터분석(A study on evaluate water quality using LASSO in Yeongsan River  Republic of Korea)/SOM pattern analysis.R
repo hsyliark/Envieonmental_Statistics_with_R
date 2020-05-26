@@ -14,6 +14,11 @@ water5_2 <- scale(water5_1) # water5_2 : 표준화 (상관분석)
 water5_3 <- cbind(water5_2[,-(17:18)],water5_1[,17:18]) # water5_3 : 표준화 (logTC, logFC 제외, 회귀분석)
 
 
+PC1 <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/통계관련자료/PC1.csv", sep=",", header=T)
+PC2_1 <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/통계관련자료/PC2_1.csv", sep=",", header=T)
+PC2_2 <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/통계관련자료/PC2_2.csv", sep=",", header=T)
+water1 <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/통계관련자료/나머지.csv", sep=",", header=T)
+
 # Install packages
 install.packages("kohonen")
 library(kohonen)
@@ -24,18 +29,18 @@ ECTN_scale_matrix <- as.matrix(ECTN_scale)
 
 
 # Original
-water_matrix <- as.matrix(water)
+water1_matrix <- as.matrix(water1)
 
 T_P <- read.csv("C:/Users/Nier/Desktop/전체지점/T-P.csv", sep=",", header=T)
 T_P_matrix <- as.matrix(T_P)
 
 som_grid <- somgrid(xdim=25, ydim=24, topo="hexagonal")
-som_model <- som(T_P_matrix, grid=som_grid)
+som_model <- som(water1_matrix, grid=som_grid)
 
 coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
 
 par(mfrow=c(1,1))
-for (i in 1:1) {
+for (i in 1:6) {
   plot(som_model, type="property", property=getCodes(som_model)[,i], 
        main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}
 par(mfrow=c(1,1))
