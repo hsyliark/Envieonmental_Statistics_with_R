@@ -1,5 +1,5 @@
 ## PCA
-data_all <- read.csv("C:/Users/Nier/Desktop/³í¹®°ü·ÃºÐ¼®_hsy/³í¹®µ¥ÀÌÅÍºÐ¼®(Evaluation and Grade Classification of River Water Quality Using Statistical Techniques)/ÁÖ¼ººÐºÐ¼®.csv", sep=",", header=T)
+data_all <- read.csv("C:/Users/Nier/Desktop/?ï¿½ï¿½ï¿½???ÃºÐ¼?_hsy/?ï¿½ï¿½ï¿½?????ÍºÐ¼?(Evaluation and Grade Classification of River Water Quality Using Statistical Techniques)/?Ö¼??ÐºÐ¼?.csv", sep=",", header=T)
 data_all_scale <- scale(data_all)
 
 ## Principal Component Analysis
@@ -61,28 +61,27 @@ par(mfrow=c(1,1))
 # reference1 : https://data-make.tistory.com/91
 # reference2 : https://www.statmethods.net/advstats/cluster.html
 
-water <- read.csv("C:/Users/Nier/Desktop/³í¹®°ü·ÃºÐ¼®_hsy/³í¹®µ¥ÀÌÅÍºÐ¼®(Evaluation and Grade Classification of River Water Quality Using Statistical Techniques)/cluster.csv", sep=",", header=T)
+water <- read.csv("C:/Users/Nier/Desktop/?ï¿½ï¿½ï¿½???ÃºÐ¼?_hsy/?ï¿½ï¿½ï¿½?????ÍºÐ¼?(Evaluation and Grade Classification of River Water Quality Using Statistical Techniques)/cluster.csv", sep=",", header=T)
 water_name <- water[,1]
 water <- water[,-1]
 rownames(water) <- water_name
 
-data1 <- read.csv("C:/Users/Nier/Desktop/FW_ RE_ ±ºÁýºÐ¼®ÀÚ·á/°á°ú1/SOM ºÐ¼®¿ë_17_LKL.csv", sep=",", header=T)
+data1 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(êµ°ì§‘ë¶„ì„ìžë£Œ)/ìˆ˜ì •ìžë£Œ/ê²°ê³¼1/SOM ë¶„ì„ìš©_17_LKL_ìˆ˜ì •.csv", sep=",", header=T)
 data1_name <- data1[,1]
 data1 <- data1[,-1]
 rownames(data1) <- data1_name
-data2 <- read.csv("C:/Users/Nier/Desktop/FW_ RE_ ±ºÁýºÐ¼®ÀÚ·á/°á°ú2/SOM ºÐ¼®¿ë_Total_AF_16.csv", sep=",", header=T)
-data2 <- data2[-(146:147),]
+data2 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(êµ°ì§‘ë¶„ì„ìžë£Œ)/ìˆ˜ì •ìžë£Œ/ê²°ê³¼2/SOM ë¶„ì„ìš©_Total_AF_16_ìˆ˜ì •.csv", sep=",", header=T)
 data2_name <- data2[,1]
 data2 <- data2[,-1]
 rownames(data2) <- data2_name
-data3 <- read.csv("C:/Users/Nier/Desktop/FW_ RE_ ±ºÁýºÐ¼®ÀÚ·á/°á°ú3/SOM ºÐ¼®¿ë_Total_BF_11.csv", sep=",", header=T)
+data3 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(êµ°ì§‘ë¶„ì„ìžë£Œ)/ìˆ˜ì •ìžë£Œ/ê²°ê³¼3/SOM ë¶„ì„ìš©_Total_BF_11_ìˆ˜ì •.csv", sep=",", header=T)
 data3_name <- data3[,1]
 data3 <- data3[,-1]
 rownames(data3) <- data3_name
 
 # Distance matrix
-data1_scale <- scale(data1)
-d <- dist(data1_scale, method="euclidean")
+data2_scale <- scale(data2)
+d <- dist(data2_scale, method="euclidean")
 as.matrix(d)[1:19,1:19]
 
 # Apply Distance matrix model
@@ -92,7 +91,7 @@ plot(fit)
 # Decide number of clusters
 install.packages("NbClust")
 library(NbClust)
-nc <- NbClust(data1_scale, distance="euclidean", method="ward.D")
+nc <- NbClust(data2_scale, distance="euclidean", method="ward.D")
 par(mfrow=c(1,1))
 barplot(table(nc$Best.nc[1,]), xlab="Number of clusters", ylab="Number of criteria", 
         main="Number of clusters chosen by 26 criteria")
@@ -113,19 +112,20 @@ install.packages("kohonen")
 library(kohonen)
 
 # Normalization of data
-data1_scale <- data.frame(scale(data1))
-data1_scale_matrix <- as.matrix(data1_scale)
+data2_scale <- data.frame(scale(data2))
+data2_scale_matrix <- as.matrix(data2_scale)
 
 # Training the SOM model
 som_grid <- somgrid(xdim=1, ydim=3, topo="hexagonal")
-som_model1 <- som(data1_scale_matrix, grid=som_grid)
+som_model1 <- som(data2_scale_matrix, grid=som_grid)
 str(som_model1)
-som_model2 <- trainSOM(x.data=data1_scale, dimension=c(3,1),
+som_model2 <- trainSOM(x.data=data2_scale, dimension=c(3,1),
                        nb.save=10, maxit=2000, scaling="none",
                        radius.type="letremy")
 str(som_model2)
 
 # Visualization
+par(mfrow=c(1,1))
 plot(som_model1, main="feature distribution")
 table(som_model2$clustering)
 plot(som_model2, what="prototypes", type="umatrix", print.title=T)
