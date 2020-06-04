@@ -1,0 +1,4 @@
+> table(som_model2$clustering)
+
+ 1  2  3 
+11  6  8 
