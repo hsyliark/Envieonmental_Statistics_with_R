@@ -6,7 +6,7 @@ Overall MSA =  0.71
 MSA for each item = 
   BOD   COD    SS   T_N   T_P   TOC NH3_N PO4_P Chl_a logTC logFC 
  0.85  0.74  0.80  0.66  0.70  0.76  0.64  0.61  0.71  0.62  0.63 
-> cortest.bartlett(cor(water_scale_pca, method="spearman"), n=nrow(water_scale))
+> cortest.bartlett(cor(water_scale_pca, method="spearman"), n=nrow(water_scale_pca))
 $chisq
 [1] 2711.647
 

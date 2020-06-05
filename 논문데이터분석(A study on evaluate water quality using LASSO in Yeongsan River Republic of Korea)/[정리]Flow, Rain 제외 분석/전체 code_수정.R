@@ -1,4 +1,4 @@
-water <- read.csv("C:/Users/Nier/Desktop/[정리]Flow, Rain 제외 분석/함평/11_함평(5년).csv", sep=",", header=T)
+water <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(A study on evaluate water quality using LASSO in Yeongsan River Republic of Korea)/[정리]영산강 본류지점 분석 (Flow 포함)/4개지점/4개지점.csv", sep=",", header=T)
 water$logTC <- log(water$TC)
 water$logFC <- log(water$FC)
 water <- water[,-11]
@@ -62,7 +62,7 @@ round(cor(water_scale_1, method="spearman"),3) # spearman
 
 # KMO and Bartlett's test
 KMO(water_scale_pca)
-cortest.bartlett(cor(water_scale_pca, method="spearman"), n=nrow(water_scale))
+cortest.bartlett(cor(water_scale_pca, method="spearman"), n=nrow(water_scale_pca))
 
 # Number of principal components 
 water_pca <- prcomp(water_scale_pca, center=T, scale.=T)
