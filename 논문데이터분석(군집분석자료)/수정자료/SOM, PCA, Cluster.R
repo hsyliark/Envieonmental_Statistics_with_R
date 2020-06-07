@@ -1,26 +1,41 @@
 ## PCA
-data_all <- read.csv("C:/Users/Nier/Desktop/?ï¿½ï¿½ï¿????ÃºÐ¼?_hsy/?ï¿½ï¿½ï¿??????ÍºÐ¼?(Evaluation and Grade Classification of River Water Quality Using Statistical Techniques)/?Ö¼??ÐºÐ¼?.csv", sep=",", header=T)
-data_all_scale <- scale(data_all)
+data1 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(êµ°ì§‘ë¶„ì„ìžë£Œ)/ìˆ˜ì •ìžë£Œ/ê²°ê³¼1/SOM ë¶„ì„ìš©_17_LKL_ìˆ˜ì •.csv", sep=",", header=T)
+data1_name <- data1[,1]
+data1 <- data1[,-1]
+rownames(data1) <- data1_name
+data2 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(êµ°ì§‘ë¶„ì„ìžë£Œ)/ìˆ˜ì •ìžë£Œ/ê²°ê³¼2/SOM ë¶„ì„ìš©_Total_AF_16_ìˆ˜ì •.csv", sep=",", header=T)
+data2_name <- data2[,1]
+data2 <- data2[,-1]
+rownames(data2) <- data2_name
+data3 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(êµ°ì§‘ë¶„ì„ìžë£Œ)/ìˆ˜ì •ìžë£Œ/ê²°ê³¼3/SOM ë¶„ì„ìš©_Total_BF_11_ìˆ˜ì •.csv", sep=",", header=T)
+data3_name <- data3[,1]
+data3 <- data3[,-1]
+rownames(data3) <- data3_name
+
 
 ## Principal Component Analysis
+
+data1_scale <- scale(data1)
+data2_scale <- scale(data2)
+data3_scale <- scale(data3)
 
 # Install and Attach required library
 install.packages("psych") # for descriptive statistics
 library(psych)
 
 # Descriptive statistics
-describe(data_all_scale)
+describe(data3_scale)
 
 # Correlation
-round(cor(data_all_scale),3) # pearson
-round(cor(data_all_scale, method="spearman"),3) # spearman
+round(cor(data3_scale),3) # pearson
+round(cor(data3_scale, method="spearman"),3) # spearman
 
 # KMO and Bartlett's test
-KMO(data_all_scale)
-cortest.bartlett(cor(data_all_scale, method="spearman"), n=nrow(data_all_scale))
+KMO(data3_scale)
+cortest.bartlett(cor(data3_scale, method="spearman"), n=nrow(data3_scale))
 
 # Number of principal components 
-water_pca <- prcomp(data_all_scale, center=T, scale.=T)
+water_pca <- prcomp(data3_scale, center=T, scale.=T)
 water_pca
 screeplot(water_pca, type="l")
 biplot(water_pca, main="Biplot")
@@ -28,9 +43,9 @@ summary(water_pca)
 water_pca$sdev^2 # Eigenvalue with respect to principal components
 
 # Component matrix 
-PCA <- principal(data_all_scale, nfactor=3, rotate="none", score=T) # The factor is the number of PC
+PCA <- principal(data3_scale, nfactor=3, rotate="none", score=T) # The factor is the number of PC
 PCA
-PCA_rot <- principal(data_all_scale, nfactor=3, rotate="varimax", score=T) # varimax rotate 
+PCA_rot <- principal(data3_scale, nfactor=3, rotate="varimax", score=T) # varimax rotate 
 PCA_rot
 biplot(PCA_rot)
 
@@ -61,15 +76,15 @@ par(mfrow=c(1,1))
 # reference1 : https://data-make.tistory.com/91
 # reference2 : https://www.statmethods.net/advstats/cluster.html
 
-data1 <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºÐ¼®(±ºÁýºÐ¼®ÀÚ·á)/¼öÁ¤ÀÚ·á/°á°ú1/SOM ºÐ¼®¿ë_17_LKL_¼öÁ¤.csv", sep=",", header=T)
+data1 <- read.csv("C:/Users/Nier/Desktop/?ï¿½ï¿½ï¿½?????ÍºÐ¼?(?????Ð¼??Ú·?)/??ï¿½ï¿½?Ú·?/????1/SOM ?Ð¼???_17_LKL_??ï¿½ï¿½.csv", sep=",", header=T)
 data1_name <- data1[,1]
 data1 <- data1[,-1]
 rownames(data1) <- data1_name
-data2 <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºÐ¼®(±ºÁýºÐ¼®ÀÚ·á)/¼öÁ¤ÀÚ·á/°á°ú2/SOM ºÐ¼®¿ë_Total_AF_16_¼öÁ¤.csv", sep=",", header=T)
+data2 <- read.csv("C:/Users/Nier/Desktop/?ï¿½ï¿½ï¿½?????ÍºÐ¼?(?????Ð¼??Ú·?)/??ï¿½ï¿½?Ú·?/????2/SOM ?Ð¼???_Total_AF_16_??ï¿½ï¿½.csv", sep=",", header=T)
 data2_name <- data2[,1]
 data2 <- data2[,-1]
 rownames(data2) <- data2_name
-data3 <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºÐ¼®(±ºÁýºÐ¼®ÀÚ·á)/¼öÁ¤ÀÚ·á/°á°ú3/SOM ºÐ¼®¿ë_Total_BF_11_¼öÁ¤.csv", sep=",", header=T)
+data3 <- read.csv("C:/Users/Nier/Desktop/?ï¿½ï¿½ï¿½?????ÍºÐ¼?(?????Ð¼??Ú·?)/??ï¿½ï¿½?Ú·?/????3/SOM ?Ð¼???_Total_BF_11_??ï¿½ï¿½.csv", sep=",", header=T)
 data3_name <- data3[,1]
 data3 <- data3[,-1]
 rownames(data3) <- data3_name
@@ -111,14 +126,14 @@ install.packages("kohonen")
 library(kohonen)
 
 # Normalization of data
-data3_scale <- data.frame(scale(data3))
-data3_scale_matrix <- as.matrix(data3_scale)
+data1_scale <- data.frame(scale(data1))
+data1_scale_matrix <- as.matrix(data1_scale)
 
 # Training the SOM model
 som_grid <- somgrid(xdim=1, ydim=3, topo="hexagonal")
-som_model1 <- som(data3_scale_matrix, grid=som_grid)
+som_model1 <- som(data1_scale_matrix, grid=som_grid)
 str(som_model1)
-som_model2 <- trainSOM(x.data=data3_scale, dimension=c(3,1),
+som_model2 <- trainSOM(x.data=data1_scale, dimension=c(3,1),
                        nb.save=10, maxit=2000, scaling="none",
                        radius.type="letremy")
 str(som_model2)

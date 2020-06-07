@@ -2,22 +2,22 @@
 # reference : https://www.shanelynn.ie/self-organising-maps-for-customer-segmentation-using-r/
 
 ## Import data
-water5 <- read.csv("C:/Users/Nier/Desktop/¼öÁúµ¥ÀÌÅÍºÐ¼®(³í¹®)/2¹øÂ°/ºÐ¼®ÀÚ·á ¼ÛºÎ/5year/csv ÆÄÀÏ/0.ÀüÃ¼ÁöÁ¡(5³â).csv", header=T, sep=',')
+water5 <- read.csv("C:/Users/Nier/Desktop/?????????ÍºÐ¼?(?ï¿½ï¿½ï¿½)/2??Â°/?Ð¼??Ú·? ?Ûº?/5year/csv ????/0.??Ã¼??ï¿½ï¿½(5??).csv", header=T, sep=',')
 water5_1 <- water5[,-(1:3)]
 water5_1$logTC <- log(water5_1$TC)
 water5_1$logFC <- log(water5_1$FC)
 water5_1$logRain <- log(water5_1$Rain)
 water5_1 <- water5_1[,-11]
 water5_1 <- water5_1[,-17]
-water5_1 <- water5_1[,-17] # water5_1 : ¿øµ¥ÀÌÅÍ (TC, FC, Rain ¿¡ log ÃëÇÔ, ±âÃÊÅë°è·® »êÁ¤)
-water5_2 <- scale(water5_1) # water5_2 : Ç¥ÁØÈ­ (»ó°üºÐ¼®)
-water5_3 <- cbind(water5_2[,-(17:18)],water5_1[,17:18]) # water5_3 : Ç¥ÁØÈ­ (logTC, logFC Á¦¿Ü, È¸±ÍºÐ¼®)
+water5_1 <- water5_1[,-17] # water5_1 : ???????? (TC, FC, Rain ?? log ????, ???????è·® ??ï¿½ï¿½)
+water5_2 <- scale(water5_1) # water5_2 : Ç¥??È­ (?????Ð¼?)
+water5_3 <- cbind(water5_2[,-(17:18)],water5_1[,17:18]) # water5_3 : Ç¥??È­ (logTC, logFC ï¿½ï¿½??, È¸?ÍºÐ¼?)
 
 
-PC1 <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºÐ¼®(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/Åë°è°ü·ÃÀÚ·á/PC1.csv", sep=",", header=T)
-PC2_1 <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºÐ¼®(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/Åë°è°ü·ÃÀÚ·á/PC2_1.csv", sep=",", header=T)
-PC2_2 <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºÐ¼®(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/Åë°è°ü·ÃÀÚ·á/PC2_2.csv", sep=",", header=T)
-water1 <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºÐ¼®(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/Åë°è°ü·ÃÀÚ·á/³ª¸ÓÁö.csv", sep=",", header=T)
+PC1 <- read.csv("C:/Users/Nier/Desktop/?ï¿½ï¿½ï¿½?????ÍºÐ¼?(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/?????????Ú·?/PC1.csv", sep=",", header=T)
+PC2_1 <- read.csv("C:/Users/Nier/Desktop/?ï¿½ï¿½ï¿½?????ÍºÐ¼?(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/?????????Ú·?/PC2_1.csv", sep=",", header=T)
+PC2_2 <- read.csv("C:/Users/Nier/Desktop/?ï¿½ï¿½ï¿½?????ÍºÐ¼?(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/?????????Ú·?/PC2_2.csv", sep=",", header=T)
+water1 <- read.csv("C:/Users/Nier/Desktop/?ï¿½ï¿½ï¿½?????ÍºÐ¼?(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/?????????Ú·?/??????.csv", sep=",", header=T)
 
 # Install packages
 install.packages("kohonen")
@@ -31,16 +31,20 @@ ECTN_scale_matrix <- as.matrix(ECTN_scale)
 # Original
 water1_matrix <- as.matrix(water1)
 
-T_P <- read.csv("C:/Users/Nier/Desktop/ÀüÃ¼ÁöÁ¡/T-P.csv", sep=",", header=T)
-T_P_matrix <- as.matrix(T_P)
+group1 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(êµ°ì§‘ë¶„ì„ìžë£Œ)/ìˆ˜ì •ìžë£Œ/ê²°ê³¼3/data3_g1.csv", sep=",", header=T)
+group2 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(êµ°ì§‘ë¶„ì„ìžë£Œ)/ìˆ˜ì •ìžë£Œ/ê²°ê³¼3/data3_g2.csv", sep=",", header=T)
+group3 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(êµ°ì§‘ë¶„ì„ìžë£Œ)/ìˆ˜ì •ìžë£Œ/ê²°ê³¼3/data3_g3.csv", sep=",", header=T)
+group1_matrix <- as.matrix(group1)
+group2_matrix <- as.matrix(group2)
+group3_matrix <- as.matrix(group3)
 
-som_grid <- somgrid(xdim=5, ydim=5, topo="hexagonal")
-som_model <- som(data1_matrix, grid=som_grid)
+som_grid <- somgrid(xdim=9, ydim=8, topo="hexagonal")
+som_model <- som(group3_matrix, grid=som_grid)
 
 coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
 
 par(mfrow=c(1,1))
-for (i in 1:14) {
+for (i in 1:4) {
   plot(som_model, type="property", property=getCodes(som_model)[,i], 
        main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}
 par(mfrow=c(1,1))
@@ -57,34 +61,34 @@ library(lmtest)
 # Drawing graph
 par(mfrow=c(2,2))
 attach(ECTN)
-plot.ts(¿µ»êÆ÷_1.EC, main="¿µ»êÆ÷-1(EC)")
-plot.ts(¿µ»êÆ÷_1.TN, main="¿µ»êÆ÷-1(T-N)")
-plot.ts(°í¸·¿øÃµ2_1.EC, main="°í¸·¿øÃµ2-1(EC)")
-plot.ts(°í¸·¿øÃµ2_1.TN, main="°í¸·¿øÃµ2-1(T-N)")
+plot.ts(??????_1.EC, main="??????-1(EC)")
+plot.ts(??????_1.TN, main="??????-1(T-N)")
+plot.ts(?ï¿½ï¿½ï¿½??Ãµ2_1.EC, main="?ï¿½ï¿½ï¿½??Ãµ2-1(EC)")
+plot.ts(?ï¿½ï¿½ï¿½??Ãµ2_1.TN, main="?ï¿½ï¿½ï¿½??Ãµ2-1(T-N)")
 par(mfrow=c(1,1))
 
 # Time series
 install.packages("forecast")
 require(forecast)
 
-# KPSS test (Á¤»ó½Ã°è¿­À» À§ÇÑ Â÷ºÐ½ÃÂ÷ °áÁ¤)
-ndiffs(ECTN$¿µ»êÆ÷_1.EC, alpha=0.05, test=c("kpss")) 
-ndiffs(ECTN$¿µ»êÆ÷_1.TN, alpha=0.05, test=c("kpss")) 
-ndiffs(ECTN$°í¸·¿øÃµ2_1.EC, alpha=0.05, test=c("kpss")) 
-ndiffs(ECTN$°í¸·¿øÃµ2_1.TN, alpha=0.05, test=c("kpss")) 
+# KPSS test (ï¿½ï¿½???Ã°è¿­ï¿½ï¿½ ï¿½ï¿½?? ???Ð½??? ??ï¿½ï¿½)
+ndiffs(ECTN$??????_1.EC, alpha=0.05, test=c("kpss")) 
+ndiffs(ECTN$??????_1.TN, alpha=0.05, test=c("kpss")) 
+ndiffs(ECTN$?ï¿½ï¿½ï¿½??Ãµ2_1.EC, alpha=0.05, test=c("kpss")) 
+ndiffs(ECTN$?ï¿½ï¿½ï¿½??Ãµ2_1.TN, alpha=0.05, test=c("kpss")) 
 
-# Â÷ºÐ½ÃÂ÷°¡ ³ª¿Â °æ¿ì¿¡¸¸ ÇØ´ç
-ECTN$diff1_¿µ»êÆ÷_1.EC <- diff(ECTN$¿µ»êÆ÷_1.EC, 1)
-ECTN$diff1_¿µ»êÆ÷_1.TN <- diff(ECTN$¿µ»êÆ÷_1.TN, 1)
-ECTN$diff1_°í¸·¿øÃµ2_1.EC <- diff(ECTN$°í¸·¿øÃµ2_1.EC, 1)
-ECTN$diff1_°í¸·¿øÃµ2_1.TN <- diff(ECTN$°í¸·¿øÃµ2_1.TN, 1)
+# ???Ð½????? ???? ???ì¿¡?? ?Ø´?
+ECTN$diff1_??????_1.EC <- diff(ECTN$??????_1.EC, 1)
+ECTN$diff1_??????_1.TN <- diff(ECTN$??????_1.TN, 1)
+ECTN$diff1_?ï¿½ï¿½ï¿½??Ãµ2_1.EC <- diff(ECTN$?ï¿½ï¿½ï¿½??Ãµ2_1.EC, 1)
+ECTN$diff1_?ï¿½ï¿½ï¿½??Ãµ2_1.TN <- diff(ECTN$?ï¿½ï¿½ï¿½??Ãµ2_1.TN, 1)
 par(mfrow=c(2,2))
-plot.ts(ECTN$diff1_¿µ»êÆ÷_1.EC, main="¿µ»êÆ÷-1(EC) 1½ÃÂ÷ Â÷ºÐ")
-plot.ts(ECTN$diff1_¿µ»êÆ÷_1.TN, main="¿µ»êÆ÷-1(T-N) 1½ÃÂ÷ Â÷ºÐ")
-plot.ts(ECTN$diff1_°í¸·¿øÃµ2_1.EC, main="°í¸·¿øÃµ2-1(EC) 1½ÃÂ÷ Â÷ºÐ")
-plot.ts(ECTN$diff1_°í¸·¿øÃµ2_1.TN, main="°í¸·¿øÃµ2-1(T-N) 1½ÃÂ÷ Â÷ºÐ")
+plot.ts(ECTN$diff1_??????_1.EC, main="??????-1(EC) 1???? ????")
+plot.ts(ECTN$diff1_??????_1.TN, main="??????-1(T-N) 1???? ????")
+plot.ts(ECTN$diff1_?ï¿½ï¿½ï¿½??Ãµ2_1.EC, main="?ï¿½ï¿½ï¿½??Ãµ2-1(EC) 1???? ????")
+plot.ts(ECTN$diff1_?ï¿½ï¿½ï¿½??Ãµ2_1.TN, main="?ï¿½ï¿½ï¿½??Ãµ2-1(T-N) 1???? ????")
 par(mfrow=c(1,1))
 
-# ÀÎ°ú°ü°è ºÐ¼® (°á°ú ~ ¿øÀÎ)
-grangertest(ECTN$°í¸·¿øÃµ2_1.EC ~ ECTN$¿µ»êÆ÷_1.EC, order=3)
-grangertest(ECTN$°í¸·¿øÃµ2_1.TN ~ ECTN$¿µ»êÆ÷_1.TN, order=3)
+# ?Î°????? ?Ð¼? (???? ~ ????)
+grangertest(ECTN$?ï¿½ï¿½ï¿½??Ãµ2_1.EC ~ ECTN$??????_1.EC, order=3)
+grangertest(ECTN$?ï¿½ï¿½ï¿½??Ãµ2_1.TN ~ ECTN$??????_1.TN, order=3)

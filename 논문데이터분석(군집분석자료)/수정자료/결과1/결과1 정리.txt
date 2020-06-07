@@ -1,4 +1,68 @@
 > table(som_model2$clustering)
 
  1  2  3 
-11  6  8 
+ 11  6 8 
+
+
+> # KMO and Bartlett's test
+> KMO(data1_scale)
+Kaiser-Meyer-Olkin factor adequacy
+Call: KMO(r = data1_scale)
+Overall MSA =  0.58
+MSA for each item = 
+      MIC       TMC     MC.LR     MC.RR     Chl.a       TOC        TN        TP 
+     0.42      0.45      0.42      0.45      0.35      0.53      0.75      0.70 
+NO2.NO3.N     PO4.P     NH3.N        WT        EC     Light 
+     0.71      0.69      0.46      0.70      0.88      0.40 
+> cortest.bartlett(cor(data1_scale, method="spearman"), n=nrow(data1_scale))
+$chisq
+[1] 395.4201
+
+$p.value
+[1] 1.475115e-39
+
+$df
+[1] 91
+
+
+
+
+> PCA_rot <- principal(data1_scale, nfactor=2, rotate="varimax", score=T) # varimax rotate 
+> PCA_rot
+Principal Components Analysis
+Call: principal(r = data1_scale, nfactors = 2, rotate = "varimax", 
+    scores = T)
+Standardized loadings (pattern matrix) based upon correlation matrix
+            RC1   RC2   h2    u2 com
+MIC        0.26  0.87 0.82 0.179 1.2
+TMC       -0.06  0.96 0.92 0.080 1.0
+MC.LR     -0.14  0.92 0.86 0.139 1.0
+MC.RR     -0.05  0.95 0.91 0.087 1.0
+Chl.a      0.07  0.40 0.16 0.837 1.1
+TOC       -0.32  0.59 0.45 0.549 1.5
+TN         0.93  0.15 0.88 0.118 1.0
+TP         0.90  0.31 0.90 0.095 1.2
+NO2.NO3.N  0.95 -0.05 0.90 0.101 1.0
+PO4.P      0.95  0.12 0.92 0.084 1.0
+NH3.N      0.64 -0.11 0.42 0.577 1.1
+WT         0.85 -0.19 0.76 0.239 1.1
+EC         0.95 -0.10 0.91 0.088 1.0
+Light      0.45 -0.09 0.21 0.786 1.1
+
+                       RC1  RC2
+SS loadings           5.91 4.13
+Proportion Var        0.42 0.29
+Cumulative Var        0.42 0.72
+Proportion Explained  0.59 0.41
+Cumulative Proportion 0.59 1.00
+
+Mean item complexity =  1.1
+Test of the hypothesis that 2 components are sufficient.
+
+The root mean square of the residuals (RMSR) is  0.08 
+ with the empirical chi square  28.26  with prob <  1 
+
+Fit based upon off diagonal values = 0.97
+
+
+
