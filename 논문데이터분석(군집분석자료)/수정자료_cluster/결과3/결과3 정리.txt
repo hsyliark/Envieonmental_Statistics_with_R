@@ -134,12 +134,12 @@ Kaiser-Meyer-Olkin factor adequacy
 Call: KMO(r = data3_scale)
 Overall MSA =  0.62
 MSA for each item = 
-           WT            EC           TOC            TN            TP 
-         0.88          0.58          0.41          0.78          0.45 
-        PO4.P         Chl.a         NO3.N         NH3.N            TC 
-         0.51          0.53          0.74          0.79          0.59 
-           FC     Toxic.CYA Non.toxic.CYA 
-         0.55          0.64          0.67 
+           WT            EC           TOC            TN            TP         PO4.P 
+         0.88          0.58          0.41          0.78          0.45          0.51 
+        Chl.a         NO3.N         NH3.N            TC            FC     Toxic.CYA 
+         0.53          0.74          0.79          0.59          0.55          0.64 
+Non.toxic.CYA 
+         0.67 
 > cortest.bartlett(cor(data3_scale, method="spearman"), n=nrow(data3_scale))
 $chisq
 [1] 764.2292
@@ -150,8 +150,9 @@ $p.value
 $df
 [1] 78
 
-
-
+> # Number of principal components 
+> water_pca <- prcomp(data3_scale, center=T, scale.=T)
+> screeplot(water_pca, type="l")
 > PCA_rot <- principal(data3_scale, nfactor=2, rotate="varimax", score=T) # varimax rotate 
 > PCA_rot
 Principal Components Analysis
@@ -187,3 +188,5 @@ The root mean square of the residuals (RMSR) is  0.13
  with the empirical chi square  192.44  with prob <  1e-17 
 
 Fit based upon off diagonal values = 0.89
+
+

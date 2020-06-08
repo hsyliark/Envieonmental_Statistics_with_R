@@ -24,9 +24,9 @@ $p.value
 $df
 [1] 91
 
-
-
-
+> # Number of principal components 
+> water_pca <- prcomp(data1_scale, center=T, scale.=T)
+> screeplot(water_pca, type="l")
 > PCA_rot <- principal(data1_scale, nfactor=2, rotate="varimax", score=T) # varimax rotate 
 > PCA_rot
 Principal Components Analysis
@@ -63,6 +63,3 @@ The root mean square of the residuals (RMSR) is  0.08
  with the empirical chi square  28.26  with prob <  1 
 
 Fit based upon off diagonal values = 0.97
-
-
-

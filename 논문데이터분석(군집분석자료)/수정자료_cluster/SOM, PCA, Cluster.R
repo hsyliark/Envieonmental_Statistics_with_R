@@ -1,13 +1,13 @@
 ## PCA
-data1 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(군집분석자료)/수정자료/결과1/SOM 분석용_17_LKL_수정.csv", sep=",", header=T)
+data1 <- read.csv("C:/Users/Nier/Desktop/�����ڷ�_cluster/���1/SOM �м���_17_LKL_����.csv", sep=",", header=T)
 data1_name <- data1[,1]
 data1 <- data1[,-1]
 rownames(data1) <- data1_name
-data2 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(군집분석자료)/수정자료/결과2/SOM 분석용_Total_AF_16_수정.csv", sep=",", header=T)
+data2 <- read.csv("C:/Users/Nier/Desktop/�����ڷ�_cluster/���2/SOM �м���_Total_AF_16_����.csv", sep=",", header=T)
 data2_name <- data2[,1]
 data2 <- data2[,-1]
 rownames(data2) <- data2_name
-data3 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(군집분석자료)/수정자료/결과3/SOM 분석용_Total_BF_11_수정.csv", sep=",", header=T)
+data3 <- read.csv("C:/Users/Nier/Desktop/�����ڷ�_cluster/���3/SOM �м���_Total_BF_11_����.csv", sep=",", header=T)
 data3_name <- data3[,1]
 data3 <- data3[,-1]
 rownames(data3) <- data3_name
@@ -76,15 +76,15 @@ par(mfrow=c(1,1))
 # reference1 : https://data-make.tistory.com/91
 # reference2 : https://www.statmethods.net/advstats/cluster.html
 
-data1 <- read.csv("C:/Users/Nier/Desktop/?���?????ͺм?(?????м??ڷ?)/??��?ڷ?/????1/SOM ?м???_17_LKL_??��.csv", sep=",", header=T)
+data1 <- read.csv("C:/Users/Nier/Desktop/?���??????ͺм?(?????м??ڷ?)/??��?ڷ?/????1/SOM ?м???_17_LKL_??��.csv", sep=",", header=T)
 data1_name <- data1[,1]
 data1 <- data1[,-1]
 rownames(data1) <- data1_name
-data2 <- read.csv("C:/Users/Nier/Desktop/?���?????ͺм?(?????м??ڷ?)/??��?ڷ?/????2/SOM ?м???_Total_AF_16_??��.csv", sep=",", header=T)
+data2 <- read.csv("C:/Users/Nier/Desktop/?���??????ͺм?(?????м??ڷ?)/??��?ڷ?/????2/SOM ?м???_Total_AF_16_??��.csv", sep=",", header=T)
 data2_name <- data2[,1]
 data2 <- data2[,-1]
 rownames(data2) <- data2_name
-data3 <- read.csv("C:/Users/Nier/Desktop/?���?????ͺм?(?????м??ڷ?)/??��?ڷ?/????3/SOM ?м???_Total_BF_11_??��.csv", sep=",", header=T)
+data3 <- read.csv("C:/Users/Nier/Desktop/?���??????ͺм?(?????м??ڷ?)/??��?ڷ?/????3/SOM ?м???_Total_BF_11_??��.csv", sep=",", header=T)
 data3_name <- data3[,1]
 data3 <- data3[,-1]
 rownames(data3) <- data3_name
