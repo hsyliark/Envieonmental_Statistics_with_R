@@ -7,7 +7,7 @@ output: html_document
 
 ## Data loading
 ```{r}
-water <- read.csv("C:/Users/HSY/Desktop/광주2-1trend 분석/광주2-1.csv", sep=",", header=T)
+water <- read.csv("D:/Workplace/Environmental_Statistics_with_R/시계열분석/광주2-1.csv", sep=",", header=T)
 water_name <- water$date
 rownames(water) <- water_name
 ```
