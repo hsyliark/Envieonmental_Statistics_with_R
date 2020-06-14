@@ -1,0 +1,83 @@
+## Data loading
+water <- read.csv("C:/Users/HSY/Desktop/광주2-1trend 분석/광주2-1.csv", sep=",", header=T)
+water_name <- water$date
+rownames(water) <- water_name
+
+## Install packages
+install.packages("TTR")
+install.packages("forecast")
+library(TTR)
+library(forecast)
+
+## Time series data
+TP <- ts(water[,4], frequency=48, start=c(2015,1))
+TOC <- ts(water[,5], frequency=48, start=c(2015,1)) 
+plot.ts(TP, main="T-P of Gwangju2-1 point")
+plot.ts(TOC, main="TOC of Gwangju2-1 point")
+
+## data decomposition - trend, seasonal, random
+TP_comp <- decompose(TP)
+plot(TP_comp)
+TOC_comp <- decompose(TOC)
+plot(TOC_comp)
+
+## 시계열 데이터에서 계절성 요인 제거
+TP_adjusted <- TP - TP_comp$seasonal
+plot.ts(TP_adjusted, main = "TP - seasonal factor")
+plot.ts(TP_comp$seasonal, main="Seasonal factor of TP")
+TOC_adjusted <- TOC - TOC_comp$seasonal
+plot.ts(TOC_adjusted, main = "TOC - seasonal factor")
+plot.ts(TOC_comp$seasonal, main="Seasonal factor of TOC")
+
+## Dickey-Fuller unit root test
+# H0: 자료에 단위근이 존재한다.
+# H1: 시계열 자료가 정상성을 만족한다(또는 추세 정상성을 만족한다).
+install.packages("tseries")
+library(tseries)
+adf.test(TP_adjusted)
+# -> 계절성 요인을 제거한 T-P는 단위근이 존재하지 않음. (차분 필요 없음)
+adf.test(TOC_adjusted)
+# -> 계절성 요인을 제거한 TOC는 단위근이 존재함. 즉, 추세가 존재. (차분 필요)
+adf.test(TP_comp$seasonal)
+adf.test(TOC_comp$seasonal)
+# -> T-P와 TOC의 계절성 요인은 모두 추세가 존재하지 않음.
+## 차분을 통해 정상성 확인
+TOC_diff1 <- diff(TOC_adjusted, differences = 1)
+plot.ts(TOC_diff1, main = "TOC - seasonal factor 1차 차분") 
+adf.test(TOC_diff1)
+
+## ACF, PACF
+# T-P
+acf(TP_adjusted, lag.max = 4800)  # lag 3 에서 절단값 --> MA(2)
+pacf(TP_adjusted, lag.max = 4800)  # lag 3 에서 절단값 --> AR(2)
+# --> 계절성 요인을 제거한 T-P : ARIMA(2,0,2) ?
+acf(TP_comp$seasonal, lag.max = 4800) # 감소추세
+pacf(TP_comp$seasonal, lag.max = 4800) # lag 2 에서 절단값 --> AR(1)
+# --> T-P의 계절성 요인 : ARIMA(1,0,0)[48] 
+# TOC
+acf(TOC_diff1, lag.max = 4800) # lag 1 에서 절단값 --> MA(0)
+pacf(TOC_diff1, lag.max = 4800) # lag 2 에서 절단값 --> AR(1)
+# --> 계절성 요인을 제거한 TOC : ARIMA(0,1,1) ?
+acf(TOC_comp$seasonal, lag.max = 4800) # 감소추세
+pacf(TOC_comp$seasonal, lag.max = 4800) # lag 2 에서 절단값 --> AR(1) 
+# --> TOC의 계절성 요인 : ARIMA(1,0,0)[48]
+# ----> T-P : ARIMA(2,0,2)(1,0,0)[48]
+# ----> TOC : ARIMA(0,1,1)(1,0,0)[48]
+
+## 자동으로 ARIMA 모형 확인
+auto.arima(TP)
+auto.arima(TOC)
+
+## Time series modeling
+TP_arima <- arima(TP, order=c(2,0,2), seasonal=list(order=c(1,0,0),period=48))
+TP_arima
+TOC_arima <- arima(TOC, order=c(0,1,1), seasonal=list(order=c(1,0,0),period=48))
+TOC_arima
+
+## Forecasting
+TP_fcast <- forecast(TP_arima)
+TP_fcast
+plot(TP_fcast, main = "T-P Forecasts")
+TOC_fcast <- forecast(TOC_arima)
+TOC_fcast
+plot(TOC_fcast, main = "TOC Forecasts")
