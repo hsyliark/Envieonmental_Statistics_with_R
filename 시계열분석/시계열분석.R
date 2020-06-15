@@ -1,5 +1,5 @@
 ## Data loading
-water <- read.csv("C:/Users/HSY/Desktop/Й╢▒Лё╪2-1trend К╤└Л└²/Й╢▒Лё╪2-1.csv", sep=",", header=T)
+water <- read.csv("C:/Users/Nier/Desktop/╫ц╟Х©╜╨п╪╝/╠╓аж2-1.csv", sep=",", header=T)
 water_name <- water$date
 rownames(water) <- water_name
 
@@ -21,7 +21,7 @@ plot(TP_comp)
 TOC_comp <- decompose(TOC)
 plot(TOC_comp)
 
-## Л▀°ЙЁ└Л≈╢ К█╟Л²╢М└╟Л≈░Л└° ЙЁ└Л═┬Л└╠ Л ■Л²╦ Л═°Й╠╟
+## ?▀°ЙЁ└Л≈╢ ?█╟?²╢?└╟?≈░?└° ЙЁ└Л═┬?└╠ ? ■?²╦ ?═°Й╠?
 TP_adjusted <- TP - TP_comp$seasonal
 plot.ts(TP_adjusted, main = "TP - seasonal factor")
 plot.ts(TP_comp$seasonal, main="Seasonal factor of TP")
@@ -30,41 +30,41 @@ plot.ts(TOC_adjusted, main = "TOC - seasonal factor")
 plot.ts(TOC_comp$seasonal, main="Seasonal factor of TOC")
 
 ## Dickey-Fuller unit root test
-# H0: Л·░Кё▄Л≈░ К▀╗Л°└Й╥╪Л²╢ Л║╢Л·╛М∙°К▀╓.
-# H1: Л▀°ЙЁ└Л≈╢ Л·░Кё▄Й╟─ Л═∙Л┐│Л└╠Л²└ К╖▄Л║╠М∙°К▀╓(К≤░К┼■ Л╤■Л└╦ Л═∙Л┐│Л└╠Л²└ К╖▄Л║╠М∙°К▀╓).
+# H0: ?·░Кё▄Л≈░ ?▀╗?°└Й╥╪Л²╢ Л║╢Л·╛?∙°?▀╓.
+# H1: ?▀°ЙЁ└Л≈╢ ?·░Кё▄Й?─ ?═∙?┐│?└╠?²└ К╖▄Л║╠?∙°?▀╓(?≤░?┼■ Л╤■Л└╦ ?═∙?┐│?└╠?²└ К╖▄Л║╠?∙°?▀╓).
 install.packages("tseries")
 library(tseries)
 adf.test(TP_adjusted)
-# -> ЙЁ└Л═┬Л└╠ Л ■Л²╦Л²└ Л═°Й╠╟М∙° T-PК┼■ К▀╗Л°└Й╥╪Л²╢ Л║╢Л·╛М∙≤Л╖─ Л∙┼Л²▄. (Л╟╗К╤└ М∙└Л ■ Л≈├Л²▄)
+# -> ЙЁ└Л═┬?└╠ ? ■?²╦?²└ ?═°Й╠╟М∙° T-P?┼■ ?▀╗?°└Й╥╪Л²╢ Л║╢Л·╛?∙≤Л╖─ ?∙┼?²▄. (Л╟╗К╤└ ?∙└? ■ ?≈├?²▄)
 adf.test(TOC_adjusted)
-# -> ЙЁ└Л═┬Л└╠ Л ■Л²╦Л²└ Л═°Й╠╟М∙° TOCК┼■ К▀╗Л°└Й╥╪Л²╢ Л║╢Л·╛М∙╗. Л╕┴, Л╤■Л└╦Й╟─ Л║╢Л·╛. (Л╟╗К╤└ М∙└Л ■)
+# -> ЙЁ└Л═┬?└╠ ? ■?²╦?²└ ?═°Й╠╟М∙° TOC?┼■ ?▀╗?°└Й╥╪Л²╢ Л║╢Л·╛?∙╗. Л╕?, Л╤■Л└╦Й╟─ Л║╢Л·╛. (Л╟╗К╤└ ?∙└? ■)
 adf.test(TP_comp$seasonal)
 adf.test(TOC_comp$seasonal)
-# -> T-PЛ≥─ TOCЛ²≤ ЙЁ└Л═┬Л└╠ Л ■Л²╦Л²─ К╙╗К▒░ Л╤■Л└╦Й╟─ Л║╢Л·╛М∙≤Л╖─ Л∙┼Л²▄.
-## Л╟╗К╤└Л²└ М├╣М∙╢ Л═∙Л┐│Л└╠ М≥∙Л²╦
+# -> T-P??─ TOC?²≤ ЙЁ└Л═┬?└╠ ? ■?²╦??─ К╙╗К▒░ Л╤■Л└╦Й╟─ Л║╢Л·╛?∙≤Л╖─ ?∙┼?²▄.
+## Л╟╗К╤└?²└ ?├╣?∙╢ ?═∙?┐│?└╠ ?≥∙?²╦
 TOC_diff1 <- diff(TOC_adjusted, differences = 1)
-plot.ts(TOC_diff1, main = "TOC - seasonal factor 1Л╟╗ Л╟╗К╤└") 
+plot.ts(TOC_diff1, main = "TOC - seasonal factor 1Л╟? Л╟╗К╤└") 
 adf.test(TOC_diff1)
 
 ## ACF, PACF
 # T-P
-acf(TP_adjusted, lag.max = 4800)  # lag 3 Л≈░Л└° Л═┬К▀╗Й╟▓ --> MA(2)
-pacf(TP_adjusted, lag.max = 4800)  # lag 3 Л≈░Л└° Л═┬К▀╗Й╟▓ --> AR(2)
-# --> ЙЁ└Л═┬Л└╠ Л ■Л²╦Л²└ Л═°Й╠╟М∙° T-P : ARIMA(2,0,2) ?
+acf(TP_adjusted, lag.max = 4800)  # lag 3 ?≈░?└° ?═┬?▀╗Й╟? --> MA(2)
+pacf(TP_adjusted, lag.max = 4800)  # lag 3 ?≈░?└° ?═┬?▀╗Й╟? --> AR(2)
+# --> ЙЁ└Л═┬?└╠ ? ■?²╦?²└ ?═°Й╠╟М∙° T-P : ARIMA(2,0,2) ?
 acf(TP_comp$seasonal, lag.max = 4800) # Й╟░Л├▄Л╤■Л└╦
-pacf(TP_comp$seasonal, lag.max = 4800) # lag 2 Л≈░Л└° Л═┬К▀╗Й╟▓ --> AR(1)
-# --> T-PЛ²≤ ЙЁ└Л═┬Л└╠ Л ■Л²╦ : ARIMA(1,0,0)[48] 
+pacf(TP_comp$seasonal, lag.max = 4800) # lag 2 ?≈░?└° ?═┬?▀╗Й╟? --> AR(1)
+# --> T-P?²≤ ЙЁ└Л═┬?└╠ ? ■?²╦ : ARIMA(1,0,0)[48] 
 # TOC
-acf(TOC_diff1, lag.max = 4800) # lag 1 Л≈░Л└° Л═┬К▀╗Й╟▓ --> MA(0)
-pacf(TOC_diff1, lag.max = 4800) # lag 2 Л≈░Л└° Л═┬К▀╗Й╟▓ --> AR(1)
-# --> ЙЁ└Л═┬Л└╠ Л ■Л²╦Л²└ Л═°Й╠╟М∙° TOC : ARIMA(0,1,1) ?
+acf(TOC_diff1, lag.max = 4800) # lag 1 ?≈░?└° ?═┬?▀╗Й╟? --> MA(0)
+pacf(TOC_diff1, lag.max = 4800) # lag 2 ?≈░?└° ?═┬?▀╗Й╟? --> AR(1)
+# --> ЙЁ└Л═┬?└╠ ? ■?²╦?²└ ?═°Й╠╟М∙° TOC : ARIMA(0,1,1) ?
 acf(TOC_comp$seasonal, lag.max = 4800) # Й╟░Л├▄Л╤■Л└╦
-pacf(TOC_comp$seasonal, lag.max = 4800) # lag 2 Л≈░Л└° Л═┬К▀╗Й╟▓ --> AR(1) 
-# --> TOCЛ²≤ ЙЁ└Л═┬Л└╠ Л ■Л²╦ : ARIMA(1,0,0)[48]
+pacf(TOC_comp$seasonal, lag.max = 4800) # lag 2 ?≈░?└° ?═┬?▀╗Й╟? --> AR(1) 
+# --> TOC?²≤ ЙЁ└Л═┬?└╠ ? ■?²╦ : ARIMA(1,0,0)[48]
 # ----> T-P : ARIMA(2,0,2)(1,0,0)[48]
 # ----> TOC : ARIMA(0,1,1)(1,0,0)[48]
 
-## Л·░К▐≥Л°╪К║° ARIMA К╙╗М≤∙ М≥∙Л²╦
+## ?·░?▐≥?°╪К║? ARIMA К╙╗М≤∙ ?≥∙?²╦
 auto.arima(TP)
 auto.arima(TOC)
 
