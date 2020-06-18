@@ -75,3 +75,28 @@ NH3.N       -1.169803e-03
 PO4.P       -2.494660e-01
 Chl.a        .           
 Rain         .           
+
+
+반응변수 : COD
+
+> set.seed(1)
+> cv.lasso <- cv.glmnet(X, y, alpha=1)
+> plot(cv.lasso)
+> bestlam.lasso <- cv.lasso$lambda.min
+> bestlam.lasso
+[1] 0.0007815571
+> 
+> best.lasso <- glmnet(X, y, alpha=1, lambda=sh)
+> predict(best.lasso, s=bestlam.lasso, type="coefficients")
+10 x 1 sparse Matrix of class "dgCMatrix"
+                        1
+(Intercept)  1.145350e-16
+BOD          4.973729e-01
+SS           1.864071e-01
+T.N         -2.819338e-01
+T.P         -1.921126e-01
+TOC          5.270879e-01
+NH3.N        2.530619e-01
+PO4.P        2.311241e-01
+Chl.a       -2.866269e-02
+Rain        -8.844890e-02

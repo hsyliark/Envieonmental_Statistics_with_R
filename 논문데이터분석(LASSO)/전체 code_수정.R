@@ -1,4 +1,4 @@
-water <- read.csv("C:/Users/HSY/Desktop/논문데이터분석(LASSO)/자료, 결과정리/유량(O)/csv파일/10_함평.csv", sep=",", header=T)
+water <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(LASSO)/자료, 결과정리/유량(O)/csv파일/5_광산.csv", sep=",", header=T)
 water1 <- water[,-(10:11)]
 water_scale <- scale(water)
 water1_scale <- scale(water1) # PCA, SOM
