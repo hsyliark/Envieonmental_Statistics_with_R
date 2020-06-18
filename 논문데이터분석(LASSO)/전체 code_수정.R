@@ -1,3 +1,8 @@
+water <- read.csv("C:/Users/HSY/Desktop/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(LASSO)/ìë£Œ, ê²°ê³¼ì •ë¦¬/ìœ ëŸ‰(O)/csvíŒŒì¼/10_í•¨í‰.csv", sep=",", header=T)
+water1 <- water[,-(10:11)]
+water_scale <- scale(water)
+water1_scale <- scale(water1) # PCA, SOM
+
 ## Correlation analysis
 
 install.packages('corrplot') 
@@ -6,12 +11,12 @@ install.packages('ggplot2')
 library(ggplot2)
 install.packages('ggcorrplot')
 library(ggcorrplot)
-X <- round(cor(all_site_scale, method='spearman'),4)
+X <- round(cor(water_scale, method='spearman'),4)
 pairs(X) # Correlation plot 1
 corrplot(X) # Correlation plot 2
 X # Correlation matrix
 # Compute a matrix of correlation p-values
-p.mat <- cor_pmat(all_site_scale, method='spearman')
+p.mat <- cor_pmat(water_scale, method='spearman')
 p.mat
 
 # Using ggplot2, ggcorrplot
@@ -37,7 +42,7 @@ ggcorrplot(X, hc.order=T, type="lower", p.mat=p.mat) +
 # Install and Attach required library
 install.packages("psych") # for descriptive statistics
 library(psych)
-water <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºĞ¼®/³í¹®µ¥ÀÌÅÍºĞ¼®(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/Åë°è°ü·ÃÀÚ·á/ÀüÃ¼ÁöÁ¡.csv", header=T, sep=',')
+water <- read.csv("C:/Users/Nier/Desktop/?ï¿½ï¿½ï¿½?????ÍºĞ¼?/?ï¿½ï¿½ï¿½?????ÍºĞ¼?(A study on evaluate water quality using LASSO in Yeongsan River, Republic of Korea)/?????????Ú·?/??Ã¼??ï¿½ï¿½.csv", header=T, sep=',')
 water <- water[,-11]
 water <- water[,-14]
 water <- water[,-(18:19)]
@@ -47,18 +52,18 @@ water <- water[,-(10:11)]
 water_scale_1 <- scale(water)
 
 # Descriptive statistics
-describe(water_scale_1)
+describe(water1_scale)
 
 # Correlation
-round(cor(water_scale_1),3) # pearson
-round(cor(water_scale_1, method="spearman"),3) # spearman
+round(cor(water1_scale),3) # pearson
+round(cor(water1_scale, method="spearman"),3) # spearman
 
 # KMO and Bartlett's test
-KMO(water_scale_1)
-cortest.bartlett(cor(water_scale_1, method="spearman"), n=nrow(water_scale_1))
+KMO(water1_scale)
+cortest.bartlett(cor(water1_scale, method="spearman"), n=nrow(water1_scale))
 
 # Number of principal components 
-water_pca <- prcomp(water_scale_1, center=T, scale.=T)
+water_pca <- prcomp(water1_scale, center=T, scale.=T)
 water_pca
 screeplot(water_pca, type="l")
 biplot(water_pca, main="Biplot")
@@ -66,9 +71,9 @@ summary(water_pca)
 water_pca$sdev^2 # Eigenvalue with respect to principal components
 
 # Component matrix 
-PCA <- principal(water_scale_1, nfactor=3, rotate="none", score=T) # The factor is the number of PC
+PCA <- principal(water1_scale, nfactor=3, rotate="none", score=T) # The factor is the number of PC
 PCA
-PCA_rot <- principal(water_scale_1, nfactor=2, rotate="varimax", score=T) # varimax rotate 
+PCA_rot <- principal(water1_scale, nfactor=2, rotate="varimax", score=T) # varimax rotate 
 PCA_rot
 biplot(PCA_rot, main="Biplot")
 
@@ -102,8 +107,8 @@ library(lars)
 colnames(water_scale)
 
 # Lasso (Variation of coefficient with s(threshold))
-X <- as.matrix(water_scale[,-6])
-y <- as.matrix(water_scale[,6])
+X <- as.matrix(water_scale[,-2])
+y <- as.matrix(water_scale[,2])
 object <- lars(X, y, type="lasso")
 plot(object) 
 

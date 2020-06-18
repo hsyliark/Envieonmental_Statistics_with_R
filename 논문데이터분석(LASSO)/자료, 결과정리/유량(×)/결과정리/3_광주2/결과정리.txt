@@ -1,0 +1,78 @@
+> # KMO and Bartlett's test
+> KMO(water1_scale)
+Kaiser-Meyer-Olkin factor adequacy
+Call: KMO(r = water1_scale)
+Overall MSA =  0.71
+MSA for each item = 
+  BOD   COD    SS   T.N   T.P   TOC NH3.N PO4.P Chl.a 
+ 0.87  0.80  0.87  0.55  0.51  0.85  0.67  0.41  0.72 
+> cortest.bartlett(cor(water1_scale, method="spearman"), n=nrow(water1_scale))
+$chisq
+[1] 470.1922
+
+$p.value
+[1] 4.916059e-77
+
+$df
+[1] 36
+
+
+
+
+> PCA_rot <- principal(water1_scale, nfactor=2, rotate="varimax", score=T) # varimax rotate 
+> PCA_rot
+Principal Components Analysis
+Call: principal(r = water1_scale, nfactors = 2, rotate = "varimax", 
+    scores = T)
+Standardized loadings (pattern matrix) based upon correlation matrix
+        RC1   RC2   h2    u2 com
+BOD    0.84  0.36 0.83 0.173 1.4
+COD    0.89  0.19 0.83 0.174 1.1
+SS     0.66  0.50 0.69 0.313 1.9
+T.N    0.62 -0.27 0.45 0.550 1.4
+T.P    0.23  0.89 0.84 0.161 1.1
+TOC    0.85  0.14 0.74 0.255 1.1
+NH3.N  0.74 -0.12 0.56 0.438 1.1
+PO4.P -0.24  0.92 0.91 0.094 1.1
+Chl.a  0.76 -0.05 0.58 0.424 1.0
+
+                       RC1  RC2
+SS loadings           4.27 2.15
+Proportion Var        0.47 0.24
+Cumulative Var        0.47 0.71
+Proportion Explained  0.67 0.33
+Cumulative Proportion 0.67 1.00
+
+Mean item complexity =  1.2
+Test of the hypothesis that 2 components are sufficient.
+
+The root mean square of the residuals (RMSR) is  0.14 
+ with the empirical chi square  79.93  with prob <  1.9e-09 
+
+Fit based upon off diagonal values = 0.92
+
+
+
+반응변수 : COD
+
+> set.seed(1)
+> cv.lasso <- cv.glmnet(X, y, alpha=1)
+> plot(cv.lasso)
+> bestlam.lasso <- cv.lasso$lambda.min
+> bestlam.lasso
+[1] 0.04374295
+> 
+> best.lasso <- glmnet(X, y, alpha=1, lambda=sh)
+> predict(best.lasso, s=bestlam.lasso, type="coefficients")
+10 x 1 sparse Matrix of class "dgCMatrix"
+                        1
+(Intercept)  2.188323e-16
+BOD          3.064202e-01
+SS           2.039394e-01
+T.N          .           
+T.P          .           
+TOC          4.568449e-01
+NH3.N        .           
+PO4.P       -6.918869e-02
+Chl.a        8.696725e-03
+Rain         .           

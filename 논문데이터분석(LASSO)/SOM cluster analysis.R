@@ -1,17 +1,20 @@
+watersom1 <- read.csv("C:/Users/HSY/Desktop/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(LASSO)/ìë£Œ, ê²°ê³¼ì •ë¦¬/ìœ ëŸ‰(Ã—)/csvíŒŒì¼/som1.csv", sep=",", header=T)
+watersom2 <- read.csv("C:/Users/HSY/Desktop/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(LASSO)/ìë£Œ, ê²°ê³¼ì •ë¦¬/ìœ ëŸ‰(Ã—)/csvíŒŒì¼/som2.csv", sep=",", header=T)
+
 ## Self Organizing Map 
 # reference : https://woosa7.github.io/R-Clustering-Kmens-SOM/
 
 ## Import data
-water5 <- read.csv("C:/Users/Nier/Desktop/¼öÁúµ¥ÀÌÅÍºĞ¼®(³í¹®)/2¹øÂ°/ºĞ¼®ÀÚ·á ¼ÛºÎ/5year/csv ÆÄÀÏ/0.ÀüÃ¼ÁöÁ¡(5³â).csv", header=T, sep=',')
+water5 <- read.csv("C:/Users/Nier/Desktop/?????????ÍºĞ¼?(?ï¿½ï¿½ï¿½)/2??Â°/?Ğ¼??Ú·? ?Ûº?/5year/csv ????/0.??Ã¼??ï¿½ï¿½(5??).csv", header=T, sep=',')
 water5_1 <- water5[,-(1:3)]
 water5_1$logTC <- log(water5_1$TC)
 water5_1$logFC <- log(water5_1$FC)
 water5_1$logRain <- log(water5_1$Rain)
 water5_1 <- water5_1[,-11]
 water5_1 <- water5_1[,-17]
-water5_1 <- water5_1[,-17] # water5_1 : ¿øµ¥ÀÌÅÍ (TC, FC, Rain ¿¡ log ÃëÇÔ, ±âÃÊÅë°è·® »êÁ¤)
-water5_2 <- scale(water5_1) # water5_2 : Ç¥ÁØÈ­ (»ó°üºĞ¼®)
-water5_3 <- cbind(water5_2[,-(17:18)],water5_1[,17:18]) # water5_3 : Ç¥ÁØÈ­ (logTC, logFC Á¦¿Ü, È¸±ÍºĞ¼®)
+water5_1 <- water5_1[,-17] # water5_1 : ???????? (TC, FC, Rain ?? log ????, ???????è·® ??ï¿½ï¿½)
+water5_2 <- scale(water5_1) # water5_2 : Ç¥??È­ (?????Ğ¼?)
+water5_3 <- cbind(water5_2[,-(17:18)],water5_1[,17:18]) # water5_3 : Ç¥??È­ (logTC, logFC ï¿½ï¿½??, È¸?ÍºĞ¼?)
 
 
 # Install packages

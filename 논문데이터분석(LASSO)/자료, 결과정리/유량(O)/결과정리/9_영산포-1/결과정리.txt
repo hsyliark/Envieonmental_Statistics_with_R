@@ -1,0 +1,24 @@
+반응변수 : COD
+
+> set.seed(1)
+> cv.lasso <- cv.glmnet(X, y, alpha=1)
+> plot(cv.lasso)
+> bestlam.lasso <- cv.lasso$lambda.min
+> bestlam.lasso
+[1] 0.06834598
+> 
+> best.lasso <- glmnet(X, y, alpha=1, lambda=sh)
+> predict(best.lasso, s=bestlam.lasso, type="coefficients")
+11 x 1 sparse Matrix of class "dgCMatrix"
+                       1
+(Intercept) 4.843286e-16
+BOD         1.245182e-01
+SS          .           
+T.N         .           
+T.P         6.472580e-04
+TOC         7.818277e-01
+NH3.N       .           
+PO4.P       .           
+Chl.a       .           
+Rain        .           
+Flow        .           
