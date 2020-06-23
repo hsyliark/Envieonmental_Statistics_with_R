@@ -1,0 +1,128 @@
+﻿> # KMO and Bartlett's test
+> KMO(water1_scale)
+Kaiser-Meyer-Olkin factor adequacy
+Call: KMO(r = water1_scale)
+Overall MSA =  0.65
+MSA for each item = 
+  BOD   COD    SS   T.N   T.P   TOC NH3.N PO4.P Chl.a  Rain 
+ 0.71  0.68  0.81  0.57  0.57  0.65  0.52  0.62  0.62  0.76 
+> cortest.bartlett(cor(water1_scale, method="spearman"), n=nrow(water1_scale))
+$chisq
+[1] 486.6746
+
+$p.value
+[1] 1.933507e-75
+
+$df
+[1] 45
+
+
+
+
+> PCA_rot <- principal(water1_scale, nfactor=2, rotate="varimax", score=T) # varimax rotate 
+> PCA_rot
+Principal Components Analysis
+Call: principal(r = water1_scale, nfactors = 2, rotate = "varimax", 
+    scores = T)
+Standardized loadings (pattern matrix) based upon correlation matrix
+        RC1   RC2   h2   u2 com
+BOD    0.89 -0.14 0.81 0.19 1.0
+COD    0.88  0.15 0.79 0.21 1.1
+SS     0.82  0.17 0.70 0.30 1.1
+T.N    0.07 -0.85 0.73 0.27 1.0
+T.P    0.48  0.61 0.60 0.40 1.9
+TOC    0.78  0.00 0.61 0.39 1.0
+NH3.N  0.22 -0.69 0.52 0.48 1.2
+PO4.P -0.02  0.88 0.77 0.23 1.0
+Chl.a  0.72 -0.23 0.57 0.43 1.2
+Rain   0.15  0.81 0.67 0.33 1.1
+
+                       RC1  RC2
+SS loadings           3.67 3.11
+Proportion Var        0.37 0.31
+Cumulative Var        0.37 0.68
+Proportion Explained  0.54 0.46
+Cumulative Proportion 0.54 1.00
+
+Mean item complexity =  1.2
+Test of the hypothesis that 2 components are sufficient.
+
+The root mean square of the residuals (RMSR) is  0.12 
+ with the empirical chi square  75.39  with prob <  1.1e-06 
+
+Fit based upon off diagonal values = 0.92
+
+
+
+
+
+반응변수 : BOD
+
+> set.seed(1)
+> cv.lasso <- cv.glmnet(X, y, alpha=1)
+> plot(cv.lasso)
+> bestlam.lasso <- cv.lasso$lambda.min
+> bestlam.lasso
+[1] 0.03780906
+> 
+> best.lasso <- glmnet(X, y, alpha=1, lambda=sh)
+> predict(best.lasso, s=bestlam.lasso, type="coefficients")
+10 x 1 sparse Matrix of class "dgCMatrix"
+                        1
+(Intercept) -6.785680e-17
+COD          6.344913e-01
+SS           .           
+T.N          .           
+T.P          .           
+TOC          .           
+NH3.N        6.054355e-02
+PO4.P       -3.012071e-03
+Chl.a        3.471791e-01
+Rain        -7.670423e-02
+
+
+> obs <- y
+> sim <- pred_y
+> NSE(sim, obs)
+[1] 0.8203321
+> my_bias(sim, obs)
+[1] -1.410908e-17
+> mae(sim, obs)
+        1 
+0.3314627 
+
+
+반응변수 : COD
+
+> set.seed(1)
+> cv.lasso <- cv.glmnet(X, y, alpha=1)
+> plot(cv.lasso)
+> bestlam.lasso <- cv.lasso$lambda.min
+> bestlam.lasso
+[1] 0.005881865
+> 
+> best.lasso <- glmnet(X, y, alpha=1, lambda=sh)
+> predict(best.lasso, s=bestlam.lasso, type="coefficients")
+10 x 1 sparse Matrix of class "dgCMatrix"
+                        1
+(Intercept) -4.768360e-17
+BOD          5.922952e-01
+SS           7.459355e-02
+T.N         -1.107799e-01
+T.P         -1.640188e-01
+TOC          4.051936e-01
+NH3.N        .           
+PO4.P        1.010298e-01
+Chl.a       -9.998133e-03
+Rain         1.475600e-01
+
+
+> obs <- y
+> sim <- pred_y
+> NSE(sim, obs)
+[1] 0.8495353
+> my_bias(sim, obs)
+[1] -5.319819e-18
+> mae(sim, obs)
+        1 
+0.2927506 

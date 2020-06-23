@@ -1,0 +1,70 @@
+NSE
+https://www.rdocumentation.org/packages/hydroGOF/versions/0.4-0/topics/NSE
+https://en.wikipedia.org/wiki/Nash%E2%80%93Sutcliffe_model_efficiency_coefficient
+
+
+Bias
+https://www.rdocumentation.org/packages/SimDesign/versions/1.14/topics/bias
+https://en.wikipedia.org/wiki/Bias_of_an_estimator
+
+
+MAE
+https://www.rdocumentation.org/packages/Metrics/versions/0.1.4/topics/mae
+https://en.wikipedia.org/wiki/Mean_absolute_error
+
+
+## Data loading
+water <- read.csv("C:/Users/Nier/Desktop/NSE, Bias, MAE in R/(200609)¼öÀ§,¼ö¿Â,¹æ·ù·® º¸Á¤°á°ú.csv", sep=",", header=T)
+
+
+## NSE(Nash-Sutcliffe Efficiency)
+install.packages("hydroGOF") # NSE, MAE
+library(hydroGOF)
+# 1. ½ÂÃÌº¸ ¼ö¿Â
+obs <- water[,2] ; sim <- water[,5] 
+NSE(sim, obs)  # = 0.9245465
+# 2. ½ÂÃÌº¸ ¼öÀ§
+obs <- water[,3] ; sim <- water[,6]
+NSE(sim, obs)  # = 0.9422839
+# 3. ½ÂÃÌº¸ À¯·®
+obs <- water[,4] ; sim <- water[,7]
+NSE(sim, obs)  # = 0.693396 
+# 4. Á×»êº¸ ¼ö¿Â
+obs <- water[,8] ; sim <- water[,9]
+NSE(sim, obs)  # = 0.9615226
+
+
+## MAE(Mean Absolute Error)
+install.packages("hydroGOF") # NSE, MAE
+library(hydroGOF)
+# 1. ½ÂÃÌº¸ ¼ö¿Â
+obs <- water[,2] ; sim <- water[,5] 
+mae(sim, obs)  # = 1.890614
+# 2. ½ÂÃÌº¸ ¼öÀ§
+obs <- water[,3] ; sim <- water[,6]
+mae(sim, obs)  # = 0.1977194
+# 3. ½ÂÃÌº¸ À¯·®
+obs <- water[,4] ; sim <- water[,7]
+mae(sim, obs)  # = 15.7602
+# 4. Á×»êº¸ ¼ö¿Â
+obs <- water[,8] ; sim <- water[,9]
+mae(sim, obs)  # = 1.415834
+
+
+## Bias
+my_bias <- function(sim, obs) {
+  bias = sum(sim-obs)/length(sim)
+  return(bias)
+}
+# 1. ½ÂÃÌº¸ ¼ö¿Â
+obs <- water[,2] ; sim <- water[,5] 
+my_bias(sim, obs)  # = -0.4715937 
+# 2. ½ÂÃÌº¸ ¼öÀ§
+obs <- water[,3] ; sim <- water[,6]
+my_bias(sim, obs)  # = -0.03394142
+# 3. ½ÂÃÌº¸ À¯·®
+obs <- water[,4] ; sim <- water[,7]
+my_bias(sim, obs)  # = 3.057885
+# 4. Á×»êº¸ ¼ö¿Â
+obs <- water[,8] ; sim <- water[,9]
+my_bias(sim, obs)  # = -0.3032684
