@@ -1,4 +1,4 @@
-water <- read.csv("C:/Users/HSY/Desktop/논문데이터분석(LASSO regression)_scree 기준/결과정리(scree 이용)/PCA에 Rain, Flow 포함/csv파일/0_4개지점.csv", sep=",", header=T)
+water <- read.csv("C:/Users/HSY/Desktop/논문데이터분석(LASSO regression)_scree 기준_수정/결과정리(scree 이용)/PCA에 Rain 포함/csv파일/0_전체지점.csv", sep=",", header=T)
 water1 <- water
 water_scale <- scale(water)
 water1_scale <- scale(water1)
@@ -69,6 +69,25 @@ PCA_rot <- principal(water1_scale, nfactor=3, rotate="varimax", score=T) # varim
 PCA_rot
 biplot(PCA_rot, main="Biplot")
 
+## 3D biplot
+# reference : https://planspace.org/2013/02/03/pca-3d-visualization-and-clustering-in-r/
+install.packages("rgl")
+library(rgl)
+plot3d(PCA_rot$scores)
+text3d(PCA_rot$scores, texts=rownames(water1_scale))
+text3d(PCA_rot$loadings, texts=rownames(PCA_rot$loadings), col="blue")
+coords <- NULL
+for (i in 1:nrow(PCA_rot$loadings)) {
+  coords <- rbind(coords, rbind(c(0,0,0),PCA_rot$loadings[i,1:3]))
+}
+lines3d(coords, col="red", lwd=3)
+# reference : https://iwatobipen.wordpress.com/2015/10/23/make-3d-pca-plot/
+# reference : https://cran.r-project.org/web/packages/pca3d/vignettes/pca3d.pdf
+install.packages("pca3d")
+library(pca3d)
+water_pca <- prcomp(water1_scale, center=T, scale.=T)
+pca3d(water_pca, biplot=T)
+snapshotPCA3d(file="fitst_plot.png")
 
 
 ## Lasso Regression
