@@ -1,4 +1,4 @@
-water <- read.csv("C:/Users/Administrator/Desktop/³í¹®µ¥ÀÌÅÍºĞ¼®(LASSO regression)_scree ±âÁØ_¼öÁ¤/°á°úÁ¤¸®(scree ÀÌ¿ë)/PCA¿¡ Rain, Flow Æ÷ÇÔ/csvÆÄÀÏ/10_ÇÔÆò.csv", sep=",", header=T)
+water <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(LASSO regression)_scree ê¸°ì¤€ 3D biplot/ê²°ê³¼ì •ë¦¬(scree ì´ìš©)/PCAì— Rain í¬í•¨/csvíŒŒì¼/0_ì „ì²´ì§€ì .csv", sep=",", header=T)
 water1 <- water
 water_scale <- scale(water)
 water1_scale <- scale(water1)
