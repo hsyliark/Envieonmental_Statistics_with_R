@@ -1,0 +1,47 @@
+> set.seed(1)
+> km <- kmeans(water_scale, centers=2)
+> str(km)
+List of 9
+ $ cluster     : Named int [1:15] 2 2 2 2 2 2 2 2 1 1 ...
+  ..- attr(*, "names")= chr [1:15] "2005" "2006" "2007" "2008" ...
+ $ centers     : num [1:2, 1:10] 0.234 -0.205 0.576 -0.504 -0.814 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : chr [1:2] "1" "2"
+  .. ..$ : chr [1:10] "BOD" "COD" "T.N" "DTN" ...
+ $ totss       : num 140
+ $ withinss    : num [1:2] 37.2 36.6
+ $ tot.withinss: num 73.9
+ $ betweenss   : num 66.1
+ $ size        : int [1:2] 7 8
+ $ iter        : int 1
+ $ ifault      : int 0
+ - attr(*, "class")= chr "kmeans"
+> km
+K-means clustering with 2 clusters of sizes 7, 8
+
+Cluster means:
+         BOD        COD        T.N        DTN
+1  0.2338909  0.5757663 -0.8142180 -0.7827767
+2 -0.2046545 -0.5037955  0.7124407  0.6849296
+       NO3.N      NH3.N        T.P        DTP
+1 -0.7351224 -0.2138327 -0.8855324 -0.9662287
+2  0.6432321  0.1871036  0.7748408  0.8454501
+       PO4.P Chlorophyll.a
+1 -0.9066253    -0.4989661
+2  0.7932972     0.4365953
+
+Clustering vector:
+2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 
+   2    2    2    2    2    2    2    2    1    1    1 
+2016 2017 2018 2019 
+   1    1    1    1 
+
+Within cluster sum of squares by cluster:
+[1] 37.24598 36.64689
+ (between_SS / total_SS =  47.2 %)
+
+Available components:
+
+[1] "cluster"      "centers"      "totss"       
+[4] "withinss"     "tot.withinss" "betweenss"   
+[7] "size"         "iter"         "ifault"  

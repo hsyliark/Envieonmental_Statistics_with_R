@@ -1,0 +1,53 @@
+> set.seed(1)
+> km <- kmeans(water_scale, centers=4)
+> str(km)
+List of 9
+ $ cluster     : Named int [1:15] 2 2 2 2 2 3 3 4 1 4 ...
+  ..- attr(*, "names")= chr [1:15] "2005" "2006" "2007" "2008" ...
+ $ centers     : num [1:4, 1:10] 0.0093 0.3721 -2.0839 0.5675 0.4182 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : chr [1:4] "1" "2" "3" "4"
+  .. ..$ : chr [1:10] "BOD" "COD" "T.N" "DTN" ...
+ $ totss       : num 140
+ $ withinss    : num [1:4] 8.42 11.7 1.22 10.83
+ $ tot.withinss: num 32.2
+ $ betweenss   : num 108
+ $ size        : int [1:4] 4 5 2 4
+ $ iter        : int 3
+ $ ifault      : int 0
+ - attr(*, "class")= chr "kmeans"
+> km
+K-means clustering with 4 clusters of sizes 4, 5, 2, 4
+
+Cluster means:
+           BOD        COD         T.N        DTN
+1  0.009303116  0.4182496 -1.38622936 -1.4221245
+2  0.372124651 -0.8857051  0.79485628  0.5199619
+3 -2.083898044 -0.2788331  0.60999542  0.8515095
+4  0.567490092  0.8282983  0.08766129  0.3464174
+       NO3.N      NH3.N        T.P        DTP
+1 -1.3717368 -0.6900966 -1.0010627 -0.8771725
+2  0.5211935  0.4308896  1.0811013  1.1802582
+3  0.9522474  0.7540567  0.7911063  0.3861621
+4  0.2441213 -0.2255438 -0.7458671 -0.7912313
+       PO4.P Chlorophyll.a
+1 -0.9661057    -0.6588088
+2  1.1407334     1.2627570
+3  0.5791609    -0.8970194
+4 -0.7493915    -0.4711277
+
+Clustering vector:
+2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 
+   2    2    2    2    2    3    3    4    1    4    1 
+2016 2017 2018 2019 
+   4    1    4    1 
+
+Within cluster sum of squares by cluster:
+[1]  8.420213 11.701516  1.218410 10.831285
+ (between_SS / total_SS =  77.0 %)
+
+Available components:
+
+[1] "cluster"      "centers"      "totss"       
+[4] "withinss"     "tot.withinss" "betweenss"   
+[7] "size"         "iter"         "ifault" 

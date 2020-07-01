@@ -1,0 +1,86 @@
+﻿> # KMO and Bartlett's test
+> KMO(water1_scale)
+Kaiser-Meyer-Olkin factor adequacy
+Call: KMO(r = water1_scale)
+Overall MSA =  0.72
+MSA for each item = 
+  BOD   COD    SS   T.N   T.P   TOC NH3.N 
+ 0.82  0.73  0.83  0.63  0.53  0.77  0.67 
+PO4.P Chl.a  Rain 
+ 0.66  0.83  0.64 
+> cortest.bartlett(cor(water1_scale, method="spearman"), n=nrow(water1_scale))
+$chisq
+[1] 565.407
+
+$p.value
+[1] 3.838711e-91
+
+$df
+[1] 45
+
+
+
+> PCA_rot <- principal(water1_scale, nfactor=3, rotate="varimax", score=T) # varimax rotate 
+> PCA_rot
+Principal Components Analysis
+Call: principal(r = water1_scale, nfactors = 3, rotate = "varimax", 
+    scores = T)
+Standardized loadings (pattern matrix) based upon correlation matrix
+        RC1   RC3   RC2   h2    u2 com
+BOD    0.90  0.23 -0.06 0.87 0.135 1.1
+COD    0.92  0.21  0.14 0.90 0.097 1.2
+SS     0.65  0.00  0.40 0.58 0.422 1.7
+T.N    0.25  0.93 -0.09 0.94 0.061 1.2
+T.P    0.26  0.03  0.88 0.84 0.159 1.2
+TOC    0.86  0.24  0.12 0.82 0.182 1.2
+NH3.N  0.40  0.83  0.13 0.88 0.122 1.5
+PO4.P -0.31 -0.39  0.79 0.87 0.130 1.8
+Chl.a  0.75  0.11 -0.30 0.67 0.330 1.4
+Rain   0.06 -0.71  0.40 0.67 0.330 1.6
+
+                       RC1  RC3  RC2
+SS loadings           3.77 2.39 1.87
+Proportion Var        0.38 0.24 0.19
+Cumulative Var        0.38 0.62 0.80
+Proportion Explained  0.47 0.30 0.23
+Cumulative Proportion 0.47 0.77 1.00
+
+Mean item complexity =  1.4
+Test of the hypothesis that 3 components are sufficient.
+
+The root mean square of the residuals (RMSR) is  0.06 
+ with the empirical chi square  19.27  with prob <  0.38 
+
+Fit based upon off diagonal values = 0.98
+
+
+COD
+
+10 x 1 sparse Matrix of class "dgCMatrix"
+                        1
+(Intercept) -5.624782e-16
+BOD          3.379651e-01
+SS           .           
+T.N          .           
+T.P          6.789950e-02
+TOC          6.100179e-01
+NH3.N        .           
+PO4.P        .           
+Chl.a        .           
+Rain         .           
+
+> set.seed(1)
+> cv.lasso <- cv.glmnet(X, y, alpha=1)
+> bestlam.lasso <- cv.lasso$lambda.min
+> bestlam.lasso
+[1] 0.03894117
+
+> obs <- y
+> sim <- pred_y
+> NSE(sim, obs)
+[1] 0.9199783
+> my_bias(sim, obs)
+[1] -1.436351e-16
+> mae(sim, obs)
+        1 
+0.2251316 

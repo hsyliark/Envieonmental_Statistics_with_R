@@ -1,4 +1,4 @@
-water <- read.csv("C:/Users/HSY/Desktop/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(K-means SOM clustering)/ë‚™ë™ê°• ì§€ë¥˜ ë¶„ì„/ì§€ë¥˜ì·¨í•©.csv", sep=",", header=T)
+water <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºĞ¼®(K-means SOM clustering)/³«µ¿°­ Áö·ù ºĞ¼®/Áö·ùÃëÇÕ.csv", sep=",", header=T)
 water_name <- water[,1]
 rownames(water) <- water_name
 water <- water[,-1]
@@ -17,9 +17,9 @@ library(superheat)
 superheat(water, scale = TRUE, left.label.text.size=3,
           bottom.label.text.size=3, bottom.label.size = .05,
           row.dendrogram = TRUE, title = "Water Quality Heatmap")
-superheat(water_t, scale = TRUE, left.label.text.size=3,
+superheat(water, scale = TRUE, left.label.text.size=3,
           bottom.label.text.size=3, bottom.label.size = .05,
-          row.dendrogram = TRUE, title = "Water Quality Heatmap")
+          row.dendrogram = FALSE, title = "Water Quality Heatmap")
 
 
 
@@ -28,17 +28,17 @@ set.seed(1)
 d <- dist(water_scale, method="euclidean")
 fit <- hclust(d, method="ward.D")
 plot(fit)
-rect.hclust(fit, k=2, border = "red")
+rect.hclust(fit, k=4, border = "red")
 
 wss <- 0
-for(i in 1:10) {wss[i] <- kmeans(water, centers=i)$tot.withinss}
+for(i in 1:10) {wss[i] <- kmeans(water_scale, centers=i)$tot.withinss}
 plot(1:10, wss, type="b", xlab="Number of clusters", 
      ylab="Within group sum of squares",
      main="Select the best number of clusters (K-means)")
 
 install.packages("NbClust")
 library(NbClust)
-nc <- NbClust(water, min.nc=2, max.nc=10, method="kmeans")
+nc <- NbClust(water_scale, min.nc=2, max.nc=10, method="kmeans")
 barplot(table(nc$Best.nc[1,]), xlab="Number of clusters", 
         ylab="Number of criteria", main="Number of clusters chosen by 26 criteria")
 
@@ -52,10 +52,10 @@ install.packages("cluster")
 library(cluster)
 
 set.seed(1)
-km <- kmeans(water, centers=2)
+km <- kmeans(water_scale, centers=4)
 str(km)
 km
-clusplot(water, km$cluster)
+clusplot(water_scale, km$cluster)
 
 water_cluster <- water
 water_cluster$cluster <- as.character(km$cluster)
@@ -95,16 +95,15 @@ water_scale_matrix <- as.matrix(water_scale)
 
 # Training the SOM model
 set.seed(1)
-som_grid <- somgrid(xdim=2, ydim=1, topo="hexagonal")
+som_grid <- somgrid(xdim=4, ydim=1, topo="hexagonal")
 som_model1 <- som(water_scale_matrix, grid=som_grid)
-som_model2 <- trainSOM(x.data=water_scale_matrix, dimension=c(1,2),
+som_model2 <- trainSOM(x.data=water_scale_matrix, dimension=c(1,4),
                        nb.save=10, maxit=2000, scaling="none",
                        radius.type="letremy")
 
 # Visualization
 plot(som_model1, main="feature distribution")
 table(som_model2$clustering)
-plot(som_model2, what="prototypes", type="umatrix", show.names=T)
 plot(som_model2, what="obs", type="names")
 plot(som_model1, type="counts", main="cluster size")
 
