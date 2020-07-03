@@ -1,4 +1,4 @@
-water <- read.csv("C:/Users/HSY/Desktop/논문데이터분석(낙동강 K-means SOM clustering)/공간적 군집분석/지류/csv파일/지류T-P.csv", sep=",", header=T)
+water <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(낙동강 K-means SOM clustering)/공간적 군집분석/전체/csv파일/전체DTN.csv", sep=",", header=T)
 water_name <- water[,1]
 rownames(water) <- water_name
 water <- water[,-1]
@@ -35,7 +35,7 @@ set.seed(1)
 d <- dist(water_scale, method="euclidean")
 fit <- hclust(d, method="ward.D")
 plot(fit)
-rect.hclust(fit, k=2, border = "red")
+rect.hclust(fit, k=4, border = "red")
 
 wss <- 0
 for(i in 1:10) {wss[i] <- kmeans(water_scale, centers=i)$tot.withinss}
@@ -59,7 +59,7 @@ install.packages("cluster")
 library(cluster)
 
 set.seed(1)
-km <- kmeans(water_scale, centers=2)
+km <- kmeans(water_scale, centers=4)
 str(km)
 km
 clusplot(water_scale, km$cluster)
@@ -130,9 +130,9 @@ water_scale_matrix <- as.matrix(water_scale)
 
 # Training the SOM model
 set.seed(1)
-som_grid <- somgrid(xdim=2, ydim=1, topo="hexagonal")
+som_grid <- somgrid(xdim=4, ydim=1, topo="hexagonal")
 som_model1 <- som(water_scale_matrix, grid=som_grid)
-som_model2 <- trainSOM(x.data=water_scale_matrix, dimension=c(1,2),
+som_model2 <- trainSOM(x.data=water_scale_matrix, dimension=c(1,4),
                        nb.save=10, maxit=2000, scaling="none",
                        radius.type="letremy")
 
