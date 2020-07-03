@@ -1,4 +1,4 @@
-water <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºĞ¼®(K-means SOM clustering)_ÀçºĞ¼®/³«µ¿°­ Áö·ù ºĞ¼®(3 Á¦¿Ü)/Áö·ùÃëÇÕ(3 Á¦¿Ü).csv", sep=",", header=T)
+water <- read.csv("C:/Users/HSY/Desktop/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(ë‚™ë™ê°• K-means SOM clustering)/ê³µê°„ì  êµ°ì§‘ë¶„ì„/ì§€ë¥˜/csvíŒŒì¼/ì§€ë¥˜T-P.csv", sep=",", header=T)
 water_name <- water[,1]
 rownames(water) <- water_name
 water <- water[,-1]
@@ -35,7 +35,7 @@ set.seed(1)
 d <- dist(water_scale, method="euclidean")
 fit <- hclust(d, method="ward.D")
 plot(fit)
-rect.hclust(fit, k=4, border = "red")
+rect.hclust(fit, k=2, border = "red")
 
 wss <- 0
 for(i in 1:10) {wss[i] <- kmeans(water_scale, centers=i)$tot.withinss}
@@ -59,7 +59,7 @@ install.packages("cluster")
 library(cluster)
 
 set.seed(1)
-km <- kmeans(water_scale, centers=4)
+km <- kmeans(water_scale, centers=2)
 str(km)
 km
 clusplot(water_scale, km$cluster)
@@ -88,9 +88,37 @@ ggplot(water_cluster, aes(x=PO4.P, fill=cluster)) +
 ggplot(water_cluster, aes(x=Chlorophyll.a, fill=cluster)) +
   geom_density(alpha=0.5)
 
-x <- ggplot(cdata, aes(x=factor(1), fill=cluster))
-x + geom_bar(width=1) + coord_polar(theta="y")
 
+ggplot(water_cluster, aes(x=X2005, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2006, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2007, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2008, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2009, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2010, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2011, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2012, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2013, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2014, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2015, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2016, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2017, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2018, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2019, fill=cluster)) +
+  geom_density(alpha=0.5)
 
 
 ## SOM clustering
@@ -102,9 +130,9 @@ water_scale_matrix <- as.matrix(water_scale)
 
 # Training the SOM model
 set.seed(1)
-som_grid <- somgrid(xdim=4, ydim=1, topo="hexagonal")
+som_grid <- somgrid(xdim=2, ydim=1, topo="hexagonal")
 som_model1 <- som(water_scale_matrix, grid=som_grid)
-som_model2 <- trainSOM(x.data=water_scale_matrix, dimension=c(1,4),
+som_model2 <- trainSOM(x.data=water_scale_matrix, dimension=c(1,2),
                        nb.save=10, maxit=2000, scaling="none",
                        radius.type="letremy")
 

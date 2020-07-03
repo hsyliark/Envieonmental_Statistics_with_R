@@ -1,0 +1,65 @@
+> set.seed(1)
+> km <- kmeans(water_scale, centers=2)
+> str(km)
+List of 9
+ $ cluster     : Named int [1:20] 1 1 1 1 2 1 1 1 1 1 ...
+  ..- attr(*, "names")= chr [1:20] "a_상주2" "b_위천" "c_상주3" "d_산곡" ...
+ $ centers     : num [1:2, 1:15] -0.652 0.797 -0.668 0.817 -0.588 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : chr [1:2] "1" "2"
+  .. ..$ : chr [1:15] "X2005" "X2006" "X2007" "X2008" ...
+ $ totss       : num 285
+ $ withinss    : num [1:2] 27.2 127.9
+ $ tot.withinss: num 155
+ $ betweenss   : num 130
+ $ size        : int [1:2] 11 9
+ $ iter        : int 1
+ $ ifault      : int 0
+ - attr(*, "class")= chr "kmeans"
+> km
+K-means clustering with 2 clusters of sizes 11, 9
+
+Cluster means:
+       X2005      X2006      X2007
+1 -0.6524874 -0.6684387 -0.5879125
+2  0.7974846  0.8169806  0.7185597
+       X2008      X2009      X2010
+1 -0.5998549 -0.6222246 -0.5698069
+2  0.7331560  0.7604967  0.6964307
+       X2011      X2012      X2013
+1 -0.5628860 -0.5797748 -0.3845529
+2  0.6879718  0.7086137  0.4700091
+       X2014      X2015      X2016
+1 -0.5094271 -0.5584575 -0.7254312
+2  0.6226331  0.6825592  0.8866382
+       X2017      X2018      X2019
+1 -0.5520757 -0.6817474 -0.5989848
+2  0.6747592  0.8332468  0.7320926
+
+Clustering vector:
+   a_상주2     b_위천    c_상주3 
+         1          1          1 
+    d_산곡     e_감천     f_강정 
+         1          2          1 
+    g_구미     h_왜관     i_성주 
+         1          1          1 
+    j_달성   k_금호강 l_화원나루 
+         1          2          2 
+    m_고령     n_현풍     o_회천 
+         2          2          1 
+    p_창녕     q_황강     r_합천 
+         2          1          2 
+    s_남강     t_남지 
+         2          2 
+
+Within cluster sum of squares by cluster:
+[1]  27.17462 127.86131
+ (between_SS / total_SS =  45.6 %)
+
+Available components:
+
+[1] "cluster"      "centers"     
+[3] "totss"        "withinss"    
+[5] "tot.withinss" "betweenss"   
+[7] "size"         "iter"        
+[9] "ifault"      

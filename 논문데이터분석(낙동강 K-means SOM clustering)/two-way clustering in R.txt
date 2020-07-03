@@ -1,0 +1,4 @@
+https://stats.stackexchange.com/questions/12580/interpretation-of-two-way-clustering-in-r
+
+http://www.sthda.com/english/wiki/beautiful-dendrogram-visualizations-in-r-5-must-known-methods-unsupervised-machine-learning
+

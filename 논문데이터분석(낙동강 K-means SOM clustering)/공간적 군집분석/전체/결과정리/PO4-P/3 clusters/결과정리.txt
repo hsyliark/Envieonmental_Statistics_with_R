@@ -1,0 +1,70 @@
+> set.seed(1)
+> km <- kmeans(water_scale, centers=3)
+> str(km)
+List of 9
+ $ cluster     : Named int [1:20] 1 1 1 1 2 1 1 1 1 1 ...
+  ..- attr(*, "names")= chr [1:20] "a_상주2" "b_위천" "c_상주3" "d_산곡" ...
+ $ centers     : num [1:3, 1:15] -0.538 0.611 3.32 -0.509 0.545 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : chr [1:3] "1" "2" "3"
+  .. ..$ : chr [1:15] "X2005" "X2006" "X2007" "X2008" ...
+ $ totss       : num 285
+ $ withinss    : num [1:3] 30 56.7 0
+ $ tot.withinss: num 86.7
+ $ betweenss   : num 198
+ $ size        : int [1:3] 13 6 1
+ $ iter        : int 2
+ $ ifault      : int 0
+ - attr(*, "class")= chr "kmeans"
+> km
+K-means clustering with 3 clusters of sizes 13, 6, 1
+
+Cluster means:
+       X2005      X2006      X2007
+1 -0.5375623 -0.5086369 -0.4519115
+2  0.6113454  0.5448227  0.3365207
+3  3.3202378  3.3433430  3.8557247
+       X2008      X2009      X2010
+1 -0.5019434 -0.5334470 -0.4781321
+2  0.4696146  0.5761487  0.4217894
+3  3.7075765  3.4779195  3.6849801
+       X2011      X2012      X2013
+1 -0.4301378 -0.4353606 -0.3367054
+2  0.2904893  0.2916974  0.4698657
+3  3.8488555  3.9095028  1.5579758
+       X2014      X2015      X2016
+1 -0.4420130 -0.4230466 -0.4997820
+2  0.6635767  0.7180260  0.8007856
+3  1.7647083  1.1914497  1.6924526
+       X2017      X2018      X2019
+1 -0.3688392 -0.4349308 -0.5492703
+2  0.4947129  0.7335941  0.8234242
+3  1.8266322  1.2525352  2.1999691
+
+Clustering vector:
+   a_상주2     b_위천    c_상주3 
+         1          1          1 
+    d_산곡     e_감천     f_강정 
+         1          2          1 
+    g_구미     h_왜관     i_성주 
+         1          1          1 
+    j_달성   k_금호강 l_화원나루 
+         1          3          2 
+    m_고령     n_현풍     o_회천 
+         2          2          1 
+    p_창녕     q_황강     r_합천 
+         2          1          2 
+    s_남강     t_남지 
+         1          1 
+
+Within cluster sum of squares by cluster:
+[1] 29.99425 56.74435  0.00000
+ (between_SS / total_SS =  69.6 %)
+
+Available components:
+
+[1] "cluster"      "centers"     
+[3] "totss"        "withinss"    
+[5] "tot.withinss" "betweenss"   
+[7] "size"         "iter"        
+[9] "ifault"      

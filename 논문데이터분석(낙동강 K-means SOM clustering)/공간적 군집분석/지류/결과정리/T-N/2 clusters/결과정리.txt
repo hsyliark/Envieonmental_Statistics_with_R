@@ -1,0 +1,55 @@
+> set.seed(1)
+> km <- kmeans(water_scale, centers=2)
+> str(km)
+List of 9
+ $ cluster     : Named int [1:6] 2 2 1 2 2 2
+  ..- attr(*, "names")= chr [1:6] "a_위천" "b_감천" "c_금호강" "d_회천" ...
+ $ centers     : num [1:2, 1:15] 1.738 -0.348 1.743 -0.349 1.912 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : chr [1:2] "1" "2"
+  .. ..$ : chr [1:15] "X2005" "X2006" "X2007" "X2008" ...
+ $ totss       : num 75
+ $ withinss    : num [1:2] 0 13.3
+ $ tot.withinss: num 13.3
+ $ betweenss   : num 61.7
+ $ size        : int [1:2] 1 5
+ $ iter        : int 1
+ $ ifault      : int 0
+ - attr(*, "class")= chr "kmeans"
+> km
+K-means clustering with 2 clusters of sizes 1, 5
+
+Cluster means:
+       X2005      X2006      X2007
+1  1.7378888  1.7430844  1.9119325
+2 -0.3475778 -0.3486169 -0.3823865
+       X2008      X2009      X2010
+1  1.8576842  1.8628017  1.8207074
+2 -0.3715368 -0.3725603 -0.3641415
+       X2011      X2012      X2013
+1  1.8346941  1.8632333  1.9288231
+2 -0.3669388 -0.3726467 -0.3857646
+       X2014      X2015    X2016
+1  1.8856014  1.9129406  1.87430
+2 -0.3771203 -0.3825881 -0.37486
+       X2017      X2018      X2019
+1  1.8925369  1.7904293  1.8346146
+2 -0.3785074 -0.3580859 -0.3669229
+
+Clustering vector:
+  a_위천   b_감천 c_금호강   d_회천 
+       2        2        1        2 
+  e_황강   f_남강 
+       2        2 
+
+Within cluster sum of squares by cluster:
+[1]  0.00000 13.33301
+ (between_SS / total_SS =  82.2 %)
+
+Available components:
+
+[1] "cluster"      "centers"     
+[3] "totss"        "withinss"    
+[5] "tot.withinss" "betweenss"   
+[7] "size"         "iter"        
+[9] "ifault"      
