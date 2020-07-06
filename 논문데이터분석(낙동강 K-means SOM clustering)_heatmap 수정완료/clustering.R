@@ -1,0 +1,154 @@
+water <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(낙동강 K-means SOM clustering)_heatmap 수정/시간적 군집분석/낙동강 지류 분석(3 제외)/지류취합(3 제외)_역순.csv", sep=",", header=T)
+water_name <- water[,1]
+rownames(water) <- water_name
+water <- water[,-1]
+water_scale <- scale(water)
+water_scale_t <- t(water_scale)
+water_t <- as.data.frame(t(water))
+water_scale_d <- as.data.frame(water_scale)
+water_scale_td <- as.data.frame(water_scale_t)
+
+
+water <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(낙동강 K-means SOM clustering)_heatmap 수정/공간적 군집분석/지류/csv파일/지류T-P.csv", sep=",", header=T)
+water_name <- water[,1]
+rownames(water) <- water_name
+water <- water[,-1]
+water_t <- as.data.frame(t(water))
+water_t_name <- c(2005:2019)
+rownames(water_t) <- water_t_name
+water_t_rev <- water_t[nrow(water_t):1,]
+
+
+## reference : https://rkabacoff.github.io/datavis/Time.html
+# heatmap
+install.packages("superheat")
+library(superheat)
+superheat(water, scale = TRUE, left.label.text.size=3,
+          bottom.label.text.size=3, bottom.label.size = .05,
+          row.dendrogram = TRUE, title = "Water Quality Heatmap")
+superheat(water, scale = TRUE, left.label.text.size=3,
+          bottom.label.text.size=3, bottom.label.size = .05,
+          row.dendrogram = FALSE, title = "Water Quality Heatmap")
+install.packages("RColorBrewer")
+library(RColorBrewer)
+colors <- brewer.pal(5, "Blues")
+superheat(water_t_rev, scale = FALSE, left.label.text.size=3,
+          bottom.label.text.size=3, bottom.label.size = .05,
+          row.dendrogram = FALSE, heat.pal = colors,
+          title = "Water Quality Heatmap")
+
+
+
+## Determining the optimal number of clusters
+set.seed(1)
+d <- dist(water_scale, method="euclidean")
+fit <- hclust(d, method="ward.D")
+plot(fit)
+rect.hclust(fit, k=3, border = "red")
+
+wss <- 0
+for(i in 1:10) {wss[i] <- kmeans(water_scale, centers=i)$tot.withinss}
+plot(1:10, wss, type="b", xlab="Number of clusters", 
+     ylab="Within group sum of squares",
+     main="Select the best number of clusters (K-means)")
+
+install.packages("NbClust")
+library(NbClust)
+nc <- NbClust(water_scale, min.nc=2, max.nc=10, method="kmeans")
+barplot(table(nc$Best.nc[1,]), xlab="Number of clusters", 
+        ylab="Number of criteria", main="Number of clusters chosen by 26 criteria")
+
+
+
+## K-means clustering
+# reference : http://www.sthda.com/english/wiki/ggplot2-density-plot-quick-start-guide-r-software-and-data-visualization
+install.packages("ggplot2")
+library(ggplot2)
+install.packages("cluster")
+library(cluster)
+
+set.seed(1)
+km <- kmeans(water_scale, centers=3)
+str(km)
+km
+clusplot(water_scale, km$cluster)
+
+water_cluster <- water
+water_cluster$cluster <- as.character(km$cluster)
+
+ggplot(water_cluster, aes(x=BOD, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=COD, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=T.N, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=DTN, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=NO3.N, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=NH3.N, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=T.P, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=DTP, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=PO4.P, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=Chlorophyll.a, fill=cluster)) +
+  geom_density(alpha=0.5)
+
+
+ggplot(water_cluster, aes(x=X2005, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2006, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2007, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2008, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2009, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2010, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2011, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2012, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2013, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2014, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2015, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2016, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2017, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2018, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=X2019, fill=cluster)) +
+  geom_density(alpha=0.5)
+
+
+## SOM clustering
+install.packages("kohonen")
+library(kohonen)
+install.packages("SOMbrero")
+library(SOMbrero)
+water_scale_matrix <- as.matrix(water_scale)
+
+# Training the SOM model
+set.seed(1)
+som_grid <- somgrid(xdim=3, ydim=1, topo="hexagonal")
+som_model1 <- som(water_scale_matrix, grid=som_grid)
+som_model2 <- trainSOM(x.data=water_scale_matrix, dimension=c(1,3),
+                       nb.save=10, maxit=2000, scaling="none",
+                       radius.type="letremy")
+
+# Visualization
+plot(som_model1, main="feature distribution")
+table(som_model2$clustering)
+plot(som_model2, what="obs", type="names")
+plot(som_model1, type="counts", main="cluster size")
+
+
