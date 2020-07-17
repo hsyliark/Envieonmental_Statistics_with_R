@@ -1,4 +1,4 @@
-water <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºĞ¼®(³«µ¿°­ K-means SOM clustering)_heatmap ¼öÁ¤/½Ã°£Àû ±ºÁıºĞ¼®/³«µ¿°­ Áö·ù ºĞ¼®(3 Á¦¿Ü)/Áö·ùÃëÇÕ(3 Á¦¿Ü)_¿ª¼ø.csv", sep=",", header=T)
+water <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(ë‚™ë™ê°• K-means SOM clustering)_heatmap ìˆ˜ì •ì™„ë£Œ/ì‹œê°„ì  êµ°ì§‘ë¶„ì„/ë‚™ë™ê°• ì§€ë¥˜ ë¶„ì„/ì§€ë¥˜ì·¨í•©.csv", sep=",", header=T)
 water_name <- water[,1]
 rownames(water) <- water_name
 water <- water[,-1]
@@ -9,7 +9,7 @@ water_scale_d <- as.data.frame(water_scale)
 water_scale_td <- as.data.frame(water_scale_t)
 
 
-water <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºĞ¼®(³«µ¿°­ K-means SOM clustering)_heatmap ¼öÁ¤/°ø°£Àû ±ºÁıºĞ¼®/Áö·ù/csvÆÄÀÏ/Áö·ùT-P.csv", sep=",", header=T)
+water <- read.csv("C:/Users/Nier/Desktop/?ï¿½ï¿½ï¿½?????ÍºĞ¼?(?????? K-means SOM clustering)_heatmap ??ï¿½ï¿½/?????? ?????Ğ¼?/????/csv????/????T-P.csv", sep=",", header=T)
 water_name <- water[,1]
 rownames(water) <- water_name
 water <- water[,-1]
@@ -152,3 +152,53 @@ plot(som_model2, what="obs", type="names")
 plot(som_model1, type="counts", main="cluster size")
 
 
+## DBSCAN clustering
+# reference : https://leedakyeong.tistory.com/entry/R-DBSCAN-%EC%BD%94%EB%93%9C-%EC%98%88%EC%8B%9C-%ED%95%B4%EC%84%9D-%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0-%EC%A1%B0%EC%A0%95-%EB%B0%A9%EB%B2%95-in-R
+# reference : https://brunch.co.kr/@gimmesilver/40
+install.packages("fpc")
+library(fpc)
+install.packages("ggplot2")
+library(ggplot2)
+# select parameter (eps, MinPts)
+dis_eps <- function(dat, a, b, c, d, e, f, g, h, i, j){
+  sqrt((dat[1]-a)^2 + (dat[2]-b)^2 + (dat[3]-c)^2 +
+         (dat[4]-d)^2 + (dat[5]-e)^2 + (dat[6]-f)^2 +
+         (dat[7]-g)^2 + (dat[8]-h)^2 + (dat[9]-i)^2 +
+         (dat[10]-j)^2)
+}
+k <- 6
+dis <- c()
+for(m in 1:nrow(water_scale)){
+  dis <- c(dis,sort(apply(water_scale, 1, dis_eps, 
+                          a=water_scale[m,1], b=water_scale[m,2],
+                          c=water_scale[m,3], d=water_scale[m,4],
+                          e=water_scale[m,5], f=water_scale[m,6],
+                          g=water_scale[m,7], h=water_scale[m,8],
+                          i=water_scale[m,9], j=water_scale[m,10]))[k+1])
+}
+sort(dis, decreasing = T)
+ggplot() +
+  geom_point(aes(x=1:length(dis), y=sort(dis, decreasing = T))) +
+  theme_bw()
+# clustering
+db <- dbscan(water_scale, eps=3.675645, MinPts=4)
+db$cluster
+
+
+
+## GMM(Gaussian Mixture Model) clustering
+# reference : https://bradleyboehmke.github.io/HOML/model-clustering.html
+# reference : https://rpackage.blogspot.com/2018/04/mclust.html
+# reference : http://blog.naver.com/PostView.nhn?blogId=sw4r&logNo=221033034225
+# reference : https://cran.r-project.org/web/packages/mclust/vignettes/mclust.html
+install.packages("mclust")
+library(mclust)
+# select number
+waterBIC <- mclustBIC(water_scale)
+waterBIC
+plot(waterBIC)
+# clustering
+watermod <- Mclust(water_scale)
+summary(watermod, parameters = TRUE)
+waterclassify <- cbind(water, watermod$classification)
+waterclassify
