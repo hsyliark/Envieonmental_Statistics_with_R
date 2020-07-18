@@ -159,6 +159,8 @@ install.packages("fpc")
 library(fpc)
 install.packages("ggplot2")
 library(ggplot2)
+install.packages("cluster")
+library(cluster)
 # select parameter (eps, MinPts)
 dis_eps <- function(dat, a, b, c, d, e, f, g, h, i, j){
   sqrt((dat[1]-a)^2 + (dat[2]-b)^2 + (dat[3]-c)^2 +
@@ -166,7 +168,7 @@ dis_eps <- function(dat, a, b, c, d, e, f, g, h, i, j){
          (dat[7]-g)^2 + (dat[8]-h)^2 + (dat[9]-i)^2 +
          (dat[10]-j)^2)
 }
-k <- 6
+k <- 5
 dis <- c()
 for(m in 1:nrow(water_scale)){
   dis <- c(dis,sort(apply(water_scale, 1, dis_eps, 
@@ -181,8 +183,35 @@ ggplot() +
   geom_point(aes(x=1:length(dis), y=sort(dis, decreasing = T))) +
   theme_bw()
 # clustering
-db <- dbscan(water_scale, eps=3.675645, MinPts=4)
+db <- dbscan(water_scale, eps=2.047646, MinPts=2)
+db
 db$cluster
+
+clusplot(water_scale, db$cluster)
+
+water_cluster <- water
+water_cluster$cluster <- as.character(db$cluster)
+
+ggplot(water_cluster, aes(x=BOD, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=COD, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=T.N, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=DTN, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=NO3.N, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=NH3.N, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=T.P, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=DTP, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=PO4.P, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=Chlorophyll.a, fill=cluster)) +
+  geom_density(alpha=0.5)
 
 
 
@@ -202,3 +231,31 @@ watermod <- Mclust(water_scale)
 summary(watermod, parameters = TRUE)
 waterclassify <- cbind(water, watermod$classification)
 waterclassify
+
+clusplot(water_scale, watermod$classification)
+
+water_cluster <- water
+water_cluster$cluster <- as.character(db$cluster)
+
+ggplot(water_cluster, aes(x=BOD, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=COD, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=T.N, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=DTN, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=NO3.N, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=NH3.N, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=T.P, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=DTP, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=PO4.P, fill=cluster)) +
+  geom_density(alpha=0.5)
+ggplot(water_cluster, aes(x=Chlorophyll.a, fill=cluster)) +
+  geom_density(alpha=0.5)
+
+
