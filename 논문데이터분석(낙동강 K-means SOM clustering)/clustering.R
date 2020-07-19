@@ -1,4 +1,4 @@
-water <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(낙동강 K-means SOM clustering)_heatmap 수정완료/시간적 군집분석/낙동강 지류 분석/지류취합.csv", sep=",", header=T)
+water <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(낙동강 K-means SOM clustering)/시간적 군집분석/낙동강 지류 분석(3 제외)/지류취합(3 제외).csv", sep=",", header=T)
 water_name <- water[,1]
 rownames(water) <- water_name
 water <- water[,-1]
@@ -168,7 +168,7 @@ dis_eps <- function(dat, a, b, c, d, e, f, g, h, i, j){
          (dat[7]-g)^2 + (dat[8]-h)^2 + (dat[9]-i)^2 +
          (dat[10]-j)^2)
 }
-k <- 5
+k <- 3
 dis <- c()
 for(m in 1:nrow(water_scale)){
   dis <- c(dis,sort(apply(water_scale, 1, dis_eps, 
@@ -183,7 +183,7 @@ ggplot() +
   geom_point(aes(x=1:length(dis), y=sort(dis, decreasing = T))) +
   theme_bw()
 # clustering
-db <- dbscan(water_scale, eps=2.047646, MinPts=2)
+db <- dbscan(water_scale, eps=2.517006, MinPts=3)
 db
 db$cluster
 
