@@ -32,14 +32,15 @@ k=4
 
 
 > # clustering
-> db <- dbscan(water_scale, eps=2.517006, MinPts=3)
+> db <- dbscan(water_scale, eps=2.517006, MinPts=2)
 > db
-dbscan Pts=15 MinPts=3 eps=2.517006
+dbscan Pts=15 MinPts=2 eps=2.517006
        0 1 2 3
-border 1 0 2 2
-seed   0 3 6 1
-total  1 3 8 3
+border 1 0 0 0
+seed   0 8 3 3
+total  1 8 3 3
 > db$cluster
- [1] 2 1 0 1 1 2 2 2 2 2 3 2 3 2 3
+ [1] 1 2 0 2 2 1 1 1 1 1 3 1 3 1 3
 --> noise : 2007
+
 

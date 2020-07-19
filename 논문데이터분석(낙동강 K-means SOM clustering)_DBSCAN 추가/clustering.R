@@ -1,4 +1,4 @@
-water <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(낙동강 K-means SOM clustering)/시간적 군집분석/낙동강 지류 분석(3 제외)/지류취합(3 제외).csv", sep=",", header=T)
+water <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(낙동강 K-means SOM clustering)/시간적 군집분석/낙동강 본류 분석(1, 16 제외)/본류취합(1, 16 제외).csv", sep=",", header=T)
 water_name <- water[,1]
 rownames(water) <- water_name
 water <- water[,-1]
@@ -152,7 +152,7 @@ plot(som_model2, what="obs", type="names")
 plot(som_model1, type="counts", main="cluster size")
 
 
-## DBSCAN clustering
+## DBSCAN(Density-based spatial clustering of applications with noise) clustering
 # reference : https://leedakyeong.tistory.com/entry/R-DBSCAN-%EC%BD%94%EB%93%9C-%EC%98%88%EC%8B%9C-%ED%95%B4%EC%84%9D-%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0-%EC%A1%B0%EC%A0%95-%EB%B0%A9%EB%B2%95-in-R
 # reference : https://brunch.co.kr/@gimmesilver/40
 install.packages("fpc")
@@ -183,7 +183,7 @@ ggplot() +
   geom_point(aes(x=1:length(dis), y=sort(dis, decreasing = T))) +
   theme_bw()
 # clustering
-db <- dbscan(water_scale, eps=2.517006, MinPts=3)
+db <- dbscan(water_scale, eps=2.517006, MinPts=2)
 db
 db$cluster
 
@@ -191,6 +191,7 @@ clusplot(water_scale, db$cluster)
 
 water_cluster <- water
 water_cluster$cluster <- as.character(db$cluster)
+# water_cluster <- water_cluster[-c(3),]
 
 ggplot(water_cluster, aes(x=BOD, fill=cluster)) +
   geom_density(alpha=0.5)
