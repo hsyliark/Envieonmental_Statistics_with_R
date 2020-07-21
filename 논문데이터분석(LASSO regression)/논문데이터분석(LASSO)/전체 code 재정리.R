@@ -1,4 +1,4 @@
-water <- read.csv("C:/Users/Nier/Desktop/LASSO 결과정리(scree 이용)/PCA에 Rain, Flow 포함/csv파일/10_함평.csv", sep=",", header=T)
+water <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(LASSO)/PCA에 Rain, Flow 포함/csv파일/10_함평.csv", sep=",", header=T)
 water1 <- water
 water_scale <- scale(water)
 water1_scale <- scale(water1)
@@ -23,7 +23,7 @@ p.mat
 # Add correlation coefficients
 # argument lab = TRUE
 ggcorrplot(X, hc.order=T, type="lower", lab=T) +
-  ggtitle("Correlation plot(Spearman) for water quality data(all site)") +   
+  ggtitle("Correlation plot(Spearman) for water quality data") +   
   theme(plot.title = element_text(family = "serif", 
                                   face = "bold", hjust = 0.5, 
                                   size = 15, color = "black"))
@@ -31,7 +31,7 @@ ggcorrplot(X, hc.order=T, type="lower", lab=T) +
 # Argument p.mat
 # Barring the no significant coefficient
 ggcorrplot(X, hc.order=T, type="lower", p.mat=p.mat) +
-  ggtitle("Correlation plot(Spearman) for water quality data(all site) with significance level") +   
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level") +   
   theme(plot.title = element_text(family = "serif", 
                                   face = "bold", hjust = 0.5, 
                                   size = 15, color = "black"))
