@@ -236,3 +236,35 @@ par(mfrow=c(1,1))
 
 grangertest(diff_BOD ~ diff_pH, order=1)
 # result ~ cause
+
+
+
+## ggplot2 boxplot
+# reference : http://www.sthda.com/english/wiki/ggplot2-box-plot-quick-start-guide-r-software-and-data-visualization
+install.packages("ggplot2")
+library(ggplot2)
+
+water <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(LASSO)/PCA에 Rain, Flow 포함/csv파일/boxplot1.csv", sep=",", header=T)
+
+ggplot(water, aes(x=point, y=BOD, fill=point)) +
+  geom_boxplot() + ggtitle("Distribution of BOD")
+ggplot(water, aes(x=point, y=COD, fill=point)) +
+  geom_boxplot() + ggtitle("Distribution of COD")
+ggplot(water, aes(x=point, y=SS, fill=point)) +
+  geom_boxplot() + ggtitle("Distribution of SS")
+ggplot(water, aes(x=point, y=T.N, fill=point)) +
+  geom_boxplot() + ggtitle("Distribution of T-N")
+ggplot(water, aes(x=point, y=T.P, fill=point)) +
+  geom_boxplot() + ggtitle("Distribution of T-P")
+ggplot(water, aes(x=point, y=TOC, fill=point)) +
+  geom_boxplot() + ggtitle("Distribution of TOC")
+ggplot(water, aes(x=point, y=NH3.N, fill=point)) +
+  geom_boxplot() + ggtitle("Distribution of NH3-N")
+ggplot(water, aes(x=point, y=PO4.P, fill=point)) +
+  geom_boxplot() + ggtitle("Distribution of PO4-P")
+ggplot(water, aes(x=point, y=Chl.a, fill=point)) +
+  geom_boxplot() + ggtitle("Distribution of Chlorophyll-a")
+ggplot(water, aes(x=point, y=Rain, fill=point)) +
+  geom_boxplot() + ggtitle("Distribution of Rain")
+ggplot(water, aes(x=point, y=Flow, fill=point)) +
+  geom_boxplot() + ggtitle("Distribution of Flow")
