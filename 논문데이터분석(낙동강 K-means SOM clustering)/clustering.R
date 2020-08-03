@@ -1,4 +1,4 @@
-water <- read.csv("D:/Workplace/Environmental_Statistics_with_R/ë…¼ë¬¸ë°ì´í„°ë¶„ì„(ë‚™ë™ê°• K-means SOM clustering)/ì‹œê°„ì  êµ°ì§‘ë¶„ì„/ë‚™ë™ê°• ë³¸ë¥˜ ë¶„ì„(1, 16 ì œì™¸)/ë³¸ë¥˜ì·¨í•©(1, 16 ì œì™¸).csv", sep=",", header=T)
+water <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºĞ¼®(³«µ¿°­ K-means SOM clustering)/ºĞ¼®ÀÚ·á/ºĞ¼®4/BOD/BOD.csv", sep=",", header=T)
 water_name <- water[,1]
 rownames(water) <- water_name
 water <- water[,-1]
@@ -9,7 +9,7 @@ water_scale_d <- as.data.frame(water_scale)
 water_scale_td <- as.data.frame(water_scale_t)
 
 
-water <- read.csv("C:/Users/Nier/Desktop/?ï¿½ï¿½ï¿½?????ÍºĞ¼?(?????? K-means SOM clustering)_heatmap ??ï¿½ï¿½/?????? ?????Ğ¼?/????/csv????/????T-P.csv", sep=",", header=T)
+water <- read.csv("C:/Users/Nier/Desktop/³í¹®µ¥ÀÌÅÍºĞ¼®(³«µ¿°­ K-means SOM clustering)/ºĞ¼®ÀÚ·á/ºĞ¼®4/Chl-a/Chl-a.csv", sep=",", header=T)
 water_name <- water[,1]
 rownames(water) <- water_name
 water <- water[,-1]
@@ -35,7 +35,7 @@ colors <- brewer.pal(5, "Blues")
 superheat(water_t_rev, scale = FALSE, left.label.text.size=3,
           bottom.label.text.size=3, bottom.label.size = .05,
           row.dendrogram = FALSE, heat.pal = colors,
-          title = "Water Quality Heatmap")
+          title = "Water Quality Heatmap (Chlorophyll-a)")
 
 
 
