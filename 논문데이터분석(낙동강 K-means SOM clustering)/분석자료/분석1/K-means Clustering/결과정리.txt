@@ -1,0 +1,192 @@
+> nc <- NbClust(water_scale, min.nc=2, max.nc=10, method="kmeans")
+*** : The Hubert index is a graphical method of determining the number of clusters.
+                In the plot of Hubert index, we seek a significant knee that corresponds to a 
+                significant increase of the value of the measure i.e the significant peak in Hubert
+                index second differences plot. 
+ 
+*** : The D index is a graphical method of determining the number of clusters. 
+                In the plot of D index, we seek a significant knee (the significant peak in Dindex
+                second differences plot) that corresponds to a significant increase of the value of
+                the measure. 
+ 
+******************************************************************* 
+* Among all indices:                                                
+* 13 proposed 3 as the best number of clusters 
+* 2 proposed 6 as the best number of clusters 
+* 2 proposed 7 as the best number of clusters 
+* 1 proposed 8 as the best number of clusters 
+* 3 proposed 9 as the best number of clusters 
+* 2 proposed 10 as the best number of clusters 
+
+                   ***** Conclusion *****                            
+ 
+* According to the majority rule, the best number of clusters is  3 
+ 
+ 
+******************************************************************* 
+
+> nc
+$All.index
+        KL      CH Hartigan     CCC    Scott Marriot
+2   0.5721 14.0758  40.6298 -3.6209  56.1880  0.4493
+3  55.3131 36.5382   2.2077 -0.1621 124.1813  0.0969
+4   0.1080 26.1184   8.7142 -2.0089 179.7369  0.0254
+5   0.6561 27.4515  20.5727 -2.8150 281.7531  0.0012
+6   1.8268 43.0299  18.8227 -1.0366 386.4239  0.0000
+7   6.8820 65.3697   3.4137  3.1495 438.8871  0.0000
+8   0.4710 62.2489   8.2458  3.0846 508.3324  0.0000
+9   7.6291 73.2244   1.4382  4.7466 564.4010  0.0000
+10  0.1371 66.4321  11.3311  4.0201 621.6269  0.0000
+     TrCovW   TraceW  Friedman   Rubin Cindex     DB
+2  340.0747 184.0498  1756.742  1.5213 0.2293 1.0023
+3   95.6333  73.4786  7403.945  3.8106 0.4011 0.5973
+4   72.9903  67.7277  7977.051  4.1342 0.4614 0.9767
+5   65.8022  50.2220 10705.128  5.5753 0.2973 0.8980
+6   35.9760  27.0418 13924.012 10.3543 0.1981 0.7048
+7    5.4477  14.8714 16634.091 18.8281 0.3531 0.4716
+8    4.5524  12.8738 28277.661 21.7496 0.3309 0.5323
+9    2.1527   9.2441 29205.088 30.2898 0.3968 0.4557
+10   2.0188   8.6239 34407.037 32.4679 0.3944 0.4371
+   Silhouette   Duda Pseudot2   Beale Ratkowsky    Ball
+2      0.3830 0.4295  23.9077  8.4621    0.4010 92.0249
+3      0.4817 0.8428   3.5433  1.1845    0.4935 24.4929
+4      0.3502 0.6348  10.3548  3.6411    0.4333 16.9319
+5      0.4470 0.7714   4.1491  1.8119    0.4043 10.0444
+6      0.5529 0.3657  12.1437  9.7222    0.3880  4.5070
+7      0.6106 1.1333  -0.1176     Inf    0.3678  2.1245
+8      0.5674 7.8518  -1.7453 -2.9343    0.3453  1.6092
+9      0.5990 8.5184   0.0000  0.0000    0.3278  1.0271
+10     0.6015 0.3210  14.8090 12.4488    0.3113  0.8624
+   Ptbiserial    Frey McClain   Dunn Hubert SDindex
+2      0.2655 -0.8518  0.5346 0.1702 0.0029  2.6637
+3      0.5178  3.2799  0.4248 0.3968 0.0082  1.3652
+4      0.4758  0.9179  0.5828 0.2163 0.0086  2.2874
+5      0.4381  0.1799  0.9957 0.2652 0.0088  1.9926
+6      0.4617  0.0390  1.0355 0.2652 0.0091  1.7263
+7      0.4773  2.1202  0.9552 0.5570 0.0092  1.6550
+8      0.4413  0.3149  1.1324 0.3805 0.0094  2.9485
+9      0.4370 11.7528  1.1293 0.5030 0.0095  2.9589
+10     0.4174  0.4835  1.2498 0.4383 0.0096  4.1158
+   Dindex   SDbw
+2  1.8221 0.5353
+3  1.3802 0.1740
+4  1.3373 0.1869
+5  1.0574 0.1345
+6  0.7311 0.0765
+7  0.6079 0.0440
+8  0.5556 0.0404
+9  0.4788 0.0258
+10 0.4472 0.0223
+
+$All.CriticalValues
+   CritValue_Duda CritValue_PseudoT2 Fvalue_Beale
+2          0.6296            10.5904       0.0000
+3          0.6216            11.5657       0.3045
+4          0.6130            11.3644       0.0002
+5          0.5403            11.9107       0.0679
+6          0.4178             9.7535       0.0000
+7         -0.4355            -3.2961          NaN
+8          0.1443            11.8605       1.0000
+9         -0.0337             0.0000          NaN
+10         0.4791             7.6122       0.0000
+
+$Best.nc
+                     KL      CH Hartigan    CCC    Scott
+Number_clusters  3.0000  9.0000   3.0000 9.0000   6.0000
+Value_Index     55.3131 73.2244  38.4221 4.7466 104.6708
+                Marriot   TrCovW   TraceW Friedman  Rubin
+Number_clusters  3.0000   3.0000   3.0000     8.00  9.000
+Value_Index      0.2808 244.4413 104.8202 11643.57 -6.362
+                Cindex      DB Silhouette   Duda PseudoT2
+Number_clusters 6.0000 10.0000     7.0000 3.0000   3.0000
+Value_Index     0.1981  0.4371     0.6106 0.8428   3.5433
+                 Beale Ratkowsky   Ball PtBiserial Frey
+Number_clusters 3.0000    3.0000  3.000     3.0000    1
+Value_Index     1.1845    0.4935 67.532     0.5178   NA
+                McClain  Dunn Hubert SDindex Dindex
+Number_clusters  3.0000 7.000      0  3.0000      0
+Value_Index      0.4248 0.557      0  1.3652      0
+                   SDbw
+Number_clusters 10.0000
+Value_Index      0.0223
+
+$Best.partition
+   aa_영강2    ab_상주1    ac_상주2    ad_위천2 
+          2           2           2           2 
+   ae_상주3     af_산곡    ag_감천2     ah_강정 
+          2           2           1           2 
+    ai_구미     aj_왜관     ak_성주     al_달성 
+          1           1           1           1 
+ am_금호강6 an_화원나루     ao_고령     ap_현풍 
+          3           1           1           1 
+   aq_회천2     ar_창녕    as_황강3     at_합천 
+          2           1           2           1 
+   au_남강4     av_남지   aw_임해진     ax_하남 
+          1           1           1           1 
+ ay_밀양강3   az_삼랑진     ba_물금     bb_금곡 
+          1           1           1           1 
+    bc_구포 
+          1 
+
+> set.seed(1)
+> km <- kmeans(water_scale, centers=3)
+> str(km)
+List of 9
+ $ cluster     : Named int [1:29] 2 2 2 2 2 2 1 2 1 1 ...
+  ..- attr(*, "names")= chr [1:29] "aa_영강2" "ab_상주1" "ac_상주2" "ad_위천2" ...
+ $ centers     : num [1:3, 1:10] 0.413 -1.154 2.542 0.366 -1.066 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : chr [1:3] "1" "2" "3"
+  .. ..$ : chr [1:10] "BOD" "COD" "TN" "DTN" ...
+ $ totss       : num 280
+ $ withinss    : num [1:3] 64.85 8.63 0
+ $ tot.withinss: num 73.5
+ $ betweenss   : num 207
+ $ size        : int [1:3] 19 9 1
+ $ iter        : int 2
+ $ ifault      : int 0
+ - attr(*, "class")= chr "kmeans"
+> km
+K-means clustering with 3 clusters of sizes 19, 9, 1
+
+Cluster means:
+         BOD        COD         TN        DTN       NO3.N
+1  0.4127447  0.3658643  0.1447484  0.1190699  0.04530607
+2 -1.1538340 -1.0662238 -0.7625765 -0.7066758 -0.55108251
+3  2.5423564  2.6445926  4.1129688  4.0977538  4.09892732
+       NH3.N        T.P         DTP       PO4.P
+1  0.2070351  0.2173810  0.07596276  0.06920392
+2 -0.7090799 -0.9073073 -0.65563930 -0.63930461
+3  2.4480521  4.0355264  4.45746121  4.43886701
+       CHL.A
+1  0.4763131
+2 -1.1554925
+3  1.3494828
+
+Clustering vector:
+   aa_영강2    ab_상주1    ac_상주2    ad_위천2 
+          2           2           2           2 
+   ae_상주3     af_산곡    ag_감천2     ah_강정 
+          2           2           1           2 
+    ai_구미     aj_왜관     ak_성주     al_달성 
+          1           1           1           1 
+ am_금호강6 an_화원나루     ao_고령     ap_현풍 
+          3           1           1           1 
+   aq_회천2     ar_창녕    as_황강3     at_합천 
+          2           1           2           1 
+   au_남강4     av_남지   aw_임해진     ax_하남 
+          1           1           1           1 
+ ay_밀양강3   az_삼랑진     ba_물금     bb_금곡 
+          1           1           1           1 
+    bc_구포 
+          1 
+
+Within cluster sum of squares by cluster:
+[1] 64.848330  8.630275  0.000000
+ (between_SS / total_SS =  73.8 %)
+
+Available components:
+
+[1] "cluster"      "centers"      "totss"       
+[4] "withinss"     "tot.withinss" "betweenss"   
+[7] "size"         "iter"         "ifault"      

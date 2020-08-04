@@ -1,4 +1,4 @@
-water <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(낙동강 K-means SOM clustering)/분석자료/분석4/BOD/BOD.csv", sep=",", header=T)
+water <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(낙동강 K-means SOM clustering)/분석자료/분석1/Cluster analysis(Main+Tributaries)_heatmap and SOM and K-means cluster analysis.csv", sep=",", header=T)
 water_name <- water[,1]
 rownames(water) <- water_name
 water <- water[,-1]
@@ -7,7 +7,7 @@ water_scale_t <- t(water_scale)
 water_t <- as.data.frame(t(water))
 water_scale_d <- as.data.frame(water_scale)
 water_scale_td <- as.data.frame(water_scale_t)
-
+water_scale_rev <- water_scale[nrow(water_scale):1,]
 
 water <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(낙동강 K-means SOM clustering)/분석자료/분석4/Chl-a/Chl-a.csv", sep=",", header=T)
 water_name <- water[,1]
@@ -32,19 +32,20 @@ superheat(water, scale = TRUE, left.label.text.size=3,
 install.packages("RColorBrewer")
 library(RColorBrewer)
 colors <- brewer.pal(5, "Blues")
-superheat(water_t_rev, scale = FALSE, left.label.text.size=3,
+superheat(water_scale_rev, scale = FALSE, left.label.text.size=3,
           bottom.label.text.size=3, bottom.label.size = .05,
           row.dendrogram = FALSE, heat.pal = colors,
-          title = "Water Quality Heatmap (Chlorophyll-a)")
+          title = "Water Quality Heatmap")
 
 
 
 ## Determining the optimal number of clusters
+par(mfrow=c(1,1))
 set.seed(1)
 d <- dist(water_scale, method="euclidean")
 fit <- hclust(d, method="ward.D")
 plot(fit)
-rect.hclust(fit, k=3, border = "red")
+rect.hclust(fit, k=2, border = "red")
 
 wss <- 0
 for(i in 1:10) {wss[i] <- kmeans(water_scale, centers=i)$tot.withinss}
@@ -55,6 +56,7 @@ plot(1:10, wss, type="b", xlab="Number of clusters",
 install.packages("NbClust")
 library(NbClust)
 nc <- NbClust(water_scale, min.nc=2, max.nc=10, method="kmeans")
+par(mfrow=c(1,1))
 barplot(table(nc$Best.nc[1,]), xlab="Number of clusters", 
         ylab="Number of criteria", main="Number of clusters chosen by 26 criteria")
 
@@ -68,7 +70,7 @@ install.packages("cluster")
 library(cluster)
 
 set.seed(1)
-km <- kmeans(water_scale, centers=3)
+km <- kmeans(water_scale, centers=2)
 str(km)
 km
 clusplot(water_scale, km$cluster)
@@ -80,7 +82,7 @@ ggplot(water_cluster, aes(x=BOD, fill=cluster)) +
   geom_density(alpha=0.5)
 ggplot(water_cluster, aes(x=COD, fill=cluster)) +
   geom_density(alpha=0.5)
-ggplot(water_cluster, aes(x=T.N, fill=cluster)) +
+ggplot(water_cluster, aes(x=TN, fill=cluster)) +
   geom_density(alpha=0.5)
 ggplot(water_cluster, aes(x=DTN, fill=cluster)) +
   geom_density(alpha=0.5)
@@ -94,7 +96,7 @@ ggplot(water_cluster, aes(x=DTP, fill=cluster)) +
   geom_density(alpha=0.5)
 ggplot(water_cluster, aes(x=PO4.P, fill=cluster)) +
   geom_density(alpha=0.5)
-ggplot(water_cluster, aes(x=Chlorophyll.a, fill=cluster)) +
+ggplot(water_cluster, aes(x=CHL.A, fill=cluster)) +
   geom_density(alpha=0.5)
 
 
@@ -139,9 +141,9 @@ water_scale_matrix <- as.matrix(water_scale)
 
 # Training the SOM model
 set.seed(1)
-som_grid <- somgrid(xdim=3, ydim=1, topo="hexagonal")
+som_grid <- somgrid(xdim=2, ydim=1, topo="hexagonal")
 som_model1 <- som(water_scale_matrix, grid=som_grid)
-som_model2 <- trainSOM(x.data=water_scale_matrix, dimension=c(1,3),
+som_model2 <- trainSOM(x.data=water_scale_matrix, dimension=c(1,2),
                        nb.save=10, maxit=2000, scaling="none",
                        radius.type="letremy")
 

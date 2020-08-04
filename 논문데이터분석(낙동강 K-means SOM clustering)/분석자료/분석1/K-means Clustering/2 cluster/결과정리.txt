@@ -1,0 +1,52 @@
+> set.seed(1)
+> km <- kmeans(water_scale, centers=2)
+> str(km)
+List of 9
+ $ cluster     : Named int [1:29] 2 2 2 2 2 2 1 2 1 1 ...
+  ..- attr(*, "names")= chr [1:29] "aa_영강2" "ab_상주1" "ac_상주2" "ad_위천2" ...
+ $ centers     : num [1:2, 1:10] 0.519 -1.154 0.48 -1.066 0.343 ...
+  ..- attr(*, "dimnames")=List of 2
+  .. ..$ : chr [1:2] "1" "2"
+  .. ..$ : chr [1:10] "BOD" "COD" "TN" "DTN" ...
+ $ totss       : num 280
+ $ withinss    : num [1:2] 175.42 8.63
+ $ tot.withinss: num 184
+ $ betweenss   : num 96
+ $ size        : int [1:2] 20 9
+ $ iter        : int 1
+ $ ifault      : int 0
+ - attr(*, "class")= chr "kmeans"
+> km
+K-means clustering with 2 clusters of sizes 20, 9
+
+Cluster means:
+         BOD        COD         TN        DTN      NO3.N
+1  0.5192253  0.4798007  0.3431594  0.3180041  0.2479871
+2 -1.1538340 -1.0662238 -0.7625765 -0.7066758 -0.5510825
+       NH3.N        T.P        DTP      PO4.P      CHL.A
+1  0.3190859  0.4082883  0.2950377  0.2876871  0.5199716
+2 -0.7090799 -0.9073073 -0.6556393 -0.6393046 -1.1554925
+
+Clustering vector:
+   aa_영강2    ab_상주1    ac_상주2    ad_위천2    ae_상주3 
+          2           2           2           2           2 
+    af_산곡    ag_감천2     ah_강정     ai_구미     aj_왜관 
+          2           1           2           1           1 
+    ak_성주     al_달성  am_금호강6 an_화원나루     ao_고령 
+          1           1           1           1           1 
+    ap_현풍    aq_회천2     ar_창녕    as_황강3     at_합천 
+          1           2           1           2           1 
+   au_남강4     av_남지   aw_임해진     ax_하남  ay_밀양강3 
+          1           1           1           1           1 
+  az_삼랑진     ba_물금     bb_금곡     bc_구포 
+          1           1           1           1 
+
+Within cluster sum of squares by cluster:
+[1] 175.419490   8.630275
+ (between_SS / total_SS =  34.3 %)
+
+Available components:
+
+[1] "cluster"      "centers"      "totss"       
+[4] "withinss"     "tot.withinss" "betweenss"   
+[7] "size"         "iter"         "ifault"   
