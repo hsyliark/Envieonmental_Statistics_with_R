@@ -1,4 +1,4 @@
-water <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(낙동강 K-means SOM clustering)/분석자료/분석1/Cluster analysis(Main+Tributaries)_heatmap and SOM and K-means cluster analysis.csv", sep=",", header=T)
+water <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(낙동강 K-means SOM clustering)_MannKendall, boxplot 흑백 추가/분석자료/분석1/Cluster analysis(Main+Tributaries)_heatmap and SOM and K-means cluster analysis.csv", sep=",", header=T)
 water_name <- water[,1]
 rownames(water) <- water_name
 water <- water[,-1]
@@ -225,6 +225,10 @@ ggplot(water_cluster, aes(x=Chlorophyll.a, fill=cluster)) +
 # reference : https://cran.r-project.org/web/packages/mclust/vignettes/mclust.html
 install.packages("mclust")
 library(mclust)
+install.packages("cluster")
+library(cluster)
+install.packages("ggplot2")
+library(ggplot2)
 # select number
 waterBIC <- mclustBIC(water_scale)
 waterBIC
@@ -238,13 +242,13 @@ waterclassify
 clusplot(water_scale, watermod$classification)
 
 water_cluster <- water
-water_cluster$cluster <- as.character(db$cluster)
+water_cluster$cluster <- as.character(watermod$classification)
 
 ggplot(water_cluster, aes(x=BOD, fill=cluster)) +
   geom_density(alpha=0.5)
 ggplot(water_cluster, aes(x=COD, fill=cluster)) +
   geom_density(alpha=0.5)
-ggplot(water_cluster, aes(x=T.N, fill=cluster)) +
+ggplot(water_cluster, aes(x=TN, fill=cluster)) +
   geom_density(alpha=0.5)
 ggplot(water_cluster, aes(x=DTN, fill=cluster)) +
   geom_density(alpha=0.5)
@@ -258,7 +262,7 @@ ggplot(water_cluster, aes(x=DTP, fill=cluster)) +
   geom_density(alpha=0.5)
 ggplot(water_cluster, aes(x=PO4.P, fill=cluster)) +
   geom_density(alpha=0.5)
-ggplot(water_cluster, aes(x=Chlorophyll.a, fill=cluster)) +
+ggplot(water_cluster, aes(x=CHL.A, fill=cluster)) +
   geom_density(alpha=0.5)
 
 

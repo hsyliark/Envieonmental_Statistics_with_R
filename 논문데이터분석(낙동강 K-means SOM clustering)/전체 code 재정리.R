@@ -247,28 +247,57 @@ grangertest(diff_BOD ~ diff_pH, order=1)
 install.packages("ggplot2")
 library(ggplot2)
 
-water <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(낙동강 K-means SOM clustering)/분석자료/분석3/Long-term variation of water quality(year).csv", sep=",", header=T)
+water <- read.csv("C:/Users/Nier/Desktop/논문데이터분석(낙동강 K-means SOM clustering)_MannKendall추가/분석자료/분석3/Long-term variation of water quality(year).csv", sep=",", header=T)
 
 ggplot(water, aes(x=Point, y=BOD, fill=Point)) +
-  geom_boxplot() + ggtitle("Distribution of BOD")
+  geom_boxplot() + ggtitle("Distribution of BOD") 
 ggplot(water, aes(x=Point, y=COD, fill=Point)) +
-  geom_boxplot() + ggtitle("Distribution of COD")
-ggplot(water, aes(x=Point, y=SS, fill=Point)) +
-  geom_boxplot() + ggtitle("Distribution of SS")
+  geom_boxplot() + ggtitle("Distribution of COD") 
 ggplot(water, aes(x=Point, y=T.N, fill=Point)) +
   geom_boxplot() + ggtitle("Distribution of T-N")
 ggplot(water, aes(x=Point, y=T.P, fill=Point)) +
-  geom_boxplot() + ggtitle("Distribution of T-P")
+  geom_boxplot() + ggtitle("Distribution of T-P") 
 ggplot(water, aes(x=Point, y=NH3.N, fill=Point)) +
   geom_boxplot() + ggtitle("Distribution of NH3-N")
 ggplot(water, aes(x=Point, y=PO4.P, fill=Point)) +
-  geom_boxplot() + ggtitle("Distribution of PO4-P")
+  geom_boxplot() + ggtitle("Distribution of PO4-P") 
 ggplot(water, aes(x=Point, y=Chl.a, fill=Point)) +
   geom_boxplot() + ggtitle("Distribution of Chlorophyll-a")
 ggplot(water, aes(x=Point, y=DTN, fill=Point)) +
   geom_boxplot() + ggtitle("Distribution of DTN")
 ggplot(water, aes(x=Point, y=NO3.N, fill=Point)) +
-  geom_boxplot() + ggtitle("Distribution of NO3-N")
+  geom_boxplot() + ggtitle("Distribution of NO3-N") 
 ggplot(water, aes(x=Point, y=DTP, fill=Point)) +
   geom_boxplot() + ggtitle("Distribution of DTP")
+
+ggplot(water, aes(x=Point, y=BOD, fill=Point)) +
+  geom_boxplot(fill='#A4A4A4', color="black") + ggtitle("Distribution of BOD") +
+  theme_classic()
+ggplot(water, aes(x=Point, y=COD, fill=Point)) +
+  geom_boxplot(fill='#A4A4A4', color="black") + ggtitle("Distribution of COD") +
+  theme_classic()
+ggplot(water, aes(x=Point, y=T.N, fill=Point)) +
+  geom_boxplot(fill='#A4A4A4', color="black") + ggtitle("Distribution of T-N") +
+  theme_classic()
+ggplot(water, aes(x=Point, y=T.P, fill=Point)) +
+  geom_boxplot(fill='#A4A4A4', color="black") + ggtitle("Distribution of T-P") +
+  theme_classic()
+ggplot(water, aes(x=Point, y=NH3.N, fill=Point)) +
+  geom_boxplot(fill='#A4A4A4', color="black") + ggtitle("Distribution of NH3-N") +
+  theme_classic()
+ggplot(water, aes(x=Point, y=PO4.P, fill=Point)) +
+  geom_boxplot(fill='#A4A4A4', color="black") + ggtitle("Distribution of PO4-P") +
+  theme_classic()
+ggplot(water, aes(x=Point, y=Chl.a, fill=Point)) +
+  geom_boxplot(fill='#A4A4A4', color="black") + ggtitle("Distribution of Chlorophyll-a") +
+  theme_classic()
+ggplot(water, aes(x=Point, y=DTN, fill=Point)) +
+  geom_boxplot(fill='#A4A4A4', color="black") + ggtitle("Distribution of DTN") +
+  theme_classic()
+ggplot(water, aes(x=Point, y=NO3.N, fill=Point)) +
+  geom_boxplot(fill='#A4A4A4', color="black") + ggtitle("Distribution of NO3-N") +
+  theme_classic()
+ggplot(water, aes(x=Point, y=DTP, fill=Point)) +
+  geom_boxplot(fill='#A4A4A4', color="black") + ggtitle("Distribution of DTP") +
+  theme_classic()
 

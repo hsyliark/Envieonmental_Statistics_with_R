@@ -1,0 +1,29 @@
+> SeasonalMannKendall(ts(water$BOD))
+tau = -0.0477, 2-sided pvalue =0.35537
+
+> SeasonalMannKendall(ts(water$COD))
+tau = 0.311, 2-sided pvalue =9.6665e-10
+
+> SeasonalMannKendall(ts(water$T.N))
+tau = -0.179, 2-sided pvalue =0.0003683
+
+> SeasonalMannKendall(ts(water$DTN))
+tau = -0.105, 2-sided pvalue =0.036213
+
+> SeasonalMannKendall(ts(water$NO3.N))
+tau = -0.113, 2-sided pvalue =0.024423
+
+> SeasonalMannKendall(ts(water$NH3.N))
+tau = -0.0547, 2-sided pvalue =0.27679
+
+> SeasonalMannKendall(ts(water$T.P))
+tau = -0.581, 2-sided pvalue =< 2.22e-16
+
+> SeasonalMannKendall(ts(water$DTP))
+tau = -0.583, 2-sided pvalue =< 2.22e-16
+
+> SeasonalMannKendall(ts(water$PO4.P))
+tau = -0.594, 2-sided pvalue =< 2.22e-16
+
+> SeasonalMannKendall(ts(water$Chl.a))
+tau = -0.298, 2-sided pvalue =2.8529e-09
