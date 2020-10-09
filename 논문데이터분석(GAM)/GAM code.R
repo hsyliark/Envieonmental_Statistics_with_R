@@ -93,3 +93,27 @@ ggGam(model5,by=fuel)
 ggGam(model5,by=fuel,facet=TRUE)
 ggGam(model5)
 ggGamCat(model5)
+
+model6 <- gam(hw.mpg ~ s(weight, by=fuel), data=mpg, method="REML")
+ggGam(model6,by=fuel)
+
+model7 <- gam(hw.mpg ~ s(weight, by=fuel) + fuel, data=mpg, method="REML")
+ggGam(model7,by=fuel)
+
+model8 <- gam(hw.mpg ~ s(weight) + s(length) + s(price), data=mpg, method="REML")
+ggGam(model8)
+
+model9 <- gam(hw.mpg ~ s(weight) + s(length) + s(price) + fuel + drive + style, 
+              data=mpg, method="REML")
+ggGam(model9)
+ggGam(model9,by="fuel")
+ggGam(model9,by="drive",se=FALSE)
+ggGam(model9,by="style",se=FALSE)
+model10 <- gam(hw.mpg ~ s(weight,by = drive) + s(length, by = drive) + s(price, by= drive)+drive,
+               data=mpg, method="REML")
+ggGam(model10,by=drive,se=FALSE)
+
+
+
+# Chapter 3
+
