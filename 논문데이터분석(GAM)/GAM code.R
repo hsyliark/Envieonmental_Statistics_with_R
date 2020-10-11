@@ -185,4 +185,29 @@ ggplot(co2,aes(x=time,y=co2))+
 
 # Chapter 4
 
-
+data(meuse,package="sp") # spatial data
+head(meuse)
+require(mgcv)
+mod <- gam(cadmium ~ s(x,y), data=meuse, method = "REML") # interaction
+summary(mod)
+par(mfrow=c(2,2))
+gam.check(mod)
+par(mfrow=c(1,1))
+mod2 <- gam(cadmium ~ s(x,y) + s(elev) + s(dist), data=meuse, method = "REML")
+summary(mod2)
+par(mfrow=c(2,2))
+gam.check(mod2)
+par(mfrow=c(1,1))
+plot(mod2,select=1) # contour plot
+plot(mod2, scheme=1, select=1) # 3d
+plot(mod2, scheme=2, select=1) # 노란색은 큰 예측값을, 붉은색은 낮은 예측값
+vis.gam(x=mod2,                 # GAM 모형이름
+        view=c("x","y"),      # 변수이름
+        plot.type="persp")  # plot 종류
+vis.gam(mod2, view=c("x","y"), plot.type="contour")
+vis.gam(mod2, view=c("x","y"),plot.type="contour",
+        too.far=0.1, main="too.far=0.1") # too.far : 실제 데이터로부터 너무 멀어지므로 그리지 말아야할 예측치를 지정
+vis.gam(mod2, view=c("x","y"),plot.type="contour",
+        too.far=0.05,main="too.far=0.05")
+vis.gam(mod2, view=c("x","y"),
+        plot.type="persp", se=2) # se : 예측표면으로부터 표준오차의 몇배 떨어진 표면을 그릴 것인지 지정
