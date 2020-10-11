@@ -1,4 +1,5 @@
 # Reference : https://bookdown.org/cardiomoon/gam/
+# Reference : https://be-favorite.tistory.com/59
 
 
 # Chapter 1
@@ -117,3 +118,37 @@ ggGam(model10,by=drive,se=FALSE)
 
 # Chapter 3
 
+# model interpretation
+require(mgcv)
+data(mpg,package="gamair")
+require(ggGam)
+m <- gam(hw.mpg ~ s(weight) + s(rpm) + s(price) + s(comp.ratio) + s(width) + fuel,
+         data=mpg, method="REML")
+summary(m)
+require(ggplot2)
+ggGam(m)+geom_hline(yintercept=20,col="red")
+
+# model checking
+par(mfrow=c(2,2))
+gam.check(m)
+par(mfrow=c(1,1))
+m1 <- gam(hw.mpg ~ s(weight, k=12) + s(rpm) + s(price) + s(comp.ratio) + s(width) + fuel,
+          data=mpg, method="REML") 
+par(mfrow=c(2,2))
+gam.check(m1)
+par(mfrow=c(1,1))
+m2 <- gam(hw.mpg ~ s(weight, k=15) + s(rpm) + s(price) + s(comp.ratio) + s(width) + fuel,
+          data=mpg, method="REML")
+par(mfrow=c(2,2))
+gam.check(m2)
+par(mfrow=c(1,1))
+m3 <- gam(hw.mpg ~ s(weight, k=18) + s(rpm) + s(price) + s(comp.ratio) + s(width) + fuel,
+          data=mpg, method="REML")
+par(mfrow=c(2,2))
+gam.check(m3)
+par(mfrow=c(1,1))
+m4 <- gam(hw.mpg ~ s(weight, k=40) + s(rpm) + s(price) + s(comp.ratio) + s(width) + fuel,
+          data=mpg, method="REML")
+par(mfrow=c(2,2))
+gam.check(m4)
+par(mfrow=c(1,1))
