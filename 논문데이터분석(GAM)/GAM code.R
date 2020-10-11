@@ -152,3 +152,37 @@ m4 <- gam(hw.mpg ~ s(weight, k=40) + s(rpm) + s(price) + s(comp.ratio) + s(width
 par(mfrow=c(2,2))
 gam.check(m4)
 par(mfrow=c(1,1))
+
+# checking concurvity (설명변수끼리 곡선관계를 가짐)
+concurvity(m,full=TRUE) # 전체적인 concurvity
+concurvity(m,full=FALSE) # 쌍별(pairwise) concurvity
+
+# example (CO2 data)
+co2 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(GAM)/manua_loa_co2.csv",stringsAsFactors=FALSE)
+str(co2)
+co2$time <- as.integer(as.Date(co2$Date,format="%d/%m/%Y"))
+ggplot(co2,aes(x=time,y=co2))+geom_line()
+co2df <- co2[co2$year>=2000,]
+m1 <- gam(co2 ~ s(time),data=co2df, method="REML")
+ggGam(m1)
+summary(m1)
+par(mfrow=c(2,2))
+gam.check(m1)
+par(mfrow=c(1,1))
+m2 <- gam(co2 ~ s(month, bs="cc",k=12)+ s(time),data=co2, method="REML")
+ggGam(m2,point=FALSE)
+summary(m2)
+par(mfrow=c(2,2))
+gam.check(m2)
+par(mfrow=c(1,1))
+gam.Dx(m2) # ggplot2를 이용한 진단그래프
+co2$yhat <- predict(m2,newdata=co2) # 구축모형을 이용한 예측값 산출
+ggplot(co2,aes(x=time,y=co2))+
+  geom_point()+
+  geom_line(aes(y=yhat),col="red")
+
+
+
+# Chapter 4
+
+
