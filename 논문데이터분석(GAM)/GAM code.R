@@ -5,15 +5,14 @@
 # Chapter 1
 
 # Install packages
-# gam 패키지 불필요
-
 library(mgcv)
 library(ggplot2)
 library(moonBook)
 library(ztable)
 library(survival)
-devtools::install_github("cardiomoon/ggGam") # 업데이트 불필요
+devtools::install_github("cardiomoon/ggGam") # Don't use gam package!
 library(ggGam)
+
 
 
 # Chapter 2
@@ -53,8 +52,7 @@ basisFun(m1,which=4,lty=1)
 par(mfrow=c(1,1))
 coef(m1)
 
-
-# 기저함수(basis function)와 평활모수(smoothing parameter)
+# basis function, smoothing parameter
 
 # checking basis function
 k3 <- gam(accel ~ s(times, k=3),data=mcycle)
@@ -70,40 +68,30 @@ sp2 <- gam(accel ~ s(times),data=mcycle, sp=0.0001)
 ggGam(sp1) + ggtitle("sp=0.1")
 ggGam(sp2) + ggtitle("sp=0.0001")
 
-
 # Multiple GAMs
 library(gamair)
 data(mpg, package="gamair")
 DT::datatable(mpg)
-
 model1 <- gam(hw.mpg ~ s(weight), data=mpg, method="REML")
 ggGam(model1)
-
 model2 <- gam(hw.mpg ~ s(weight)+s(length), data=mpg, method="REML")
 ggGam(model2)
-
 model3 <- gam(hw.mpg ~ s(weight)+length, data=mpg, method="REML")
 ggGam(model3)
-
 model4 <- gam(hw.mpg ~ s(weight)+s(length,sp=1000), data=mpg, method="REML")
 ggGam(model4)
-
 model5 <- gam(hw.mpg ~ s(weight)+fuel, data=mpg, method="REML")
 plot(model5,residuals=TRUE,pch=1,shade=TRUE,seWithMean = TRUE,shift=coef(model5)[1],pages=1,all.terms=TRUE)
 ggGam(model5,by=fuel)
 ggGam(model5,by=fuel,facet=TRUE)
 ggGam(model5)
 ggGamCat(model5)
-
 model6 <- gam(hw.mpg ~ s(weight, by=fuel), data=mpg, method="REML")
 ggGam(model6,by=fuel)
-
 model7 <- gam(hw.mpg ~ s(weight, by=fuel) + fuel, data=mpg, method="REML")
 ggGam(model7,by=fuel)
-
 model8 <- gam(hw.mpg ~ s(weight) + s(length) + s(price), data=mpg, method="REML")
 ggGam(model8)
-
 model9 <- gam(hw.mpg ~ s(weight) + s(length) + s(price) + fuel + drive + style, 
               data=mpg, method="REML")
 ggGam(model9)
@@ -153,12 +141,12 @@ par(mfrow=c(2,2))
 gam.check(m4)
 par(mfrow=c(1,1))
 
-# checking concurvity (설명변수끼리 곡선관계를 가짐)
-concurvity(m,full=TRUE) # 전체적인 concurvity
-concurvity(m,full=FALSE) # 쌍별(pairwise) concurvity
+# checking concurvity 
+concurvity(m,full=TRUE) # overall concurvity
+concurvity(m,full=FALSE) # pairwise concurvity
 
 # example (CO2 data)
-co2 <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(GAM)/manua_loa_co2.csv",stringsAsFactors=FALSE)
+co2 <- read.csv("manua_loa_co2.csv",stringsAsFactors=FALSE)
 str(co2)
 co2$time <- as.integer(as.Date(co2$Date,format="%d/%m/%Y"))
 ggplot(co2,aes(x=time,y=co2))+geom_line()
@@ -175,16 +163,17 @@ summary(m2)
 par(mfrow=c(2,2))
 gam.check(m2)
 par(mfrow=c(1,1))
-gam.Dx(m2) # ggplot2를 이용한 진단그래프
-co2$yhat <- predict(m2,newdata=co2) # 구축모형을 이용한 예측값 산출
+gam.Dx(m2) 
+co2$yhat <- predict(m2,newdata=co2) 
 ggplot(co2,aes(x=time,y=co2))+
   geom_point()+
   geom_line(aes(y=yhat),col="red")
 
 
 
-# Chapter 4
+# Chapter 4 (interaction)
 
+# example 1
 data(meuse,package="sp") # spatial data
 head(meuse)
 require(mgcv)
@@ -198,16 +187,129 @@ summary(mod2)
 par(mfrow=c(2,2))
 gam.check(mod2)
 par(mfrow=c(1,1))
-plot(mod2,select=1) # contour plot
+plot(mod2, select=1) # contour plot
 plot(mod2, scheme=1, select=1) # 3d
-plot(mod2, scheme=2, select=1) # 노란색은 큰 예측값을, 붉은색은 낮은 예측값
-vis.gam(x=mod2,                 # GAM 모형이름
-        view=c("x","y"),      # 변수이름
-        plot.type="persp")  # plot 종류
+plot(mod2, scheme=2, select=1) 
+vis.gam(x=mod2, view=c("x","y"), plot.type="persp") 
 vis.gam(mod2, view=c("x","y"), plot.type="contour")
-vis.gam(mod2, view=c("x","y"),plot.type="contour",
-        too.far=0.1, main="too.far=0.1") # too.far : 실제 데이터로부터 너무 멀어지므로 그리지 말아야할 예측치를 지정
-vis.gam(mod2, view=c("x","y"),plot.type="contour",
-        too.far=0.05,main="too.far=0.05")
-vis.gam(mod2, view=c("x","y"),
-        plot.type="persp", se=2) # se : 예측표면으로부터 표준오차의 몇배 떨어진 표면을 그릴 것인지 지정
+vis.gam(mod2, view=c("x","y"), plot.type="contour", too.far=0.1, main="too.far=0.1")
+vis.gam(mod2, view=c("x","y"), plot.type="contour", too.far=0.05, main="too.far=0.05")
+vis.gam(mod2, view=c("x","y"), plot.type="persp", se=2) 
+vis.gam(mod2, view=c("x","y"), plot.type="persp", theta = 220)
+vis.gam(mod2, view=c("x","y"), plot.type="persp", phi = 55)
+vis.gam(mod2, view=c("x","y"), plot.type="persp", r = 0.1)
+vis.gam(mod2, view = c("x","y"), plot.type = "contour", color = "gray")
+vis.gam(mod2, view = c("x","y"), plot.type = "contour", contour.col = "blue")
+vis.gam(mod2, view = c("x","y"), plot.type = "contour", nlevels = 20)
+plot(mod2, pages=1)
+plot(mod2, scheme=1, pages=1)
+plot(mod2, scheme=2, pages=1)
+vis.gam(mod, view=c("x","y"), plot.type="persp", se=2)
+vis.gam(mod, view=c("x","y"), plot.type="persp", se=2, theta=135)
+vis.gam(mod, view=c("x","y"), plot.type="contour", too.far=0.25)
+
+# example 2
+data(mpg, package="gamair")
+mod3 <- gam(hw.mpg ~ s(weight,by=fuel) + fuel, data=mpg, method="REML")
+plot(mod3, pages=1, all.terms=TRUE, seWithMean = TRUE, shift=coef(mod3)[1], shade=TRUE)
+require(ggGam)
+ggGam(mod3, by=fuel)
+mod3a <- gam(hw.mpg ~ s(weight,fuel,bs="fs"), data=mpg, method="REML")
+summary(mod3a)
+plot(mod3a, pages=1, all.terms=TRUE, seWithMean = TRUE, shift=coef(mod3a)[1], shade=TRUE)
+ggGam(mod3a, by=fuel)
+
+# example 3
+mod4 <- gam(copper ~ s(dist, by = landuse) + landuse, data = meuse, method = "REML") 
+mod4a <- gam(copper ~ s(dist, landuse, bs = "fs"), data = meuse, method = "REML") 
+plot(mod4,pages=1, all.terms=TRUE, seWithMean = TRUE, shift=coef(mod3a)[1], shade=TRUE)
+plot(mod4a,pages=1, all.terms=TRUE, seWithMean = TRUE, shift=coef(mod3a)[1], shade=TRUE)
+vis.gam(mod4,view = c("dist", "landuse"), plot.type = "persp")
+vis.gam(mod4a,view = c("dist", "landuse"), plot.type = "persp")
+
+# example 4
+# tensor smooth (different unit)
+tensorMod <- gam(cadmium ~ te(x, y, elev), data = meuse, method = "REML")
+summary(tensorMod)
+plot(tensorMod)
+tensorMod2 <- gam(cadmium ~ s(x, y) + s(elev) + ti(x, y, elev), data = meuse, method = "REML")
+summary(tensorMod2)
+plot(tensorMod2, pages=1)
+vis.gam(tensorMod2, theta=100, phi=30)
+
+
+
+# Chapter 5 (logistic)
+
+# require packages
+require(mgcv)
+require(ggplot2)
+require(ggpubr)
+require(egg)
+require(moonBook)
+require(ztable)
+require(ggGam)
+
+# example 1
+data(wesdr,package="gamair")
+str(wesdr)
+ggCompare <- function(data,y,group) {
+            yvar <- as.character(substitute(y))
+            groupvar <- as.character(substitute(group))
+            if(!is.factor(data[[groupvar]])) data[[groupvar]] <- factor(data[[groupvar]])
+            p1 <- ggplot(data,aes_string(x=yvar,fill=groupvar))+
+              geom_density(alpha=0.5,size=0.3)+theme_article()+
+              theme(legend.position="None")
+            p2 <- ggplot(data,aes_string(x=groupvar,y=yvar,fill=groupvar))+
+              geom_boxplot(alpha=0.5)+theme_article()+
+              theme(legend.position="None")
+            ggpubr::ggarrange(p1,p2,ncol=2) }
+ggCompare(wesdr,y=dur,group=ret)
+ggCompare(wesdr,y=gly,group=ret)
+ggCompare(wesdr,y=bmi,group=ret)
+z <- ztable(mytable(ret~.,data=wesdr))
+print(z,type="html")
+m <- gam(ret~s(dur)+s(gly)+s(bmi)+ti(dur,gly)+ti(dur,bmi)+ti(gly,bmi),select=TRUE,
+         data=wesdr,family=binomial,method="REML")
+ow <- options(warn=-1) ## avoid complaint about zlim 
+plot(m,pages=1,scheme=1,zlim=c(-3,3))
+options(ow)
+summary(m)
+vis.gam(m,view=c("gly","bmi"),se=1,color="bw",theta=-40,phi=40)
+plot(m,select=1,shade=TRUE,seWithMean = TRUE,shift=coef(m)[1])
+par(mfrow=c(2,2))
+gam.check(m)
+par(mfrow=c(1,1))
+ggGam(m)
+
+
+
+# Chapter 6 (survival data)
+
+# require packages
+require(mgcv)
+require(survival)
+require(ggplot2)
+
+# example 1 (primary biliary cirrhosis)
+data(pbc,package="survival")
+str(pbc)
+pbc$status1 <- as.numeric(pbc$status==2)
+pbc$stage <- factor(pbc$stage)
+b0 <- gam(time ~ trt+sex+stage+s(sqrt(protime))+s(platelet)+
+          s(age)+s(bili)+s(albumin)+s(sqrt(ast))+s(alk.phos), 
+          weights=status1, family=cox.ph, data=pbc, method="REML")
+summary(b0)
+anova(b0)
+plot(b0,pages=1,all.terms=TRUE,seWithMean=TRUE,shift=coef(b0)[1],shade= TRUE)
+b <- gam(time ~ trt+sex+s(sqrt(protime))+s(platelet)+s(age)+s(bili)+s(albumin),
+        weights=status1, family=cox.ph, data=pbc, method="REML")
+par(mfrow=c(2,2))
+gam.check(b)
+par(mfrow=c(1,1))
+df <- data.frame(x=b$linear.predictors,y=residuals(b))
+ggplot(df,aes(x=x,y=y))+geom_point()+
+  labs(x="linear predictor",y="residuals")+theme_bw()
+summary(b)
+anova(b)
+plot(b,pages=1,seWithMean = TRUE,shift=coef(b0)[1],shade=TRUE)
