@@ -312,4 +312,97 @@ ggplot(df,aes(x=x,y=y))+geom_point()+
   labs(x="linear predictor",y="residuals")+theme_bw()
 summary(b)
 anova(b)
-plot(b,pages=1,seWithMean = TRUE,shift=coef(b0)[1],shade=TRUE)
+plot(b,pages=1,seWithMean=TRUE,shift=coef(b0)[1],shade=TRUE)
+
+# drawSurv function
+drawSurv <- function(model,data,np=100,timevar="time",until=NULL,id=list()){
+  if(is.null(until)) until=max(model$model[[timevar]],na.rm=TRUE)
+  if(length(id)==0) id=list(id=1:nrow(data))
+  for(i in 1:nrow(data)){
+    newd <- data.frame(matrix(0,np,0))
+    for (n in names(data)) newd[[n]] <- rep(data[[n]][i],np)
+    newd$time <- seq(0,until,length=np)
+    fv <- predict(model,newdata=newd,type="response",se=TRUE)
+    newd$fit=fv$fit
+    # newd$ymax=fv$fit+se*fv$se.fit
+    # newd$ymin=fv$fit-se*fv$se.fit
+    se <- fv$se.fit/fv$fit
+    newd$ymax=exp(log(fv$fit)+se)
+    newd$ymin=exp(log(fv$fit)-se)
+    idname=names(id)[1]
+    newd[[idname]]=id[[1]][i]
+    if(i==1){
+      final=newd
+    } else{
+      final=rbind(final,newd)
+    }
+  }
+  final[[idname]]=factor(final[[idname]])
+  final
+  ggplot(data=final,aes_string(x="time",y="fit",fill=idname,group=idname))+
+    geom_line(aes_string(color=idname))+
+    geom_ribbon(aes_string(ymax="ymax",ymin="ymin"),alpha=0.3)+
+    ylim(c(0,1)) + ylab("cumulative survival")+xlab("days")+
+    theme_bw()+
+    theme(legend.position = "top")
+}
+drawSurv(b,data=pbc[c(10,66,5),],id=list(id=c(10,66,25)))
+
+# averageData function 1
+averageData <- function(data){
+  newd=list()    
+  for(i in 1:ncol(data)){
+    if(is.numeric(data[[i]])) {
+      newd[[i]]=mean(data[[i]],na.rm=TRUE)
+    } else if(is.factor(data[[i]])){
+      newd[[i]]=levels(data[[i]])[1]
+    } else{
+      newd[[i]]=sort(unique(data[[i]]))[1]
+    }
+  }
+  names(newd)=names(data)
+  df=as.data.frame(newd)
+  df
+}
+drawSurv(b,data=averageData(pbc))
+
+# averageData function 2
+averageData <- function(data,newValue=list()){
+  newd=list()    
+  for(i in 1:ncol(data)){
+    if(is.numeric(data[[i]])) {
+      newd[[i]]=mean(data[[i]],na.rm=TRUE)
+    } else if(is.factor(data[[i]])){
+      newd[[i]]=levels(data[[i]])[1]
+    } else{
+      newd[[i]]=sort(unique(data[[i]]))[1]
+    }
+  }
+  names(newd)=names(data)
+  df=as.data.frame(newd)
+  df
+  if(length(newValue)>0){
+    no=length(newValue[[1]])
+    for(i in 1:no){
+      if(i==1) {
+        final=df
+      } else{
+        final=rbind(final,df)
+      }
+    }
+    final[[names(newValue)[1]]]=newValue[[1]]
+    df=final
+  }
+  df
+}
+dfSex <- averageData(pbc,list(sex=c("m","f")))
+dfSex
+drawSurv(b,data=dfSex,id=list(sex=c("m","f")))
+dfBili <- averageData(pbc,list(bili=c(1,10)))
+dfBili
+drawSurv(b,data=dfBili,id=list(bili=c(1,10)))
+
+
+
+# Chapter 7
+

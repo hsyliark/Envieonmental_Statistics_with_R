@@ -1,0 +1,117 @@
+---
+title: "Example1"
+author: "Hwang Seong-Yun"
+date: '2020 10 13 '
+output: html_document
+---
+
+### 필요 패키지 
+
+```{r}
+library(mgcv)
+library(ggplot2)
+library(moonBook)
+library(ztable)
+library(survival)
+library(ggGam)
+library(corrplot)
+library(ggcorrplot)
+library(car)
+```
+
+### Correlation Analysis
+#### 사용데이터 : 광산, 영산포-1, 우치, 함평 지점에 대한 수질데이터 (LASSO 연구논문)
+
+```{r}
+ex1 <- read.csv("C:/Users/stat/Desktop/논문데이터분석(GAM)/연습용csv파일/0_4개지점.csv", sep=",", header=T)
+ex1_scale <- scale(ex1)
+X1 <- round(cor(ex1, method='spearman'),4) # no scaling
+pairs(X1) 
+corrplot(X1)
+X1
+p.mat1 <- cor_pmat(ex1, method='spearman')
+p.mat1
+ggcorrplot(X1, hc.order=T, type="lower", lab=T) +
+  ggtitle("Correlation plot(Spearman) for water quality data") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+ggcorrplot(X1, hc.order=T, type="lower", p.mat=p.mat1) +
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+X2 <- round(cor(ex1_scale, method='spearman'),4) # scaling
+pairs(X2) 
+corrplot(X2)
+X2
+p.mat2 <- cor_pmat(ex1_scale, method='spearman')
+p.mat2
+ggcorrplot(X2, hc.order=T, type="lower", lab=T) +
+  ggtitle("Correlation plot(Spearman) for water quality data") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+ggcorrplot(X2, hc.order=T, type="lower", p.mat=p.mat2) +
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+```
+
+### Multiple Linear Regression
+### Response variable : BOD
+#### scaling data 사용
+
+```{r}
+ex1_scale <- as.data.frame(ex1_scale)
+ggplot(data=ex1_scale,aes(x=COD,y=BOD)) + geom_point() + stat_smooth(method=lm)
+ggplot(data=ex1_scale,aes(x=SS,y=BOD)) + geom_point() + stat_smooth(method=lm)
+ggplot(data=ex1_scale,aes(x=T.N,y=BOD)) + geom_point() + stat_smooth(method=lm)
+ggplot(data=ex1_scale,aes(x=T.P,y=BOD)) + geom_point() + stat_smooth(method=lm)
+ggplot(data=ex1_scale,aes(x=TOC,y=BOD)) + geom_point() + stat_smooth(method=lm)
+ggplot(data=ex1_scale,aes(x=NH3.N,y=BOD)) + geom_point() + stat_smooth(method=lm)
+ggplot(data=ex1_scale,aes(x=PO4.P,y=BOD)) + geom_point() + stat_smooth(method=lm)
+ggplot(data=ex1_scale,aes(x=Chl.a,y=BOD)) + geom_point() + stat_smooth(method=lm)
+ggplot(data=ex1_scale,aes(x=Rain,y=BOD)) + geom_point() + stat_smooth(method=lm)
+ggplot(data=ex1_scale,aes(x=Flow,y=BOD)) + geom_point() + stat_smooth(method=lm)
+fit <- lm(BOD~.,data=ex1_scale)
+summary(fit)
+vif(fit)
+par(mfrow=c(2,2))
+plot(fit)
+par(mfrow=c(1,1))
+fit1 <- lm(BOD~COD+SS+NH3.N+Chl.a,data=ex1_scale) # 모형 fit에서 유의하지 않은 변수와 그래프를 통해 수질항목의 관계를 제대로 설명하지 못한다고 판단되는 TOC를 제거함
+summary(fit1)
+vif(fit1)
+par(mfrow=c(2,2))
+plot(fit1)
+par(mfrow=c(1,1))
+```
+
+### Generalized Additive Model
+#### scaling data 사용
+
+```{r}
+m <- gam(BOD~s(COD)+s(SS)+s(T.N)+s(T.P)+s(TOC)+s(NH3.N)+s(PO4.P)+s(Chl.a)+s(Rain)+s(Flow),data=ex1_scale)
+plot(m,pages=1,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(m)[1])
+ggGam(m)
+summary(m)
+concurvity(m,full=TRUE) # overall concurvity
+concurvity(m,full=FALSE) # pairwise concurvity
+par(mfrow=c(2,2))
+gam.check(m)
+par(mfrow=c(1,1))
+m1 <- gam(BOD~s(COD)+s(SS)+s(NH3.N)+s(Chl.a),data=ex1_scale) # 모형 m에서 유의하지 않은 변수와 그래프를 통해 수질항목의 관계를 제대로 설명하지 못한다고 판단되는 TOC를 제거함 
+plot(m1,pages=1,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(m)[1])
+ggGam(m1)
+summary(m1)
+concurvity(m1,full=TRUE) # overall concurvity
+concurvity(m1,full=FALSE) # pairwise concurvity
+par(mfrow=c(2,2))
+gam.check(m1)
+par(mfrow=c(1,1))
+```
+
+#### 일반적인 다중선형회귀모형(MLR)을 적합 시 최종모형 fit1의 Adjusted R-squared는 0.829(82.9%), 반응변수와 설명변수와의 비선형관계를 가정한 일반화선형모형(GAM)을 적합 시 최종모형 m1의 Adjusted R-squared는 0.878(87.8%) 로 산출되어 GAM 모형이 MLR 모형보다 데이터에 대한 설명력이 더 좋게 나왔음. GAM도 MLR과 마찬가지로 다중공선성(multicollinearity problem)이 존재할 수 있으므로 분산팽창계수를 점검하는 함수 vif나 공선성을 확인하는 함수 concurvity를 사용하여 사후점검을 할 필요가 있음.  
+
