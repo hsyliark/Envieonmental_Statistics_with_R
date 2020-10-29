@@ -1,5 +1,6 @@
 # Reference : https://bookdown.org/cardiomoon/gam/
 # Reference : https://be-favorite.tistory.com/59
+# Reference : https://cran.r-project.org/web/packages/plsmselect/vignettes/plsmselect.html
 
 
 # Chapter 1
@@ -404,5 +405,178 @@ drawSurv(b,data=dfBili,id=list(bili=c(1,10)))
 
 
 
-# Chapter 7
+## GAM LASSO
+
+library(plsmselect)
+library(purrr)
+data(simData)
+
+## Create model matrix X corresponding to linear terms
+## (necessary for the formula option of gamlasso below)
+simData$X = model.matrix(~x1+x2+x3+x4+x5+x6+x7+x8+x9+x10, data=simData)[,-1]
+
+## The formula approach
+gfit = gamlasso(Yg ~ X +
+                  s(z1, k=5, bs="ts") +
+                  s(z2, k=5, bs="ts") +
+                  s(z3, k=5, bs="ts") +
+                  s(z4, k=5, bs="ts"),
+                data = simData,
+                seed = 1)
+
+## The term specification approach
+gfit = gamlasso(response = "Yg",
+                linear.terms = paste0("x",1:10),
+                smooth.terms = paste0("z",1:4),
+                data = simData,
+                linear.penalty = "l1",
+                smooth.penalty = "l1",
+                num.knots = 5,
+                seed = 1)
+
+# mgcv::gam object:
+class(gfit$gam)
+# glmnet::cv.glmnet object
+class(gfit$cv.glmnet)
+summary(gfit)
+## Plot the estimates of the smooth effects:
+plot(gfit$gam, pages=1)
+## Plot fitted versus observed values:
+plot(simData$Yg, predict(gfit), xlab = "Observed values", ylab = "Fitted Values")
+
+## Create model matrix X corresponding to linear terms
+## (necessary for the formula option of gamlasso below)
+simData$X = model.matrix(~x1+x2+x3+x4+x5+x6+x7+x8+x9+x10, data=simData)[,-1]
+
+## Poisson response. Formula approach.
+pfit = gamlasso(Yp ~ X + 
+                  s(z1, bs="ts", k=5) + 
+                  s(z2, bs="ts", k=5) + 
+                  s(z3, bs="ts", k=5) + 
+                  s(z4, bs="ts", k=5),
+                data = simData,
+                family = "poisson",
+                seed = 1)
+
+## Poisson response. Term-specification approach.
+pfit = gamlasso(response = "Yp",
+                linear.terms = paste0("x",1:10),
+                smooth.terms = paste0("z",1:4),
+                data = simData,
+                linear.penalty = "l1",
+                smooth.penalty = "l1",
+                family = "poisson",
+                num.knots = 5,
+                seed = 1)
+
+coef(pfit$cv.glmnet, s="lambda.min")
+
+par(mfrow=c(1,2))
+plot(pfit$gam, select=1) # estimate of smooth term z1
+plot(pfit$gam, select=2) # estimate of smooth term z2
+
+plot(predict(pfit, type="response"), exp(simData$lp), xlab="predicted count", ylab="true expected count")
+
+## Create model matrix X corresponding to linear terms
+## (necessary for the formula option of gamlasso below)
+simData$X = model.matrix(~x1+x2+x3+x4+x5+x6+x7+x8+x9+x10, data=simData)[,-1]
+
+## Bernoulli trials response
+bfit = gamlasso(Yb ~ X + 
+                  s(z1, bs="ts", k=5) + 
+                  s(z2, bs="ts", k=5) + 
+                  s(z3, bs="ts", k=5) + 
+                  s(z4, bs="ts", k=5),
+                data = simData,
+                family = "binomial",
+                seed = 1)
+
+## The term specification approach
+bfit = gamlasso(response = "Yb",
+                linear.terms = paste0("x",1:10),
+                smooth.terms = paste0("z",1:4),
+                data = simData,
+                family="binomial",
+                linear.penalty = "l1",
+                smooth.penalty = "l1",
+                num.knots = 5,
+                seed = 1)
+
+summary(bfit)
+plot(bfit$gam, pages=1)
+pred.prob <- predict(bfit, type="response")
+true.prob <- exp(simData$lp)/(1+exp(simData$lp))
+plot(pred.prob, true.prob, xlab="predicted probability", ylab="true probability")
+
+## Create model matrix X corresponding to linear terms
+## (necessary for the formula option of gamlasso below)
+simData$X = model.matrix(~x1+x2+x3+x4+x5+x6+x7+x8+x9+x10, data=simData)[,-1]
+
+## Binomial counts response. Formula approach.
+bfit2 = gamlasso(cbind(success,failure) ~ X + 
+                   s(z1, bs="ts", k=5) + 
+                   s(z2, bs="ts", k=5) + 
+                   s(z3, bs="ts", k=5) + 
+                   s(z4, bs="ts", k=5),
+                 data = simData,
+                 family = "binomial",
+                 seed = 1)
+
+## Binomial counts response. Term specification approach
+bfit2 = gamlasso(c("success","failure"),
+                 linear.terms=paste0("x",1:10),
+                 smooth.terms=paste0("z",1:4),
+                 data=simData,
+                 family = "binomial",
+                 linear.penalty = "l1",
+                 smooth.penalty = "l1",
+                 num.knots = 5,
+                 seed=1)
+
+summary(bfit2)
+plot(bfit2$gam, pages=1)
+pred.prob <- predict(bfit2, type="response")
+true.prob <- exp(simData$lp)/(1+exp(simData$lp))
+plot(pred.prob, true.prob, xlab="predicted probability", ylab="true probability")
+
+## Create model matrix X corresponding to linear terms
+## (necessary for the formula option of gamlasso below)
+simData$X = model.matrix(~x1+x2+x3+x4+x5+x6+x7+x8+x9+x10, data=simData)[,-1]
+
+# Censored time-to-event response. Formula approach.
+cfit = gamlasso(time ~ X +
+                  s(z1, bs="ts", k=5) +
+                  s(z2, bs="ts", k=5) +
+                  s(z3, bs="ts", k=5) +
+                  s(z4, bs="ts", k=5),
+                data = simData,
+                family = "cox",
+                weights = "status",
+                seed = 1)
+
+# Censored time-to-event response. Term specification approach.
+cfit = gamlasso(response = "time",
+                linear.terms = paste0("x",1:10),
+                smooth.terms = paste0("z",1:4),
+                data = simData,
+                linear.penalty = "l1",
+                smooth.penalty = "l1",
+                family = "cox",
+                weights="status",
+                num.knots = 5,
+                seed = 1)
+
+## Obtain and plot predicted cumulative baseline hazard:
+H0.pred <- cumbasehaz(cfit)
+
+time.seq <- seq(0, 60, by=1)
+plot(time.seq, H0.pred(time.seq), type="l", xlab = "Time", ylab="",
+     main = "Predicted Cumulative \nBaseline Hazard")
+
+## Obtain predicted survival at days 1,2,3,...,60:
+S.pred <- predict(cfit, type="response", new.event.times=1:60)
+
+## Plot the survival curve for sample (subject) 17:
+plot(1:60, S.pred[17,], xlab="time (in days)", ylab="Survival probability", type="l")
+
 
