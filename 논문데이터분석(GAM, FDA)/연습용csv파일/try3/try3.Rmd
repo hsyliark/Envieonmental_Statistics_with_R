@@ -1,0 +1,139 @@
+---
+title: "Generalized Additive Model, Functional Regression"
+author: "Hwang Seong-Yun"
+date: '2020 11 7 '
+output: html_document
+---
+
+### 필요 패키지 
+
+```{r}
+library(mgcv)
+library(ggplot2)
+library(gridExtra)
+library(moonBook)
+library(ztable)
+library(survival)
+library(ggGam)
+library(corrplot)
+library(ggcorrplot)
+library(car)
+library(lmtest)
+library(fda)
+library(refund)
+```
+
+#### 사용데이터 : 광산 지점 데이터
+#### 모니터링 기간 : 2010~2019년 (월별평균) 
+#### 반응변수 : 클로로필a(Chl_a)
+#### 설명변수 : 결측치가 존재하는 유량(flow)을 제외한 모든 설명변수 
+
+## 광산 지점 데이터
+### Response variable : Chl_a
+
+### Multiple Linear Regression
+#### scaling data 사용
+
+```{r}
+ex1 <- read.csv("C:/Users/HSY/Desktop/확정 자료조회_20201019(광산).csv", sep=",", header=T)
+ex1 <- ex1[,-c(1,2,3)]
+ex1_scale <- scale(ex1)
+ex1_scale <- as.data.frame(ex1_scale)
+p1 <- ggplot(data=ex1_scale,aes(x=temp,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+p2 <- ggplot(data=ex1_scale,aes(x=pH,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+p3 <- ggplot(data=ex1_scale,aes(x=DO,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+p4 <- ggplot(data=ex1_scale,aes(x=BOD,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+p5 <- ggplot(data=ex1_scale,aes(x=COD,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+p6 <- ggplot(data=ex1_scale,aes(x=SS,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+p7 <- ggplot(data=ex1_scale,aes(x=EC,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+p8 <- ggplot(data=ex1_scale,aes(x=T_N,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+p9 <- ggplot(data=ex1_scale,aes(x=DTN,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+p10 <- ggplot(data=ex1_scale,aes(x=NO3_N,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+p11 <- ggplot(data=ex1_scale,aes(x=T_P,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+p12 <- ggplot(data=ex1_scale,aes(x=DTP,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+p13 <- ggplot(data=ex1_scale,aes(x=PO4_P,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+p14 <- ggplot(data=ex1_scale,aes(x=TOC,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+p15 <- ggplot(data=ex1_scale,aes(x=TC,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+p16 <- ggplot(data=ex1_scale,aes(x=FC,y=Chl_a)) + geom_point() + stat_smooth(method=lm)
+grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,nrow=4,ncol=4)
+fit <- lm(Chl_a~.,data=ex1_scale)
+summary(fit)
+vif(fit) # 다중공선성(multicollinearity) 존재
+par(mfrow=c(2,2))
+plot(fit)
+par(mfrow=c(1,1))
+n <- length(residuals(fit))
+plot(tail(residuals(fit),n-1) ~ head(residuals(fit),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
+abline(h=0,v=0,col=grey(0.75))
+dwtest(Chl_a~.,data=ex1_scale) # 잔차가 양의 자기상관성을 가지고 있음.
+fit1 <- lm(Chl_a~temp+DO+BOD+SS+T_P,data=ex1_scale) # 모형 fit에서 유의하지 않은 변수를 제외함.
+summary(fit1) # Adjusted R-squared:  0.6287 
+vif(fit1)
+par(mfrow=c(2,2))
+plot(fit1)
+par(mfrow=c(1,1))
+n <- length(residuals(fit1))
+plot(tail(residuals(fit1),n-1) ~ head(residuals(fit1),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
+abline(h=0,v=0,col=grey(0.75))
+dwtest(Chl_a~temp+DO+BOD+SS+T_P,data=ex1_scale)
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+### Generalized Additive Model
+#### scaling data 사용
+
+```{r}
+# GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않으므로 현장항목 중 pH, 용존산소량(DO), 전기전도도(EC) 를 우선 제외하고 모형구축.
+m <- gam(Chl_a~s(temp)+s(BOD)+s(COD)+s(SS)+s(T_N)+s(DTN)+s(NO3_N)+s(T_P)+s(DTP)+s(PO4_P)+s(TOC)+s(TC)+s(FC),data=ex1_scale)
+ggGam(m)
+summary(m)
+concurvity(m,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(m)
+par(mfrow=c(1,1))
+m1 <- gam(Chl_a~s(BOD)+s(COD)+s(SS)+s(T_P)+s(TC),data=ex1_scale) # 모형 m에서 유의하지 않은 변수를 제외하고 모형구축.
+ggGam(m1)
+summary(m1) # R-sq.(adj) =  0.583
+concurvity(m1,full=TRUE)
+par(mfrow=c(2,2))
+gam.check(m1)
+par(mfrow=c(1,1)) 
+```
+
+### Functional Regression
+#### Functional Data Analysis : 각각의 변수들이 시간에 대한 함수(function)임에 초점을 맞추어 분석하는 것
+
+#### scaling data 사용
+
+#### Smoothing by Fourier basis : 주기적인 데이터에 유용함
+
+#### 기저의 개수가 많을수록 함수적 자료의 형태가 이산형 자료가 되어 편의(bias)가 줄어들고, 기저의 개수가 적을수록 평활화 정도가 커지게 되어 분산이 줄어든다. 본 데이터는 월별자료이고 주기가 12이므로 기저함수의 개수를 중간정도인 6으로 정함.
+
+```{r}
+monthbasisfourier <- create.fourier.basis(c(0, 120), nbasis=6, period=12) 
+temp.fb <- smooth.basis(argvals=1:120, ex1$temp, monthbasisfourier, fdnames=list("month", "Station", "temp"))$fd
+par(mfrow=c(2,1))
+plot(temp.fb) ; plot(ex1$temp)
+par(mfrow=c(1,1))
+pH.fb <- smooth.basis(argvals=1:120, ex1$pH, monthbasisfourier, fdnames=list("month", "Station", "pH"))$fd
+par(mfrow=c(2,1))
+plot(pH.fb) ; plot(ex1$pH)
+par(mfrow=c(1,1))
+```
+
+#### Smoothing by B-spline basis : 비주기적인 데이터에 유용함
+
+#### 10년간 측정한 데이터를 월별평균하였고 각 년도마다 4분기로 나누어서 평활화하는 것이 바람직하다고 판단하여 부분구간의 개수를 40으로 정하고 cubic spline을 사용하였음. 이에 따라 기저함수의 개수는 3+40-1=42로 정함. 
+
+```{r}
+monthbasisspline <- create.bspline.basis(c(0, 120), nbasis=42, norder=4)
+temp.Bb <- smooth.basis(argvals=1:120, ex1$temp, monthbasisspline, fdnames=list("month", "Station", "temp"))$fd
+par(mfrow=c(2,1))
+plot(temp.Bb) ; plot(ex1$temp)
+par(mfrow=c(1,1))
+pH.Bb <- smooth.basis(argvals=1:120, ex1$pH, monthbasisspline, fdnames=list("month", "Station", "pH"))$fd
+par(mfrow=c(2,1))
+plot(pH.Bb) ; plot(ex1$pH) 
+par(mfrow=c(2,1))
+```
+
