@@ -274,6 +274,25 @@ par(mfrow=c(1,1))
 #### 
 
 ```{r}
+daybasisspline <- create.bspline.basis(c(0, 510), nbasis=42, norder=4)
+pH.Bb <- smooth.basis(argvals=1:510, ex1$pH, daybasisspline)$fd
+DO.Bb <- smooth.basis(argvals=1:510, ex1$DO, daybasisspline)$fd
+BOD.Bb <- smooth.basis(argvals=1:510, ex1$BOD, daybasisspline)$fd
+COD.Bb <- smooth.basis(argvals=1:510, ex1$COD, daybasisspline)$fd
+SS.Bb <- smooth.basis(argvals=1:510, ex1$SS, daybasisspline)$fd
+T_N.Bb <- smooth.basis(argvals=1:510, ex1$T_N, daybasisspline)$fd
+T_P.Bb <- smooth.basis(argvals=1:510, ex1$T_P, daybasisspline)$fd
+TOC.Bb <- smooth.basis(argvals=1:510, ex1$TOC, daybasisspline)$fd
+WT.Bb <- smooth.basis(argvals=1:510, ex1$WT, daybasisspline)$fd
+EC.Bb <- smooth.basis(argvals=1:510, ex1$EC, daybasisspline)$fd
+TC.Bb <- smooth.basis(argvals=1:510, ex1$TC, daybasisspline)$fd
+NH3_N.Bb <- smooth.basis(argvals=1:510, ex1$NH3_N, daybasisspline)$fd
+PO4_P.Bb <- smooth.basis(argvals=1:510, ex1$PO4_P, daybasisspline)$fd
+Chl_a.Bb <- smooth.basis(argvals=1:510, ex1$Chl_a, daybasisspline)$fd
+Chl_a.Bb <- smooth.basis(argvals=1:510, ex1$Chl_a, daybasisspline)$fd
+FC.Bb <- smooth.basis(argvals=1:510, ex1$FC, daybasisspline)$fd
+Flow.Bb <- smooth.basis(argvals=1:510, ex1$Flow, daybasisspline)$fd
+Rain.Bb <- smooth.basis(argvals=1:510, ex1$Rain, daybasisspline)$fd
 Chl_a.fR <- fRegress(Chl_a.Bb ~ pH.Bb+DO.Bb+BOD.Bb+COD.Bb+SS.Bb+T_N.Bb+T_P.Bb+TOC.Bb+WT.Bb+EC.Bb+TC.Bb+NH3_N.Bb+PO4_P.Bb+FC.Bb+Flow.Bb+Rain.Bb)
 ```
 
