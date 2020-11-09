@@ -1,0 +1,256 @@
+---
+title: "Example3"
+author: "Hwang Seong-Yun"
+date: '2020 11 9 '
+output: html_document
+---
+
+### 필요 패키지 
+
+```{r}
+library(tidyverse)
+library(mgcv)
+library(ggplot2)
+library(gridExtra)
+library(moonBook)
+library(ztable)
+library(survival)
+library(ggGam)
+library(corrplot)
+library(ggcorrplot)
+library(car)
+library(lmtest)
+library(fda)
+library(refund)
+```
+
+
+
+
+### 사용데이터 : 광산 지점 데이터
+
+#### 모니터링 기간 : 2010~2019년 (일별 주단위자료) 
+
+#### 반응변수 : Chla
+
+#### 설명변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P, FC, Flow, Rain
+
+#### 수질항목별 단위가 다르다는 점을 감안하여 표준화된 데이터를 사용
+
+### Correlation Analysis
+
+```{r}
+ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- ex1[,-1]
+ex1_scale <- scale(ex1)
+X1 <- round(cor(ex1_scale, method='spearman'),4) 
+corrplot(X1)
+p.mat1 <- cor_pmat(ex1, method='spearman')
+ggcorrplot(X1, hc.order=T, type="lower", lab=T) +
+  ggtitle("Correlation plot(Spearman) for water quality data") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+ggcorrplot(X1, hc.order=T, type="lower", p.mat=p.mat1) +
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+```
+
+
+
+### Multiple Linear Regression
+#### scaling data 사용
+
+```{r}
+ex1_scale <- as.data.frame(ex1_scale)
+p1 <- ggplot(data=ex1_scale,aes(x=pH,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p2 <- ggplot(data=ex1_scale,aes(x=DO,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p3 <- ggplot(data=ex1_scale,aes(x=BOD,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p4 <- ggplot(data=ex1_scale,aes(x=COD,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p5 <- ggplot(data=ex1_scale,aes(x=SS,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p6 <- ggplot(data=ex1_scale,aes(x=TN,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p7 <- ggplot(data=ex1_scale,aes(x=TP,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p8 <- ggplot(data=ex1_scale,aes(x=TOC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p9 <- ggplot(data=ex1_scale,aes(x=WT,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p10 <- ggplot(data=ex1_scale,aes(x=EC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p11 <- ggplot(data=ex1_scale,aes(x=TC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p12 <- ggplot(data=ex1_scale,aes(x=NH3N,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p13 <- ggplot(data=ex1_scale,aes(x=PO4P,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p14 <- ggplot(data=ex1_scale,aes(x=FC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p15 <- ggplot(data=ex1_scale,aes(x=Flow,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p16 <- ggplot(data=ex1_scale,aes(x=Rain,y=Chla)) + geom_point() + stat_smooth(method=lm)
+grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,nrow=4,ncol=4)
+fit <- lm(Chla~.,data=ex1_scale)
+summary(fit) # Adjusted R-squared:  0.647
+vif(fit) # 다중공선성(multicollinearity) 존재
+par(mfrow=c(2,2))
+plot(fit)
+par(mfrow=c(1,1))
+n <- length(residuals(fit))
+plot(tail(residuals(fit),n-1) ~ head(residuals(fit),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
+abline(h=0,v=0,col=grey(0.75))
+dwtest(Chla~.,data=ex1_scale) # 잔차가 양의 자기상관성을 가지고 있음.
+fit1 <- lm(Chla~DO+BOD+COD+SS+TP+WT+TC+PO4P,data=ex1_scale) # 모형 fit에서 유의하지 않은 변수를 제외함.
+summary(fit1) # Adjusted R-squared:  0.6405  
+vif(fit1) # 다중공선성 존재
+par(mfrow=c(2,2))
+plot(fit1)
+par(mfrow=c(1,1))
+n <- length(residuals(fit1))
+plot(tail(residuals(fit1),n-1) ~ head(residuals(fit1),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
+abline(h=0,v=0,col=grey(0.75))
+dwtest(Chla~DO+BOD+COD+SS+TP+WT+TC+PO4P,data=ex1_scale)
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+### Generalized Additive Model
+#### scaling data 사용
+
+```{r}
+# GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
+m <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1_scale)
+ggGam(m)
+summary(m) # R-sq.(adj) =  0.706
+concurvity(m,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(m)
+par(mfrow=c(1,1))
+m1 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TP)+s(WT)+s(TC)+s(PO4P),data=ex1_scale) # 모형 m에서 유의하지 않은 변수를 제외하고 모형구축.
+ggGam(m1)
+summary(m1) # R-sq.(adj) =  0.691 
+concurvity(m1,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2)) 
+gam.check(m1)
+par(mfrow=c(1,1)) 
+m2 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TP)+s(WT)+s(PO4P),data=ex1_scale) # 모형 m1에서 유의하지 않은 변수를 제외하고 모형구축.
+ggGam(m2)
+summary(m2) # R-sq.(adj) =  0.686 
+concurvity(m2,full=TRUE)
+par(mfrow=c(2,2))
+gam.check(m2)
+par(mfrow=c(1,1)) 
+```
+
+#### 최종선택된 모형의 설명력 : 64.1%(다중선형회귀모형), 68.6%(일반화가법모형) -> 반응변수를 TC로 했을때보다 확실한 차이는 나지 않았음.
+
+#### 일반화가법모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 TC나 FC처럼 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
+
+
+
+
+
+
+### 사용데이터 : 우치 지점 데이터
+
+#### 모니터링 기간 : 2010~2019년 (일별 주단위자료) 
+
+#### 반응변수 : Chla
+
+#### 설명변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P, FC, Flow, Rain
+
+#### 수질항목별 단위가 다르다는 점을 감안하여 표준화된 데이터를 사용
+
+### Correlation Analysis
+
+```{r}
+ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- ex2[,-1]
+ex2_scale <- scale(ex2)
+X2 <- round(cor(ex2_scale, method='spearman'),4) 
+corrplot(X2)
+p.mat2 <- cor_pmat(ex2, method='spearman')
+ggcorrplot(X2, hc.order=T, type="lower", lab=T) +
+  ggtitle("Correlation plot(Spearman) for water quality data") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+ggcorrplot(X2, hc.order=T, type="lower", p.mat=p.mat1) +
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+```
+
+
+
+### Multiple Linear Regression
+#### scaling data 사용
+
+```{r}
+ex2_scale <- as.data.frame(ex2_scale)
+g1 <- ggplot(data=ex2_scale,aes(x=pH,y=Chla)) + geom_point() + stat_smooth(method=lm)
+g2 <- ggplot(data=ex2_scale,aes(x=DO,y=Chla)) + geom_point() + stat_smooth(method=lm)
+g3 <- ggplot(data=ex2_scale,aes(x=BOD,y=Chla)) + geom_point() + stat_smooth(method=lm)
+g4 <- ggplot(data=ex2_scale,aes(x=COD,y=Chla)) + geom_point() + stat_smooth(method=lm)
+g5 <- ggplot(data=ex2_scale,aes(x=SS,y=Chla)) + geom_point() + stat_smooth(method=lm)
+g6 <- ggplot(data=ex2_scale,aes(x=TN,y=Chla)) + geom_point() + stat_smooth(method=lm)
+g7 <- ggplot(data=ex2_scale,aes(x=TP,y=Chla)) + geom_point() + stat_smooth(method=lm)
+g8 <- ggplot(data=ex2_scale,aes(x=TOC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+g9 <- ggplot(data=ex2_scale,aes(x=WT,y=Chla)) + geom_point() + stat_smooth(method=lm)
+g10 <- ggplot(data=ex2_scale,aes(x=EC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+g11 <- ggplot(data=ex2_scale,aes(x=TC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+g12 <- ggplot(data=ex2_scale,aes(x=NH3N,y=Chla)) + geom_point() + stat_smooth(method=lm)
+g13 <- ggplot(data=ex2_scale,aes(x=PO4P,y=Chla)) + geom_point() + stat_smooth(method=lm)
+g14 <- ggplot(data=ex2_scale,aes(x=FC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+g15 <- ggplot(data=ex2_scale,aes(x=Flow,y=Chla)) + geom_point() + stat_smooth(method=lm)
+g16 <- ggplot(data=ex2_scale,aes(x=Rain,y=Chla)) + geom_point() + stat_smooth(method=lm)
+grid.arrange(g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,nrow=4,ncol=4)
+gfit <- lm(Chla~.,data=ex2_scale)
+summary(gfit) # Adjusted R-squared:  0.7037
+vif(gfit) 
+par(mfrow=c(2,2))
+plot(gfit)
+par(mfrow=c(1,1))
+n <- length(residuals(gfit))
+plot(tail(residuals(gfit),n-1) ~ head(residuals(gfit),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
+abline(h=0,v=0,col=grey(0.75))
+dwtest(Chla~.,data=ex2_scale) # 잔차가 양의 자기상관성을 가지고 있음.
+gfit1 <- lm(Chla~pH+BOD+COD+TN+TP+EC+PO4P+Rain,data=ex2_scale) # 모형 gfit에서 유의하지 않은 변수를 제외함.
+summary(gfit1) # Adjusted R-squared:  0.6931  
+vif(gfit1) # 다중공선성 존재
+par(mfrow=c(2,2))
+plot(gfit1)
+par(mfrow=c(1,1))
+n <- length(residuals(gfit1))
+plot(tail(residuals(gfit1),n-1) ~ head(residuals(gfit1),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
+abline(h=0,v=0,col=grey(0.75))
+dwtest(Chla~pH+BOD+COD+TN+TP+EC+PO4P+Rain,data=ex2_scale) # 잔차가 양의 자기상관성을 가지고 있음.
+gfit2 <- lm(Chla~pH+BOD+COD+TN+TP+EC+PO4P,data=ex2_scale) # 모형 gfit1에서 유의하지 않은 변수를 제외함.
+summary(gfit2) # Adjusted R-squared:  0.6918   
+vif(gfit2) 
+par(mfrow=c(2,2))
+plot(gfit2)
+par(mfrow=c(1,1))
+n <- length(residuals(gfit2))
+plot(tail(residuals(gfit2),n-1) ~ head(residuals(gfit2),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
+abline(h=0,v=0,col=grey(0.75))
+dwtest(Chla~pH+BOD+COD+TN+TP+EC+PO4P,data=ex2_scale) 
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+### Generalized Additive Model
+#### scaling data 사용
+
+```{r}
+mm <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2_scale)
+ggGam(mm)
+summary(mm) # R-sq.(adj) =  0.753
+concurvity(mm,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm)
+par(mfrow=c(1,1))
+mm1 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(TN)+s(TP)+s(EC)+s(PO4P),data=ex2_scale) # 모형 mm에서 유의하지 않은 변수를 제외하고 모형구축.
+ggGam(mm1)
+summary(mm1) # R-sq.(adj) =  0.744 
+concurvity(mm1,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2)) 
+gam.check(mm1)
+par(mfrow=c(1,1)) 
+```
+
+#### 최종선택된 모형의 설명력 : 69.2%(다중선형회귀모형), 74.4%(일반화가법모형) -> 반응변수를 TC로 했을때보다 확실한 차이는 나지 않았음.
+
+#### 일반화가법모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 TC나 FC처럼 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
+
