@@ -24,14 +24,19 @@ library(fda)
 library(refund)
 ```
 
-#### 사용데이터 : 광산 지점 데이터
-#### 모니터링 기간 : 2010~2019년 (일별 주단위자료) 
-#### 반응변수 : Chl_a
-#### 설명변수 : pH, DO, BOD, COD, SS, T_N, T_P, TOC, WT, EC, TC, NH3_N, PO4_P, FC, Flow, Rain
+#### 사용데이터 : 우치, 광주1, 광주2, 광산, 나주, 영산포, 함평 지점 자료
+#### 모니터링 기간 : 2000~2019년 (월별자료) 
+#### 반응변수 : TC
+#### 설명변수 : pH, DO, BOD, COD, SS, TN, TP, WT, EC, NH3N, NO3N, FC 
+
+```{r}
+
+
+```
 
 
 ### Functional Regression
-#### Functional Data Analysis : 각각의 변수들이 시간에 대한 함수(function)임에 초점을 맞추어 분석하는 것
+#### Functional Data Analysis : 각각의 변수들이 시간에 대한 함수(function)임에 초점을 맞추어 분석하는 방법
 
 #### scaling data 사용
 
