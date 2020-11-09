@@ -30,8 +30,33 @@ library(refund)
 #### 설명변수 : pH, DO, BOD, COD, SS, TN, TP, WT, EC, NH3N, NO3N, FC 
 
 ```{r}
-
-
+pH <- read.csv("C:/Users/HSY/Desktop/1_pH.csv",sep=",",header=T)
+rownames(pH) <- pH[,1] ; pH <- pH[,-1]
+DO <- read.csv("C:/Users/HSY/Desktop/2_DO.csv",sep=",",header=T)
+rownames(DO) <- DO[,1] ; DO <- DO[,-1]
+BOD <- read.csv("C:/Users/HSY/Desktop/3_BOD.csv",sep=",",header=T)
+rownames(BOD) <- BOD[,1] ; BOD <- BOD[,-1]
+COD <- read.csv("C:/Users/HSY/Desktop/4_COD.csv",sep=",",header=T)
+rownames(COD) <- COD[,1] ; COD <- COD[,-1]
+SS <- read.csv("C:/Users/HSY/Desktop/5_SS.csv",sep=",",header=T) 
+rownames(SS) <- SS[,1] ; SS <- SS[,-1]
+TN <- read.csv("C:/Users/HSY/Desktop/6_TN.csv",sep=",",header=T)
+rownames(TN) <- TN[,1] ; TN <- TN[,-1]
+TP <- read.csv("C:/Users/HSY/Desktop/7_TP.csv",sep=",",header=T)
+rownames(TP) <- TP[,1] ; TP <- TP[,-1]
+WT <- read.csv("C:/Users/HSY/Desktop/8_WT.csv",sep=",",header=T)
+rownames(WT) <- WT[,1] ; WT <- WT[,-1]
+EC <- read.csv("C:/Users/HSY/Desktop/9_EC.csv",sep=",",header=T)
+rownames(EC) <- EC[,1] ; EC <- EC[,-1]
+TC <- read.csv("C:/Users/HSY/Desktop/10_TC.csv",sep=",",header=T)
+rownames(TC) <- TC[,1] ; TC <- TC[,-1]
+NH3N <- read.csv("C:/Users/HSY/Desktop/11_NH3N.csv",sep=",",header=T)
+rownames(NH3N) <- NH3N[,1] ; NH3N <- NH3N[,-1]
+NO3N <- read.csv("C:/Users/HSY/Desktop/12_NO3N.csv",sep=",",header=T)
+rownames(NO3N) <- NO3N[,1] ; NO3N <- NO3N[,-1]
+FC <- read.csv("C:/Users/HSY/Desktop/13_FC.csv",sep=",",header=T)
+rownames(FC) <- FC[,1] ; FC <- FC[,-1]
+water <- list(pH=as.matrix(pH),DO=as.matrix(DO),BOD=as.matrix(BOD),COD=as.matrix(COD),SS=as.matrix(SS),TN=as.matrix(TN),TP=as.matrix(TP),WT=as.matrix(WT),EC=as.matrix(EC),TC=as.matrix(TC),NH3N=as.matrix(NH3N),NO3N=as.matrix(NO3N),FC=as.matrix(FC))
 ```
 
 
@@ -42,184 +67,80 @@ library(refund)
 
 #### Smoothing by Fourier basis : 주기적인 데이터에 유용함
 
-#### 기저의 개수가 많을수록 함수적 자료의 형태가 이산형 자료가 되어 편의(bias)가 줄어들고, 기저의 개수가 적을수록 평활화 정도가 커지게 되어 분산이 줄어든다. 본 데이터는 주단위자료이고 주기가 약 51이므로 기저함수의 개수를 중간정도인 25로 정함.
+#### 기저의 개수가 많을수록 함수적 자료의 형태가 이산형 자료가 되어 편의(bias)가 줄어들고, 기저의 개수가 적을수록 평활화 정도가 커지게 되어 분산이 줄어든다. 본 데이터는 월별자료이고 주기가 12이므로 기저함수의 개수를 중간정도인 25로 정함.
 
 ```{r}
-daybasisfourier <- create.fourier.basis(c(0, 510), nbasis=25, period=51) 
-pH.fb <- smooth.basis(argvals=1:510, ex1$pH, daybasisfourier, fdnames=list("week", "Station", "pH"))$fd
-par(mfrow=c(2,1))
-plot(pH.fb) ; plot(ex1$pH)
-par(mfrow=c(1,1))
-DO.fb <- smooth.basis(argvals=1:510, ex1$DO, daybasisfourier, fdnames=list("week", "Station", "DO"))$fd
-par(mfrow=c(2,1))
-plot(DO.fb) ; plot(ex1$DO)
-par(mfrow=c(1,1))
-BOD.fb <- smooth.basis(argvals=1:510, ex1$BOD, daybasisfourier, fdnames=list("week", "Station", "BOD"))$fd
-par(mfrow=c(2,1))
-plot(BOD.fb) ; plot(ex1$BOD)
-par(mfrow=c(1,1))
-COD.fb <- smooth.basis(argvals=1:510, ex1$COD, daybasisfourier, fdnames=list("week", "Station", "COD"))$fd
-par(mfrow=c(2,1))
-plot(COD.fb) ; plot(ex1$COD)
-par(mfrow=c(1,1))
-SS.fb <- smooth.basis(argvals=1:510, ex1$SS, daybasisfourier, fdnames=list("week", "Station", "SS"))$fd
-par(mfrow=c(2,1))
-plot(SS.fb) ; plot(ex1$SS)
-par(mfrow=c(1,1))
-T_N.fb <- smooth.basis(argvals=1:510, ex1$T_N, daybasisfourier, fdnames=list("week", "Station", "T_N"))$fd
-par(mfrow=c(2,1))
-plot(T_N.fb) ; plot(ex1$T_N)
-par(mfrow=c(1,1))
-T_P.fb <- smooth.basis(argvals=1:510, ex1$T_P, daybasisfourier, fdnames=list("week", "Station", "T_P"))$fd
-par(mfrow=c(2,1))
-plot(T_P.fb) ; plot(ex1$T_P)
-par(mfrow=c(1,1))
-TOC.fb <- smooth.basis(argvals=1:510, ex1$TOC, daybasisfourier, fdnames=list("week", "Station", "TOC"))$fd
-par(mfrow=c(2,1))
-plot(TOC.fb) ; plot(ex1$TOC)
-par(mfrow=c(1,1))
-WT.fb <- smooth.basis(argvals=1:510, ex1$WT, daybasisfourier, fdnames=list("week", "Station", "WT"))$fd
-par(mfrow=c(2,1))
-plot(WT.fb) ; plot(ex1$WT)
-par(mfrow=c(1,1))
-EC.fb <- smooth.basis(argvals=1:510, ex1$EC, daybasisfourier, fdnames=list("week", "Station", "EC"))$fd
-par(mfrow=c(2,1))
-plot(EC.fb) ; plot(ex1$EC)
-par(mfrow=c(1,1))
-TC.fb <- smooth.basis(argvals=1:510, ex1$TC, daybasisfourier, fdnames=list("week", "Station", "TC"))$fd
-par(mfrow=c(2,1))
-plot(TC.fb) ; plot(ex1$TC)
-par(mfrow=c(1,1))
-NH3_N.fb <- smooth.basis(argvals=1:510, ex1$NH3_N, daybasisfourier, fdnames=list("week", "Station", "NH3_N"))$fd
-par(mfrow=c(2,1))
-plot(NH3_N.fb) ; plot(ex1$NH3_N)
-par(mfrow=c(1,1))
-PO4_P.fb <- smooth.basis(argvals=1:510, ex1$PO4_P, daybasisfourier, fdnames=list("week", "Station", "PO4_P"))$fd
-par(mfrow=c(2,1))
-plot(PO4_P.fb) ; plot(ex1$PO4_P)
-par(mfrow=c(1,1))
-Chl_a.fb <- smooth.basis(argvals=1:510, ex1$Chl_a, daybasisfourier, fdnames=list("week", "Station", "Chl_a"))$fd
-par(mfrow=c(2,1))
-plot(Chl_a.fb) ; plot(ex1$Chl_a)
-par(mfrow=c(1,1))
-FC.fb <- smooth.basis(argvals=1:510, ex1$FC, daybasisfourier, fdnames=list("week", "Station", "FC"))$fd
-par(mfrow=c(2,1))
-plot(FC.fb) ; plot(ex1$FC)
-par(mfrow=c(1,1))
-Flow.fb <- smooth.basis(argvals=1:510, ex1$Flow, daybasisfourier, fdnames=list("week", "Station", "Flow"))$fd
-par(mfrow=c(2,1))
-plot(Flow.fb) ; plot(ex1$Flow)
-par(mfrow=c(1,1))
-Rain.fb <- smooth.basis(argvals=1:510, ex1$Rain, daybasisfourier, fdnames=list("week", "Station", "Rain"))$fd
-par(mfrow=c(2,1))
-plot(Rain.fb) ; plot(ex1$Rain)
-par(mfrow=c(1,1))
+daybasisfourier <- create.fourier.basis(c(0, 240), nbasis=6, period=12) 
+pH.fb <- smooth.basis(argvals=1:240, water$pH, daybasisfourier, fdnames=list("month", "Station", "pH"))$fd
+plot(pH.fb) 
+DO.fb <- smooth.basis(argvals=1:240, water$DO, daybasisfourier, fdnames=list("month", "Station", "DO"))$fd
+plot(DO.fb) 
+BOD.fb <- smooth.basis(argvals=1:240, water$BOD, daybasisfourier, fdnames=list("month", "Station", "BOD"))$fd
+plot(BOD.fb) 
+COD.fb <- smooth.basis(argvals=1:240, water$COD, daybasisfourier, fdnames=list("month", "Station", "COD"))$fd
+plot(COD.fb) 
+SS.fb <- smooth.basis(argvals=1:240, water$SS, daybasisfourier, fdnames=list("month", "Station", "SS"))$fd
+plot(SS.fb) 
+TN.fb <- smooth.basis(argvals=1:240, water$TN, daybasisfourier, fdnames=list("month", "Station", "TN"))$fd
+plot(TN.fb) 
+TP.fb <- smooth.basis(argvals=1:240, water$TP, daybasisfourier, fdnames=list("month", "Station", "TP"))$fd
+plot(TP.fb)
+WT.fb <- smooth.basis(argvals=1:240, water$WT, daybasisfourier, fdnames=list("month", "Station", "WT"))$fd
+plot(WT.fb) 
+EC.fb <- smooth.basis(argvals=1:240, water$EC, daybasisfourier, fdnames=list("month", "Station", "EC"))$fd
+plot(EC.fb) 
+TC.fb <- smooth.basis(argvals=1:240, water$TC, daybasisfourier, fdnames=list("month", "Station", "TC"))$fd
+plot(TC.fb) 
+NH3N.fb <- smooth.basis(argvals=1:240, water$NH3N, daybasisfourier, fdnames=list("month", "Station", "NH3N"))$fd
+plot(NH3N.fb)
+NO3N.fb <- smooth.basis(argvals=1:240, water$NO3N, daybasisfourier, fdnames=list("month", "Station", "NO3N"))$fd
+plot(NO3N.fb) 
+FC.fb <- smooth.basis(argvals=1:240, water$FC, daybasisfourier, fdnames=list("month", "Station", "FC"))$fd
+plot(FC.fb) 
 ```
 
 #### Smoothing by B-spline basis : 비주기적인 데이터에 유용함
 
-#### 본 데이터는 10년간 측정한 일별 주단위데이터이므로 각 년도마다 4분기로 나누어서 평활화하는 것이 바람직하다고 판단하여 부분구간의 개수를 40으로 정하고 cubic spline을 사용하였음. 이에 따라 기저함수의 개수는 3+40-1=42로 정함. 
+#### 본 데이터는 20년간 측정한 월별데이터이므로 각 년도마다 4분기로 나누어서 평활화하는 것이 바람직하다고 판단하여 부분구간의 개수를 80으로 정하고 cubic spline을 사용하였음. 이에 따라 기저함수의 개수는 3+80-1=82로 정함. 
 
 ```{r}
-daybasisspline <- create.bspline.basis(c(0, 510), nbasis=42, norder=4)
-pH.Bb <- smooth.basis(argvals=1:510, ex1$pH, daybasisspline, fdnames=list("week", "Station", "pH"))$fd
-par(mfrow=c(2,1))
-plot(pH.Bb) ; plot(ex1$pH) 
-par(mfrow=c(1,1))
-DO.Bb <- smooth.basis(argvals=1:510, ex1$DO, daybasisspline, fdnames=list("week", "Station", "DO"))$fd
-par(mfrow=c(2,1))
-plot(DO.Bb) ; plot(ex1$DO) 
-par(mfrow=c(1,1))
-BOD.Bb <- smooth.basis(argvals=1:510, ex1$BOD, daybasisspline, fdnames=list("week", "Station", "BOD"))$fd
-par(mfrow=c(2,1))
-plot(BOD.Bb) ; plot(ex1$BOD) 
-par(mfrow=c(1,1))
-COD.Bb <- smooth.basis(argvals=1:510, ex1$COD, daybasisspline, fdnames=list("week", "Station", "COD"))$fd
-par(mfrow=c(2,1))
-plot(COD.Bb) ; plot(ex1$COD) 
-par(mfrow=c(1,1))
-SS.Bb <- smooth.basis(argvals=1:510, ex1$SS, daybasisspline, fdnames=list("week", "Station", "SS"))$fd
-par(mfrow=c(2,1))
-plot(SS.Bb) ; plot(ex1$SS) 
-par(mfrow=c(1,1))
-T_N.Bb <- smooth.basis(argvals=1:510, ex1$T_N, daybasisspline, fdnames=list("week", "Station", "T_N"))$fd
-par(mfrow=c(2,1))
-plot(T_N.Bb) ; plot(ex1$T_N) 
-par(mfrow=c(1,1))
-T_P.Bb <- smooth.basis(argvals=1:510, ex1$T_P, daybasisspline, fdnames=list("week", "Station", "T_P"))$fd
-par(mfrow=c(2,1))
-plot(T_P.Bb) ; plot(ex1$T_P) 
-par(mfrow=c(1,1))
-TOC.Bb <- smooth.basis(argvals=1:510, ex1$TOC, daybasisspline, fdnames=list("week", "Station", "TOC"))$fd
-par(mfrow=c(2,1))
-plot(TOC.Bb) ; plot(ex1$TOC) 
-par(mfrow=c(1,1))
-WT.Bb <- smooth.basis(argvals=1:510, ex1$WT, daybasisspline, fdnames=list("week", "Station", "WT"))$fd
-par(mfrow=c(2,1))
-plot(WT.Bb) ; plot(ex1$WT) 
-par(mfrow=c(1,1))
-EC.Bb <- smooth.basis(argvals=1:510, ex1$EC, daybasisspline, fdnames=list("week", "Station", "EC"))$fd
-par(mfrow=c(2,1))
-plot(EC.Bb) ; plot(ex1$EC) 
-par(mfrow=c(1,1))
-TC.Bb <- smooth.basis(argvals=1:510, ex1$TC, daybasisspline, fdnames=list("week", "Station", "TC"))$fd
-par(mfrow=c(2,1))
-plot(TC.Bb) ; plot(ex1$TC) 
-par(mfrow=c(1,1))
-NH3_N.Bb <- smooth.basis(argvals=1:510, ex1$NH3_N, daybasisspline, fdnames=list("week", "Station", "NH3_N"))$fd
-par(mfrow=c(2,1))
-plot(NH3_N.Bb) ; plot(ex1$NH3_N) 
-par(mfrow=c(1,1))
-PO4_P.Bb <- smooth.basis(argvals=1:510, ex1$PO4_P, daybasisspline, fdnames=list("week", "Station", "PO4_P"))$fd
-par(mfrow=c(2,1))
-plot(PO4_P.Bb) ; plot(ex1$PO4_P) 
-par(mfrow=c(1,1))
-Chl_a.Bb <- smooth.basis(argvals=1:510, ex1$Chl_a, daybasisspline, fdnames=list("week", "Station", "Chl_a"))$fd
-par(mfrow=c(2,1))
-plot(Chl_a.Bb) ; plot(ex1$Chl_a) 
-par(mfrow=c(1,1))
-Chl_a.Bb <- smooth.basis(argvals=1:510, ex1$Chl_a, daybasisspline, fdnames=list("week", "Station", "Chl_a"))$fd
-par(mfrow=c(2,1))
-plot(Chl_a.Bb) ; plot(ex1$Chl_a) 
-par(mfrow=c(1,1))
-FC.Bb <- smooth.basis(argvals=1:510, ex1$FC, daybasisspline, fdnames=list("week", "Station", "FC"))$fd
-par(mfrow=c(2,1))
-plot(FC.Bb) ; plot(ex1$FC) 
-par(mfrow=c(1,1))
-Flow.Bb <- smooth.basis(argvals=1:510, ex1$Flow, daybasisspline, fdnames=list("week", "Station", "Flow"))$fd
-par(mfrow=c(2,1))
-plot(Flow.Bb) ; plot(ex1$Flow) 
-par(mfrow=c(1,1))
-Rain.Bb <- smooth.basis(argvals=1:510, ex1$Rain, daybasisspline, fdnames=list("week", "Station", "Rain"))$fd
-par(mfrow=c(2,1))
-plot(Rain.Bb) ; plot(ex1$Rain) 
-par(mfrow=c(1,1))
+daybasisspline <- create.bspline.basis(c(0, 240), nbasis=82, norder=4)
+pH.Bb <- smooth.basis(argvals=1:240, water$pH, daybasisspline, fdnames=list("month", "Station", "pH"))$fd
+plot(pH.Bb) 
+DO.Bb <- smooth.basis(argvals=1:240, water$DO, daybasisspline, fdnames=list("month", "Station", "DO"))$fd
+plot(DO.Bb) 
+BOD.Bb <- smooth.basis(argvals=1:240, water$BOD, daybasisspline, fdnames=list("month", "Station", "BOD"))$fd
+plot(BOD.Bb) 
+COD.Bb <- smooth.basis(argvals=1:240, water$COD, daybasisspline, fdnames=list("month", "Station", "COD"))$fd
+plot(COD.Bb)
+SS.Bb <- smooth.basis(argvals=1:240, water$SS, daybasisspline, fdnames=list("month", "Station", "SS"))$fd
+plot(SS.Bb)
+TN.Bb <- smooth.basis(argvals=1:240, water$TN, daybasisspline, fdnames=list("month", "Station", "TN"))$fd
+plot(TN.Bb) 
+TP.Bb <- smooth.basis(argvals=1:240, water$TP, daybasisspline, fdnames=list("month", "Station", "TP"))$fd
+plot(TP.Bb) 
+WT.Bb <- smooth.basis(argvals=1:240, water$WT, daybasisspline, fdnames=list("month", "Station", "WT"))$fd
+plot(WT.Bb) 
+EC.Bb <- smooth.basis(argvals=1:240, water$EC, daybasisspline, fdnames=list("month", "Station", "EC"))$fd
+plot(EC.Bb) 
+TC.Bb <- smooth.basis(argvals=1:240, water$TC, daybasisspline, fdnames=list("month", "Station", "TC"))$fd
+plot(TC.Bb) 
+NH3N.Bb <- smooth.basis(argvals=1:240, water$NH3N, daybasisspline, fdnames=list("month", "Station", "NH3N"))$fd
+plot(NH3N.Bb) 
+NO3N.Bb <- smooth.basis(argvals=1:240, water$NO3N, daybasisspline, fdnames=list("month", "Station", "NO3N"))$fd
+plot(NO3N.Bb) 
+FC.Bb <- smooth.basis(argvals=1:240, water$FC, daybasisspline, fdnames=list("month", "Station", "FC"))$fd
+plot(FC.Bb) 
 ```
 
 #### 재표현 결과, Fourier basis보다는 B-spline basis 방법이 각 변수의 특성을 더 잘 설명하는 함수를 추정해주는 것으로 보여진다. 이는 비주기적인 특성이나 이상점(outlier) 등의 영향 때문인것으로 파악된다. 따라서 B-spline basis 방법으로 재표현된 결과를 가지고 함수적 회귀모형을 적합해보도록 한다. 
 
-#### 
+#### 데이터 구성?
 
 ```{r}
-daybasisspline <- create.bspline.basis(c(0, 510), nbasis=42, norder=4)
-pH.Bb <- smooth.basis(argvals=1:510, ex1$pH, daybasisspline)$fd
-DO.Bb <- smooth.basis(argvals=1:510, ex1$DO, daybasisspline)$fd
-BOD.Bb <- smooth.basis(argvals=1:510, ex1$BOD, daybasisspline)$fd
-COD.Bb <- smooth.basis(argvals=1:510, ex1$COD, daybasisspline)$fd
-SS.Bb <- smooth.basis(argvals=1:510, ex1$SS, daybasisspline)$fd
-T_N.Bb <- smooth.basis(argvals=1:510, ex1$T_N, daybasisspline)$fd
-T_P.Bb <- smooth.basis(argvals=1:510, ex1$T_P, daybasisspline)$fd
-TOC.Bb <- smooth.basis(argvals=1:510, ex1$TOC, daybasisspline)$fd
-WT.Bb <- smooth.basis(argvals=1:510, ex1$WT, daybasisspline)$fd
-EC.Bb <- smooth.basis(argvals=1:510, ex1$EC, daybasisspline)$fd
-TC.Bb <- smooth.basis(argvals=1:510, ex1$TC, daybasisspline)$fd
-NH3_N.Bb <- smooth.basis(argvals=1:510, ex1$NH3_N, daybasisspline)$fd
-PO4_P.Bb <- smooth.basis(argvals=1:510, ex1$PO4_P, daybasisspline)$fd
-Chl_a.Bb <- smooth.basis(argvals=1:510, ex1$Chl_a, daybasisspline)$fd
-Chl_a.Bb <- smooth.basis(argvals=1:510, ex1$Chl_a, daybasisspline)$fd
-FC.Bb <- smooth.basis(argvals=1:510, ex1$FC, daybasisspline)$fd
-Flow.Bb <- smooth.basis(argvals=1:510, ex1$Flow, daybasisspline)$fd
-Rain.Bb <- smooth.basis(argvals=1:510, ex1$Rain, daybasisspline)$fd
-Chl_a.fR <- fRegress(Chl_a.Bb ~ pH.Bb+DO.Bb+BOD.Bb+COD.Bb+SS.Bb+T_N.Bb+T_P.Bb+TOC.Bb+WT.Bb+EC.Bb+TC.Bb+NH3_N.Bb+PO4_P.Bb+FC.Bb+Flow.Bb+Rain.Bb)
+daybasisspline <- create.bspline.basis(c(0, 240), nbasis=82, norder=4)
+# water.fd <- smooth.basis(argvals=1:240, water, daybasisspline)$fd
+TC.fR <- fRegress(TC.Bb ~ pH.Bb+DO.Bb+BOD.Bb+COD.Bb+SS.Bb+TN.Bb+TP.Bb+WT.Bb+EC.Bb+NH3N.Bb+NO3N.Bb+FC.Bb)
 ```
 
+#### Error in eigchk(Cmat) : Negative eigenvalue of coefficient matrix. ...?
