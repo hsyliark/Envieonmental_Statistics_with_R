@@ -57,6 +57,7 @@ rownames(NO3N) <- NO3N[,1] ; NO3N <- NO3N[,-1]
 FC <- read.csv("C:/Users/HSY/Desktop/13_FC.csv",sep=",",header=T)
 rownames(FC) <- FC[,1] ; FC <- FC[,-1]
 water <- list(pH=as.matrix(pH),DO=as.matrix(DO),BOD=as.matrix(BOD),COD=as.matrix(COD),SS=as.matrix(SS),TN=as.matrix(TN),TP=as.matrix(TP),WT=as.matrix(WT),EC=as.matrix(EC),TC=as.matrix(TC),NH3N=as.matrix(NH3N),NO3N=as.matrix(NO3N),FC=as.matrix(FC))
+water <- as.array(water)
 ```
 
 
