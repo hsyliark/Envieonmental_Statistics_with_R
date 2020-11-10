@@ -21,6 +21,7 @@ library(ggcorrplot)
 library(car)
 library(lmtest)
 library(fda)
+library(fpca)
 library(refund)
 ```
 
