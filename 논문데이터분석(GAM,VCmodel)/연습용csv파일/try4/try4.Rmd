@@ -449,9 +449,9 @@ par(mfrow=c(1,1))
 
 #### 모니터링 기간 : 2010~2019년 (일별 주단위자료) 
 
-#### 반응변수 : TC 또는 FC
+#### 반응변수 : Chla, TC, FC
 
-#### 설명변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, NH3N, PO4P, Chla, Flow, Rain
+#### 설명변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, Flow, Rain, TC, FC (반응변수 제외)
 
 #### 수질항목별 단위가 다르다는 점을 감안하여 표준화된 데이터를 사용
 
