@@ -1,7 +1,7 @@
 ---
 title: "Example4"
 author: "Hwang Seong-Yun"
-date: '2020 11 10 '
+date: '2020 11 11 '
 output: html_document
 ---
 
@@ -22,6 +22,7 @@ library(car)
 library(lmtest)
 library(fda)
 library(refund)
+library(MASS)
 par(mar=c(4,4,4,4))
 par(oma=c(0.5,0.5,0.5,0.5))
 ```
@@ -33,11 +34,33 @@ par(oma=c(0.5,0.5,0.5,0.5))
 
 #### 모니터링 기간 : 2010~2019년 (일별 주단위자료) 
 
-#### 반응변수 : TC 또는 FC
+#### 반응변수 : Chla, TC, FC
 
-#### 설명변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, Flow, Rain
+#### 설명변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, Flow, Rain, TC, FC (반응변수 제외)
 
 #### 수질항목별 단위가 다르다는 점을 감안하여 표준화된 데이터를 사용
+
+### Correlation Analysis
+
+```{r}
+ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- ex1[,-1]
+ex1_scale <- scale(ex1)
+X1 <- round(cor(ex1_scale, method='spearman'),4) 
+corrplot(X1)
+p.mat1 <- cor_pmat(ex1, method='spearman')
+ggcorrplot(X1, hc.order=T, type="lower", lab=T) +
+  ggtitle("Correlation plot(Spearman) for water quality data") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+ggcorrplot(X1, hc.order=T, type="lower", p.mat=p.mat1) +
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+```
+
 
 
 ### Dependent(Response) variable : TC
@@ -77,28 +100,26 @@ n <- length(residuals(fit))
 plot(tail(residuals(fit),n-1) ~ head(residuals(fit),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
 abline(h=0,v=0,col=grey(0.75))
 dwtest(TC~.,data=ex1_scale) # 잔차가 양의 자기상관성을 가지고 있음.
-fit1 <- lm(TC~DO+BOD+COD+WT+Chla+FC,data=ex1_scale) # 모형 fit에서 유의하지 않은 변수를 제외함.
-summary(fit1) # Adjusted R-squared:  0.625  
-vif(fit1) 
-par(mfrow=c(2,2))
-plot(fit1)
-par(mfrow=c(1,1))
-n <- length(residuals(fit1))
-plot(tail(residuals(fit1),n-1) ~ head(residuals(fit1),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
-abline(h=0,v=0,col=grey(0.75))
-dwtest(TC~DO+BOD+COD+WT+Chla+FC,data=ex1_scale) # 잔차가 양의 자기상관성을 가지고 있음.
-fit2 <- lm(TC~DO+BOD+WT+Chla+FC,data=ex1_scale) # 모형 fit1에서 유의하지 않은 변수를 제외함.
-summary(fit2) # Adjusted R-squared:  0.6238  
-vif(fit2) 
-par(mfrow=c(2,2))
-plot(fit2)
-par(mfrow=c(1,1))
-n <- length(residuals(fit2))
-plot(tail(residuals(fit2),n-1) ~ head(residuals(fit2),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
-abline(h=0,v=0,col=grey(0.75))
-dwtest(TC~DO+BOD+WT+Chla+FC,data=ex1_scale)
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+fit.step <- stepAIC(fit, direction="both", trace=TRUE)
+fit.step # 선택변수 : DO, BOD, COD, SS, TN, TP, WT, Chla, FC
+summary(fit.step) # Adjusted R-squared:  0.6462
+vif(fit.step) 
+par(mfrow=c(2,2))
+plot(fit.step)
+par(mfrow=c(1,1))
+n <- length(residuals(fit.step))
+plot(tail(residuals(fit.step),n-1) ~ head(residuals(fit.step),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
+abline(h=0,v=0,col=grey(0.75))
+dwtest(TC~DO+BOD+COD+SS+TN+TP+WT+Chla+FC,data=ex1_scale) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
 
 ### Generalized Additive Model
 #### scaling data 사용
@@ -106,32 +127,29 @@ dwtest(TC~DO+BOD+WT+Chla+FC,data=ex1_scale)
 ```{r}
 # GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
 m <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1_scale)
+par(mfrow=c(2,2))
+plot(m,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(m)[1])
+par(mfrow=c(1,1))
 ggGam(m)
 summary(m) # R-sq.(adj) =  0.727
 concurvity(m,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(m) # 적합결여 존재 (기저함수 부족)
 par(mfrow=c(1,1))
-m1 <- gam(TC~s(COD)+s(SS)+s(TP)+s(WT)+s(Chla)+s(FC),data=ex1_scale) # 모형 m에서 유의하지 않은 변수를 제외하고 모형구축.
-ggGam(m1)
-summary(m1) # R-sq.(adj) =  0.718 
-concurvity(m1,full=TRUE) 
-par(mfrow=c(2,2)) 
-gam.check(m1) 
-par(mfrow=c(1,1)) 
-m2 <- gam(TC~s(SS)+s(TP)+s(WT)+s(Chla)+s(FC),data=ex1_scale) # 모형 m1에서 유의하지 않은 변수를 제외하고 모형구축.
-ggGam(m2)
-summary(m2) # R-sq.(adj) =  0.716 
-concurvity(m2,full=TRUE)
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+m.shrink <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1_scale,method="GCV.Cp",select=TRUE) 
 par(mfrow=c(2,2))
-gam.check(m2) # 적합결여 존재 (기저함수 부족)
-par(mfrow=c(1,1)) 
-m3 <- gam(TC~s(SS)+s(TP)+s(WT)+s(FC),data=ex1_scale) # 모형 m2에서 유의하지 않은 변수를 제외하고 모형구축.
-ggGam(m3)
-summary(m3) # R-sq.(adj) =  0.715 
-concurvity(m3,full=TRUE)
+plot(m.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(m.shrink)[1])
+par(mfrow=c(1,1))
+ggGam(m.shrink) # 선택변수 : DO, COD, SS, TN, TP, TOC, WT, EC, Chla, FC
+summary(m.shrink) # R-sq.(adj) =   0.73
+concurvity(m.shrink,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
-gam.check(m3) 
+gam.check(m.shrink) # 적합결여 존재 (기저함수 부족)
 par(mfrow=c(1,1))
 ```
 
@@ -144,49 +162,30 @@ par(oma=c(0.5,0.5,0.5,0.5))
 nrow(ex1_scale)
 ex1_scale$time <- 1:nrow(ex1_scale)
 head(ex1_scale)
-vc1 <- gam(TC~s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1_scale)
+vc <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1_scale)
 par(mfrow=c(2,2))
-plot(vc1,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc1)[1])
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1])
 par(mfrow=c(1,1))
-summary(vc1) # R-sq.(adj) =  0.785
+summary(vc) # R-sq.(adj) =  0.806
 par(mfrow=c(2,2))
-gam.check(vc1) 
-par(mfrow=c(1,1))
-vc2 <- gam(TC~s(time,by=DO)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=WT)+s(time,by=EC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow),data=ex1_scale) # vc1 모형에서 유의하지 않다고 나온 변수 제외
-par(mfrow=c(2,2))
-plot(vc2,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc2)[1])
-par(mfrow=c(1,1))
-summary(vc2) # R-sq.(adj) =  0.777
-par(mfrow=c(2,2))
-gam.check(vc2) 
-par(mfrow=c(1,1))
-vc3 <- gam(TC~s(time,by=DO)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=WT)+s(time,by=EC)+s(time,by=NH3N)+s(time,by=FC)+s(time,by=Flow),data=ex1_scale) # vc2 모형에서 유의하지 않다고 나온 변수 제외
-par(mfrow=c(2,2))
-plot(vc3,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc3)[1])
-par(mfrow=c(1,1))
-summary(vc3) # R-sq.(adj) =  0.774
-par(mfrow=c(2,2))
-gam.check(vc3) 
-par(mfrow=c(1,1))
-vc4 <- gam(TC~s(time,by=DO)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=WT)+s(time,by=EC)+s(time,by=FC)+s(time,by=Flow),data=ex1_scale) # vc3 모형에서 유의하지 않다고 나온 변수 제외
-par(mfrow=c(2,2))
-plot(vc4,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc4)[1])
-par(mfrow=c(1,1))
-summary(vc4) # R-sq.(adj) =  0.761
-par(mfrow=c(2,2))
-gam.check(vc4) 
-par(mfrow=c(1,1))
-vc5 <- gam(TC~s(time,by=DO)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=WT)+s(time,by=FC)+s(time,by=Flow),data=ex1_scale) # vc4 모형에서 유의하지 않다고 나온 변수 제외
-par(mfrow=c(2,2))
-plot(vc5,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc5)[1])
-par(mfrow=c(1,1))
-summary(vc5) # R-sq.(adj) =  0.76
-par(mfrow=c(2,2))
-gam.check(vc5) 
+gam.check(vc) 
 par(mfrow=c(1,1))
 ```
 
-#### 최종선택된 모형의 설명력 : 62.4%(다중선형회귀모형), 71.5%(일반화가법모형), 76.0%(시간에 따른 계수변화모형) 
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+vc.shrink <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1_scale,method="GCV.Cp",select=TRUE)
+par(mfrow=c(2,2))
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1])
+par(mfrow=c(1,1)) # 선택변수 : DO, BOD, COD, SS, TN, TOC, WT, EC, PO4P, FC, Flow
+summary(vc.shrink) # R-sq.(adj) =   0.786
+par(mfrow=c(2,2))
+gam.check(vc.shrink) 
+par(mfrow=c(1,1))
+```
+
+#### 최종선택된 모형의 설명력 : 64.6%(다중선형회귀모형), 73.0%(일반화가법모형), 78.6%(시간에 따른 계수변화모형) 
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
@@ -228,16 +227,23 @@ n <- length(residuals(fit))
 plot(tail(residuals(fit),n-1) ~ head(residuals(fit),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
 abline(h=0,v=0,col=grey(0.75))
 dwtest(FC~.,data=ex1_scale) # 잔차가 양의 자기상관성을 가지고 있음.
-fit1 <- lm(FC~BOD+TOC+TC,data=ex1_scale) # 모형 fit에서 유의하지 않은 변수를 제외함.
-summary(fit1) # Adjusted R-squared:  0.6038  
-vif(fit1) 
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+fit.step <- stepAIC(fit, direction="both", trace=TRUE)
+fit.step # 선택변수 : BOD, TOC, WT, EC, TC, NH3N
+summary(fit.step) # Adjusted R-squared:  0.6166
+vif(fit.step) 
 par(mfrow=c(2,2))
-plot(fit1)
+plot(fit.step)
 par(mfrow=c(1,1))
-n <- length(residuals(fit1))
-plot(tail(residuals(fit1),n-1) ~ head(residuals(fit1),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
+n <- length(residuals(fit.step))
+plot(tail(residuals(fit.step),n-1) ~ head(residuals(fit.step),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
 abline(h=0,v=0,col=grey(0.75))
-dwtest(FC~BOD+TOC+TC,data=ex1_scale) 
+dwtest(FC~BOD+TOC+WT+EC+TC+NH3N,data=ex1_scale) # 잔차가 양의 자기상관성을 가지고 있음.
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
@@ -247,26 +253,30 @@ dwtest(FC~BOD+TOC+TC,data=ex1_scale)
 ```{r}
 # GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
 m <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(TC)+s(Flow)+s(Rain),data=ex1_scale)
+par(mfrow=c(2,2))
+plot(m,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(m)[1])
+par(mfrow=c(1,1))
 ggGam(m)
 summary(m) # R-sq.(adj) =  0.698
 concurvity(m,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(m) # 적합결여 존재 (기저함수 부족)
 par(mfrow=c(1,1))
-m1 <- gam(FC~s(SS)+s(NH3N)+s(PO4P)+s(TC),data=ex1_scale) # 모형 m에서 유의하지 않은 변수를 제외하고 모형구축.
-ggGam(m1)
-summary(m1) # R-sq.(adj) =  0.681 
-concurvity(m1,full=TRUE) 
-par(mfrow=c(2,2)) 
-gam.check(m1) 
-par(mfrow=c(1,1)) 
-m2 <- gam(FC~s(SS)+s(PO4P)+s(TC),data=ex1_scale) # 모형 m1에서 유의하지 않은 변수를 제외하고 모형구축.
-ggGam(m2)
-summary(m2) # R-sq.(adj) =  0.677 
-concurvity(m2,full=TRUE)
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+m.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(TC)+s(Flow)+s(Rain),data=ex1_scale,method="GCV.Cp",select=TRUE) 
 par(mfrow=c(2,2))
-gam.check(m2) 
-par(mfrow=c(1,1)) 
+plot(m.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(m.shrink)[1])
+par(mfrow=c(1,1))
+ggGam(m.shrink) # 선택변수 : DO, BOD, SS, TN, TP, TOC, EC, Chla, NH3N, PO4P, TC, Flow 
+summary(m.shrink) # R-sq.(adj) =   0.702
+concurvity(m.shrink,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(m.shrink) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
 ```
 
 ### Time Varying Coefficient Model
@@ -278,26 +288,159 @@ par(oma=c(0.5,0.5,0.5,0.5))
 nrow(ex1_scale)
 ex1_scale$time <- 1:nrow(ex1_scale)
 head(ex1_scale)
-vc1 <- gam(FC~s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=TC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1_scale)
+vc <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Flow)+s(time,by=Rain),data=ex1_scale)
 par(mfrow=c(2,2))
-plot(vc1,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc1)[1])
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1])
 par(mfrow=c(1,1))
-summary(vc1) # R-sq.(adj) =  1
+summary(vc) # R-sq.(adj) =  0.831
 par(mfrow=c(2,2))
-gam.check(vc1) 
-par(mfrow=c(1,1))
-vc2 <- gam(FC~s(time,by=TC),data=ex1_scale) # vc2 모형에서 유의하지 않다고 나온 변수 제외
-plot(vc2,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc2)[1])
-summary(vc2) # R-sq.(adj) =  0.766
-par(mfrow=c(2,2))
-gam.check(vc2) 
+gam.check(vc) 
 par(mfrow=c(1,1))
 ```
 
-#### 최종선택된 모형의 설명력 : 60.4%(다중선형회귀모형), 67.7%(일반화가법모형) , 76.6%(시간에 따른 계수변화모형) 
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Flow)+s(time,by=Rain),data=ex1_scale,method="GCV.Cp",select=TRUE)
+par(mfrow=c(2,2))
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1])
+par(mfrow=c(1,1)) # 선택변수 : pH, SS, TOC, WT, TC, Flow, Rain
+summary(vc.shrink) # R-sq.(adj) =   0.814
+par(mfrow=c(2,2))
+gam.check(vc.shrink) 
+par(mfrow=c(1,1))
+```
+
+#### 최종선택된 모형의 설명력 : 61.6%(다중선형회귀모형), 70.2%(일반화가법모형) , 81.4%(시간에 따른 계수변화모형) 
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
+
+
+### Dependent(Response) variable : Chla
+
+### Multiple Linear Regression
+#### scaling data 사용
+
+```{r}
+ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- ex1[,-1]
+ex1_scale <- scale(ex1)
+ex1_scale <- as.data.frame(ex1_scale)
+p1 <- ggplot(data=ex1_scale,aes(x=pH,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p2 <- ggplot(data=ex1_scale,aes(x=DO,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p3 <- ggplot(data=ex1_scale,aes(x=BOD,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p4 <- ggplot(data=ex1_scale,aes(x=COD,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p5 <- ggplot(data=ex1_scale,aes(x=SS,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p6 <- ggplot(data=ex1_scale,aes(x=TN,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p7 <- ggplot(data=ex1_scale,aes(x=TP,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p8 <- ggplot(data=ex1_scale,aes(x=TOC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p9 <- ggplot(data=ex1_scale,aes(x=WT,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p10 <- ggplot(data=ex1_scale,aes(x=EC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p11 <- ggplot(data=ex1_scale,aes(x=TC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p12 <- ggplot(data=ex1_scale,aes(x=NH3N,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p13 <- ggplot(data=ex1_scale,aes(x=PO4P,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p14 <- ggplot(data=ex1_scale,aes(x=FC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p15 <- ggplot(data=ex1_scale,aes(x=Flow,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p16 <- ggplot(data=ex1_scale,aes(x=Rain,y=Chla)) + geom_point() + stat_smooth(method=lm)
+grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,nrow=4,ncol=4)
+fit <- lm(Chla~.,data=ex1_scale)
+summary(fit) # Adjusted R-squared:  0.647
+vif(fit) # 다중공선성(multicollinearity) 존재
+par(mfrow=c(2,2))
+plot(fit)
+par(mfrow=c(1,1))
+n <- length(residuals(fit))
+plot(tail(residuals(fit),n-1) ~ head(residuals(fit),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
+abline(h=0,v=0,col=grey(0.75))
+dwtest(Chla~.,data=ex1_scale) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+fit.step <- stepAIC(fit, direction="both", trace=TRUE)
+fit.step # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, TC, NH3N, PO4P
+summary(fit.step) # Adjusted R-squared:  0.656
+vif(fit.step) # 다중공선성(multicollinearity) 존재 
+par(mfrow=c(2,2))
+plot(fit.step)
+par(mfrow=c(1,1))
+n <- length(residuals(fit.step))
+plot(tail(residuals(fit.step),n-1) ~ head(residuals(fit.step),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
+abline(h=0,v=0,col=grey(0.75))
+dwtest(Chla~pH+DO+BOD+COD+SS+TP+TOC+WT+TC+NH3N+PO4P,data=ex1_scale) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+### Generalized Additive Model
+#### scaling data 사용
+
+```{r}
+# GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
+m <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1_scale)
+par(mfrow=c(2,2))
+plot(m,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(m)[1])
+par(mfrow=c(1,1))
+ggGam(m)
+summary(m) # R-sq.(adj) =  0.706
+concurvity(m,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(m) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+m.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1_scale,method="GCV.Cp",select=TRUE) 
+par(mfrow=c(2,2))
+plot(m.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(m.shrink)[1])
+par(mfrow=c(1,1))
+ggGam(m.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TP, WT, EC, TC, NH3N, PO4P, FC, Rain
+summary(m.shrink) # R-sq.(adj) =   0.706
+concurvity(m.shrink,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(m.shrink) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+### Time Varying Coefficient Model
+#### scaling data 사용
+
+```{r}
+par(mar=c(4,4,4,4))
+par(oma=c(0.5,0.5,0.5,0.5))
+nrow(ex1_scale)
+ex1_scale$time <- 1:nrow(ex1_scale)
+head(ex1_scale)
+vc <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1_scale)
+par(mfrow=c(2,2))
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1])
+par(mfrow=c(1,1))
+summary(vc) # R-sq.(adj) =  0.731
+par(mfrow=c(2,2))
+gam.check(vc) 
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1_scale,method="GCV.Cp",select=TRUE)
+par(mfrow=c(2,2))
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1])
+par(mfrow=c(1,1)) # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, EC, TC, NH3N, PO4P, Rain
+summary(vc.shrink) # R-sq.(adj) =   0.727
+par(mfrow=c(2,2))
+gam.check(vc.shrink) 
+par(mfrow=c(1,1))
+```
+
+#### 최종선택된 모형의 설명력 : 65.6%(다중선형회귀모형), 70.6%(일반화가법모형) , 72.7%(시간에 따른 계수변화모형) 
+
+#### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
 
 
@@ -311,6 +454,28 @@ par(mfrow=c(1,1))
 #### 설명변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, NH3N, PO4P, Chla, Flow, Rain
 
 #### 수질항목별 단위가 다르다는 점을 감안하여 표준화된 데이터를 사용
+
+
+### Correlation Analysis
+
+```{r}
+ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- ex2[,-1]
+ex2_scale <- scale(ex2)
+X2 <- round(cor(ex2_scale, method='spearman'),4) 
+corrplot(X2)
+p.mat2 <- cor_pmat(ex2, method='spearman')
+ggcorrplot(X2, hc.order=T, type="lower", lab=T) +
+  ggtitle("Correlation plot(Spearman) for water quality data") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+ggcorrplot(X2, hc.order=T, type="lower", p.mat=p.mat1) +
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+```
 
 
 
@@ -351,16 +516,23 @@ n <- length(residuals(gfit))
 plot(tail(residuals(gfit),n-1) ~ head(residuals(gfit),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
 abline(h=0,v=0,col=grey(0.75))
 dwtest(TC~.,data=ex2_scale) # 잔차가 양의 자기상관성을 가지고 있음.
-gfit1 <- lm(TC~EC+FC+Flow,data=ex2_scale) # 모형 gfit에서 유의하지 않은 변수를 제외함.
-summary(gfit1) # Adjusted R-squared:  0.4805  
-vif(gfit1) # 다중공선성 존재
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+gfit.step <- stepAIC(gfit, direction="both", trace=TRUE)
+gfit.step # 선택변수 : DO, TP, WT, EC, FC, Flow
+summary(gfit.step) # Adjusted R-squared:  0.4892 
+vif(gfit.step) 
 par(mfrow=c(2,2))
-plot(gfit1)
+plot(gfit.step)
 par(mfrow=c(1,1))
-n <- length(residuals(gfit1))
-plot(tail(residuals(gfit1),n-1) ~ head(residuals(gfit1),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
+n <- length(residuals(gfit.step))
+plot(tail(residuals(gfit.step),n-1) ~ head(residuals(gfit.step),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
 abline(h=0,v=0,col=grey(0.75))
-dwtest(TC~EC+FC+Flow,data=ex2_scale) 
+dwtest(Chla~DO+TP+WT+EC+FC+Flow,data=ex1_scale) # 잔차가 양의 자기상관성을 가지고 있음.
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
@@ -369,19 +541,30 @@ dwtest(TC~EC+FC+Flow,data=ex2_scale)
 
 ```{r}
 mm <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2_scale)
+par(mfrow=c(2,2))
+plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+par(mfrow=c(1,1))
 ggGam(mm)
 summary(mm) # R-sq.(adj) =  0.577
 concurvity(mm,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm) # 적합결여 존재 (기저함수 부족)
 par(mfrow=c(1,1))
-mm1 <- gam(TC~s(BOD)+s(SS)+s(TP)+s(WT)+s(FC)+s(Flow),data=ex2_scale) # 모형 mm에서 유의하지 않은 변수를 제외하고 모형구축.
-ggGam(mm1)
-summary(mm1) # R-sq.(adj) =  0.558 
-concurvity(mm1,full=TRUE) # 공선성 존재
-par(mfrow=c(2,2)) 
-gam.check(mm1) # 적합결여 존재 (기저함수 부족) 
-par(mfrow=c(1,1)) 
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+mm.shrink <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2_scale,method="GCV.Cp",select=TRUE) 
+par(mfrow=c(2,2))
+plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+par(mfrow=c(1,1))
+ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, SS, TN, TP, WT, EC, NH3N, PO4P, FC, Flow, Rain
+summary(mm.shrink) # R-sq.(adj) =   0.582
+concurvity(mm.shrink,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
 ```
 
 ### Time Varying Coefficient Model
@@ -393,25 +576,30 @@ par(oma=c(0.5,0.5,0.5,0.5))
 nrow(ex2_scale)
 ex2_scale$time <- 1:nrow(ex2_scale)
 head(ex2_scale)
-vc1 <- gam(TC~s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2_scale)
+vc <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2_scale)
 par(mfrow=c(2,2))
-plot(vc1,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc1)[1])
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1])
 par(mfrow=c(1,1))
-summary(vc1) # R-sq.(adj) =  0.666
+summary(vc) # R-sq.(adj) =  0.673
 par(mfrow=c(2,2))
-gam.check(vc1) 
+gam.check(vc) 
 par(mfrow=c(1,1))
-vc2 <- gam(TC~s(time,by=DO)+s(time,by=COD)+s(time,by=SS)+s(time,by=TP)+s(time,by=TOC)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1_scale) # vc1 모형에서 유의하지 않다고 나온 변수 제외
-par(mfrow=c(2,2))
-plot(vc2,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc2)[1])
-par(mfrow=c(1,1))
-summary(vc2) # R-sq.(adj) =  0.738
-par(mfrow=c(2,2))
-gam.check(vc2) 
-par(mfrow=c(1,1)) # TOC와 Rain이 유의하지 않게 나왔지만, 이 두 변수를 제외할 경우 추정해야 할 모수의 개수나 이항연산자의 오류 등으로 인하여 모형이 적합되지 않으므로 vc2를 최종모형으로 선정
 ```
 
-#### 최종선택된 모형의 설명력 : 48.1%(다중선형회귀모형), 55.8%(일반화가법모형), 73.8%(시간에 따른 계수변화모형) 
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+vc.shrink <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2_scale,method="GCV.Cp",select=TRUE) 
+par(mfrow=c(2,2))
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1])
+par(mfrow=c(1,1)) # 선택변수 : DO, COD, SS, TN, TP, TOC, WT, EC, NH3N, PO4P, FC, Flow, Rain
+summary(vc.shrink) # R-sq.(adj) =   0.672
+par(mfrow=c(2,2))
+gam.check(vc.shrink) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### 최종선택된 모형의 설명력 : 48.9%(다중선형회귀모형), 58.2%(일반화가법모형), 67.2%(시간에 따른 계수변화모형) 
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
@@ -454,15 +642,23 @@ n <- length(residuals(gfit))
 plot(tail(residuals(gfit),n-1) ~ head(residuals(gfit),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
 abline(h=0,v=0,col=grey(0.75))
 dwtest(FC~.,data=ex2_scale) # 잔차가 양의 자기상관성을 가지고 있음.
-gfit1 <- lm(FC~TC,data=ex2_scale) # 모형 gfit에서 유의하지 않은 변수를 제외함.
-summary(gfit1) # Adjusted R-squared:  0.3985  
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+gfit.step <- stepAIC(gfit, direction="both", trace=TRUE)
+gfit.step # 선택변수 : TC, Rain
+summary(gfit.step) # Adjusted R-squared:  0.4033 
+vif(gfit.step) 
 par(mfrow=c(2,2))
-plot(gfit1)
+plot(gfit.step)
 par(mfrow=c(1,1))
-n <- length(residuals(gfit1))
-plot(tail(residuals(gfit1),n-1) ~ head(residuals(gfit1),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
+n <- length(residuals(gfit.step))
+plot(tail(residuals(gfit.step),n-1) ~ head(residuals(gfit.step),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
 abline(h=0,v=0,col=grey(0.75))
-dwtest(FC~TC,data=ex2_scale) 
+dwtest(FC~TC+Rain,data=ex1_scale) # 잔차가 양의 자기상관성을 가지고 있음.
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
@@ -470,20 +666,31 @@ dwtest(FC~TC,data=ex2_scale)
 #### scaling data 사용
 
 ```{r}
-mm <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(TC)+s(Flow)+s(Rain),data=ex2_scale)
+mm <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(Chla)+s(Flow)+s(Rain),data=ex2_scale)
+par(mfrow=c(2,2))
+plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+par(mfrow=c(1,1))
 ggGam(mm)
 summary(mm) # R-sq.(adj) =  0.773
 concurvity(mm,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm) # 적합결여 존재 (기저함수 부족)
 par(mfrow=c(1,1))
-mm1 <- gam(FC~s(TC)+s(Flow),data=ex2_scale) # 모형 mm에서 유의하지 않은 변수를 제외하고 모형구축.
-ggGam(mm1)
-summary(mm1) # R-sq.(adj) =  0.762 
-concurvity(mm1,full=TRUE) 
-par(mfrow=c(2,2)) 
-gam.check(mm1) 
-par(mfrow=c(1,1)) 
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+mm.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(Chla)+s(Flow)+s(Rain),data=ex2_scale,method="GCV.Cp",select=TRUE) 
+par(mfrow=c(2,2))
+plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+par(mfrow=c(1,1))
+ggGam(mm.shrink) # 선택변수 : pH, COD, SS, TN, TP, TC, PO4P, Flow, Rain
+summary(mm.shrink) # R-sq.(adj) =   0.775
+concurvity(mm.shrink,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
 ```
 
 ### Time Varying Coefficient Model
@@ -495,19 +702,155 @@ par(oma=c(0.5,0.5,0.5,0.5))
 nrow(ex2_scale)
 ex2_scale$time <- 1:nrow(ex2_scale)
 head(ex2_scale)
-vc1 <- gam(FC~s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=TC)+s(time,by=Flow)+s(time,by=Rain),data=ex2_scale)
+vc <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Chla)+s(time,by=Flow)+s(time,by=Rain),data=ex2_scale)
 par(mfrow=c(2,2))
-plot(vc1,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc1)[1])
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1])
 par(mfrow=c(1,1))
-summary(vc1) # R-sq.(adj) =  0.831
+summary(vc) # R-sq.(adj) =  0.831
 par(mfrow=c(2,2))
-gam.check(vc1) 
+gam.check(vc) 
 par(mfrow=c(1,1))
-# vc1 모형에서 유의하지 않은 변수들을 모두 제외할 경우 유의확률에 대한 F 통계량이 발산하게 되어 모형이 적합되지 않으므로 vc1을 최종모형으로 결정함
 ```
 
-#### 최종선택된 모형의 설명력 : 39.9%(다중선형회귀모형), 76.2%(일반화가법모형), 83.1%(시간에 따른 계수변화모형)  
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Chla)+s(time,by=Flow)+s(time,by=Rain),data=ex2_scale,method="GCV.Cp",select=TRUE) 
+par(mfrow=c(2,2))
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1])
+par(mfrow=c(1,1)) # 선택변수 : pH, DO, BOD, TN, TP, WT, EC, TC, NH3N, Chla, Flow, Rain
+summary(vc.shrink) # R-sq.(adj) =   0.837
+par(mfrow=c(2,2))
+gam.check(vc.shrink) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### 최종선택된 모형의 설명력 : 40.3%(다중선형회귀모형), 77.5%(일반화가법모형), 83.7%(시간에 따른 계수변화모형)  
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
 
+### Dependent(Response) variable : Chla
+
+### Multiple Linear Regression
+#### scaling data 사용
+
+```{r}
+ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- ex2[,-1]
+ex2_scale <- scale(ex2)
+ex2_scale <- as.data.frame(ex2_scale)
+p1 <- ggplot(data=ex2_scale,aes(x=pH,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p2 <- ggplot(data=ex2_scale,aes(x=DO,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p3 <- ggplot(data=ex2_scale,aes(x=BOD,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p4 <- ggplot(data=ex2_scale,aes(x=COD,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p5 <- ggplot(data=ex2_scale,aes(x=SS,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p6 <- ggplot(data=ex2_scale,aes(x=TN,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p7 <- ggplot(data=ex2_scale,aes(x=TP,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p8 <- ggplot(data=ex2_scale,aes(x=TOC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p9 <- ggplot(data=ex2_scale,aes(x=WT,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p10 <- ggplot(data=ex2_scale,aes(x=EC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p11 <- ggplot(data=ex2_scale,aes(x=TC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p12 <- ggplot(data=ex2_scale,aes(x=NH3N,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p13 <- ggplot(data=ex2_scale,aes(x=PO4P,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p14 <- ggplot(data=ex2_scale,aes(x=FC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p15 <- ggplot(data=ex2_scale,aes(x=Flow,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p16 <- ggplot(data=ex2_scale,aes(x=Rain,y=Chla)) + geom_point() + stat_smooth(method=lm)
+grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,nrow=4,ncol=4)
+gfit <- lm(Chla~.,data=ex2_scale)
+summary(gfit) # Adjusted R-squared:  0.7037
+vif(gfit) 
+par(mfrow=c(2,2))
+plot(gfit)
+par(mfrow=c(1,1))
+n <- length(residuals(gfit))
+plot(tail(residuals(gfit),n-1) ~ head(residuals(gfit),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
+abline(h=0,v=0,col=grey(0.75))
+dwtest(Chla~.,data=ex2_scale) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+gfit.step <- stepAIC(gfit, direction="both", trace=TRUE)
+gfit.step # 선택변수 : pH, DO, BOD, COD, TN, TP, WT, EC, NH3N, PO4P, Rain
+summary(gfit.step) # Adjusted R-squared:  0.7053
+vif(fit.step) # 다중공선성(multicollinearity) 존재 
+par(mfrow=c(2,2))
+plot(gfit.step)
+par(mfrow=c(1,1))
+n <- length(residuals(gfit.step))
+plot(tail(residuals(gfit.step),n-1) ~ head(residuals(gfit.step),n-1), xlab= expression(hat(epsilon)[i]),ylab=expression(hat(epsilon)[i+1]))
+abline(h=0,v=0,col=grey(0.75))
+dwtest(Chla~pH+DO+BOD+COD+TN+TP+WT+EC+NH3N+PO4P+Rain,data=ex2_scale) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+### Generalized Additive Model
+#### scaling data 사용
+
+```{r}
+# GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
+mm <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2_scale)
+par(mfrow=c(2,2))
+plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+par(mfrow=c(1,1))
+ggGam(mm)
+summary(mm) # R-sq.(adj) =  0.753
+concurvity(mm,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2_scale,method="GCV.Cp",select=TRUE) 
+par(mfrow=c(2,2))
+plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+par(mfrow=c(1,1))
+ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P
+summary(mm.shrink) # R-sq.(adj) =   0.754
+concurvity(mm.shrink,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+### Time Varying Coefficient Model
+#### scaling data 사용
+
+```{r}
+par(mar=c(4,4,4,4))
+par(oma=c(0.5,0.5,0.5,0.5))
+nrow(ex2_scale)
+ex2_scale$time <- 1:nrow(ex2_scale)
+head(ex2_scale)
+vc <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2_scale)
+par(mfrow=c(2,2))
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1])
+par(mfrow=c(1,1))
+summary(vc) # R-sq.(adj) =  0.789
+par(mfrow=c(2,2))
+gam.check(vc) 
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2_scale,method="GCV.Cp",select=TRUE)
+par(mfrow=c(2,2))
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1])
+par(mfrow=c(1,1)) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, WT, EC, NH3N, PO4P, FC, Rain
+summary(vc.shrink) # R-sq.(adj) =   0.793
+par(mfrow=c(2,2))
+gam.check(vc.shrink) 
+par(mfrow=c(1,1))
+```
+
+#### 최종선택된 모형의 설명력 : 70.5%(다중선형회귀모형), 75.4%(일반화가법모형) , 79.3%(시간에 따른 계수변화모형) 
+
+#### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
