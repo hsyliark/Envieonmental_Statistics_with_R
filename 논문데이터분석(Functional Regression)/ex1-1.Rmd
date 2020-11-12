@@ -62,19 +62,12 @@ water <- as.array(water)
 ```
 
 
-
-## Functional Data Analysis
-
+### Functional Regression
 #### Functional Data Analysis : 각각의 변수들이 시간에 대한 함수(function)임에 초점을 맞추어 분석하는 방법
 
-
-### Data representation by functional method
+#### scaling data 사용
 
 #### Smoothing by Fourier basis : 주기적인 데이터에 유용함
-
-#### Smoothing by B-spline basis : 비주기적인 데이터에 유용함
-
-#### 본 데이터에 대해서는 Fourier basis
 
 #### 기저의 개수가 많을수록 함수적 자료의 형태가 이산형 자료가 되어 편의(bias)가 줄어들고, 기저의 개수가 적을수록 평활화 정도가 커지게 되어 분산이 줄어든다. 본 데이터는 월별자료이고 주기가 1이므로 기저함수의 개수를 중간정도인 6으로 정함.
 
@@ -108,19 +101,48 @@ FC.fb <- smooth.basis(argvals=monthMid, water$FC, daybasisfourier, fdnames=list(
 plot(FC.fb) 
 ```
 
+#### Smoothing by B-spline basis : 비주기적인 데이터에 유용함
 
-### Functional Regression
-
-#### Functional response model : Concurrent Linear Model
-
-```{r}
-TC.fR <- fRegress(TC.fb ~ pH.fb+DO.fb+BOD.fb+COD.fb+SS.fb+TN.fb+TP.fb+WT.fb+EC.fb+NH3N.fb+NO3N.fb+FC.fb)
-```
-
-#### Graph of coefficient
+#### 본 데이터는 20년간 측정한 월별데이터이므로 각 년도마다 4분기로 나누어서 평활화하는 것이 바람직하다고 판단하여 부분구간의 개수를 4로 정하고 cubic spline을 사용하였음. 이에 따라 기저함수의 개수는 3+4-1=6로 정함. 
 
 ```{r}
-plot(TC.fR$betaestlist$const$fd,ylab="")
-plot(TC.fR$betaestlist$pH.fb$fd,ylab="",ylim=c(0,1))
+daybasisspline <- create.bspline.basis(c(0, 12), nbasis=6, norder=3)
+pH.Bb <- smooth.basis(argvals=monthMid, water$pH, daybasisspline, fdnames=list("month", "Station", "pH"))$fd
+plot(pH.Bb) 
+DO.Bb <- smooth.basis(argvals=1:240, water$DO, daybasisspline, fdnames=list("month", "Station", "DO"))$fd
+plot(DO.Bb) 
+BOD.Bb <- smooth.basis(argvals=1:240, water$BOD, daybasisspline, fdnames=list("month", "Station", "BOD"))$fd
+plot(BOD.Bb) 
+COD.Bb <- smooth.basis(argvals=1:240, water$COD, daybasisspline, fdnames=list("month", "Station", "COD"))$fd
+plot(COD.Bb)
+SS.Bb <- smooth.basis(argvals=1:240, water$SS, daybasisspline, fdnames=list("month", "Station", "SS"))$fd
+plot(SS.Bb)
+TN.Bb <- smooth.basis(argvals=1:240, water$TN, daybasisspline, fdnames=list("month", "Station", "TN"))$fd
+plot(TN.Bb) 
+TP.Bb <- smooth.basis(argvals=1:240, water$TP, daybasisspline, fdnames=list("month", "Station", "TP"))$fd
+plot(TP.Bb) 
+WT.Bb <- smooth.basis(argvals=1:240, water$WT, daybasisspline, fdnames=list("month", "Station", "WT"))$fd
+plot(WT.Bb) 
+EC.Bb <- smooth.basis(argvals=1:240, water$EC, daybasisspline, fdnames=list("month", "Station", "EC"))$fd
+plot(EC.Bb) 
+TC.Bb <- smooth.basis(argvals=1:240, water$TC, daybasisspline, fdnames=list("month", "Station", "TC"))$fd
+plot(TC.Bb) 
+NH3N.Bb <- smooth.basis(argvals=1:240, water$NH3N, daybasisspline, fdnames=list("month", "Station", "NH3N"))$fd
+plot(NH3N.Bb) 
+NO3N.Bb <- smooth.basis(argvals=1:240, water$NO3N, daybasisspline, fdnames=list("month", "Station", "NO3N"))$fd
+plot(NO3N.Bb) 
+FC.Bb <- smooth.basis(argvals=1:240, water$FC, daybasisspline, fdnames=list("month", "Station", "FC"))$fd
+plot(FC.Bb) 
 ```
 
+#### 재표현 결과, Fourier basis보다는 B-spline basis 방법이 각 변수의 특성을 더 잘 설명하는 함수를 추정해주는 것으로 보여진다. 이는 비주기적인 특성이나 이상점(outlier) 등의 영향 때문인것으로 파악된다. 따라서 B-spline basis 방법으로 재표현된 결과를 가지고 함수적 회귀모형을 적합해보도록 한다. 
+
+#### 데이터 구성?
+
+```{r}
+daybasisspline <- create.bspline.basis(c(0, 240), nbasis=82, norder=4)
+# water.fd <- smooth.basis(argvals=1:240, water, daybasisspline)$fd
+TC.fR <- fRegress(TC.Bb ~ pH.Bb+DO.Bb+BOD.Bb+COD.Bb+SS.Bb+TN.Bb+TP.Bb+WT.Bb+EC.Bb+NH3N.Bb+NO3N.Bb+FC.Bb)
+```
+
+#### Error in eigchk(Cmat) : Negative eigenvalue of coefficient matrix. ...?
