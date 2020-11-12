@@ -113,6 +113,11 @@ plot(FC.fb)
 
 #### Functional response model : Concurrent Linear Model
 
+#### Model 1
+
+#### 반응변수 : TC
+#### 설명변수 : pH, DO, BOD, COD, SS, TN, TP, WT, EC, NH3N, NO3N, FC 
+
 ```{r}
 TC.fR <- fRegress(TC.fb ~ pH.fb+DO.fb+BOD.fb+COD.fb+SS.fb+TN.fb+TP.fb+WT.fb+EC.fb+NH3N.fb+NO3N.fb+FC.fb)
 ```
@@ -120,7 +125,23 @@ TC.fR <- fRegress(TC.fb ~ pH.fb+DO.fb+BOD.fb+COD.fb+SS.fb+TN.fb+TP.fb+WT.fb+EC.f
 #### Graph of coefficient
 
 ```{r}
-plot(TC.fR$betaestlist$const$fd,ylab="")
-plot(TC.fR$betaestlist$pH.fb$fd,ylab="",ylim=c(0,1))
+par(mfrow=c(2,2))
+plot(TC.fR$betaestlist$const$fd)
+plot(TC.fR$betaestlist$pH.fb$fd)
+plot(TC.fR$betaestlist$BOD.fb$fd)
+plot(TC.fR$betaestlist$COD.fb$fd)
+plot(TC.fR$betaestlist$SS.fb$fd)
+plot(TC.fR$betaestlist$TN.fb$fd)
+plot(TC.fR$betaestlist$TP.fb$fd)
+plot(TC.fR$betaestlist$WT.fb$fd)
+plot(TC.fR$betaestlist$EC.fb$fd)
+plot(TC.fR$betaestlist$NH3N.fb$fd)
+plot(TC.fR$betaestlist$NO3N.fb$fd)
+plot(TC.fR$betaestlist$FC.fb$fd)
+par(mfrow=c(1,1))
 ```
 
+#### Model 2
+
+#### 반응변수 : FC
+#### 설명변수 : pH, DO, BOD, COD, SS, TN, TP, WT, EC, NH3N, NO3N, TC 
