@@ -149,7 +149,7 @@ par(mfrow=c(1,1))
 # GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
 mm <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1,family="poisson")
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
-ggGam(m)
+ggGam(mm)
 summary(mm) # Deviance explained = 89.9%
 concurvity(mm,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
@@ -289,26 +289,26 @@ par(mfrow=c(1,1))
 
 ```{r}
 # GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
-m <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(TC)+s(Flow)+s(Rain),data=ex1,family="poisson")
-plot(m,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(m)[1])
-ggGam(m)
-summary(m) # Deviance explained = 93.4%
-concurvity(m,full=TRUE) # 공선성 존재
+mm <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(TC)+s(Flow)+s(Rain),data=ex1,family="poisson")
+plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+ggGam(mm)
+summary(mm) # Deviance explained = 93.4%
+concurvity(mm,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
-gam.check(m) # 적합결여 존재 (기저함수 부족)
+gam.check(mm) # 적합결여 존재 (기저함수 부족)
 par(mfrow=c(1,1))
 ```
 
 #### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
 
 ```{r}
-m.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(TC)+s(Flow)+s(Rain),data=ex1,family="poisson",method="GCV.Cp",select=TRUE) 
-plot(m.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(m.shrink)[1])
-ggGam(m.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, TC, Flow, Rain
-summary(m.shrink) # Deviance explained = 93.4%
-concurvity(m.shrink,full=TRUE) # 공선성 존재
+mm.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(TC)+s(Flow)+s(Rain),data=ex1,family="poisson",method="GCV.Cp",select=TRUE) 
+plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, TC, Flow, Rain
+summary(mm.shrink) # Deviance explained = 93.4%
+concurvity(mm.shrink,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
-gam.check(m.shrink) # 적합결여 존재 (기저함수 부족)
+gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
 par(mfrow=c(1,1))
 ```
 
@@ -336,13 +336,13 @@ par(mfrow=c(1,1))
 vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family="poisson",method="GCV.Cp",select=TRUE)
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1]) 
 ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, TC, Flow, Rain
-summary(vc.shrink) # Deviance explained = 94.7%
+summary(vc.shrink) # Deviance explained = 94.6%
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
 ```
 
-#### 최종선택된 모형의 설명력 : 61.6%(다중선형회귀모형), 70.2%(일반화가법모형) , 81.4%(시간에 따른 계수변화모형) 
+#### 최종선택된 모형의 설명력 : 61.7%(다중선형회귀모형), 69.7%(일반화선형모형), 93.4%(일반화가법모형) , 94.6%(시간에 따른 계수변화모형) 
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
