@@ -1,7 +1,7 @@
 ---
 title: "Example4-1"
 author: "Hwang Seong-Yun"
-date: '2020 11 14 '
+date: '2020 11 15 '
 output: html_document
 ---
 
@@ -121,6 +121,17 @@ dwtest(TC~DO+BOD+COD+SS+TN+TP+WT+Chla+FC,data=ex1) # 잔차가 양의 자기상�
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
+#### response vs fitted_values
+
+```{r}
+pred.mlr <- predict(fit.step,newdata=ex1,type="response")
+data.mlr <- data.frame(response=ex1$TC,fitted_values=pred.mlr)
+ggplot(data.mlr, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Multiple Linear Regression)")
+```
+
+
 ### Generalized Linear Model
 #### TC의 경우 counting variable이므로 포아송 로그모형(poisson log model)을 가정
 
@@ -144,6 +155,17 @@ par(mfrow=c(2,2))
 plot(m.step)
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.glm <- predict(m.step,newdata=ex1,type="response")
+data.glm <- data.frame(response=ex1$TC,fitted_values=pred.glm)
+ggplot(data.glm, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Linear Model)")
+```
+
 
 ### Generalized Additive Model
 #### TC의 경우 counting variable이므로 포아송 로그모형(poisson log model)을 가정
@@ -172,6 +194,17 @@ par(mfrow=c(2,2))
 gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.gam <- predict(mm.shrink,newdata=ex1,type="response")
+data.gam <- data.frame(response=ex1$TC,fitted_values=pred.gam)
+ggplot(data.gam, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Additive Model)")
+```
+
 
 ### Time Varying Coefficient Model
 #### TC의 경우 counting variable이므로 포아송 로그모형(poisson log model)을 가정
@@ -202,6 +235,17 @@ par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.tvcm <- predict(vc.shrink,newdata=ex1,type="response")
+data.tvcm <- data.frame(response=ex1$TC,fitted_values=pred.tvcm)
+ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
+```
+
 
 #### 최종선택된 모형의 설명력 : 64.6%(다중선형회귀모형), 62.1%(일반화선형모형), 89.8%(일반화가법모형), 90.7%(시간에 따른 계수변화모형) 
 
@@ -263,6 +307,17 @@ dwtest(FC~BOD+TOC+WT+EC+TC+NH3N,data=ex1) # 잔차가 양의 자기상관성을 
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
+#### response vs fitted_values
+
+```{r}
+pred.mlr <- predict(fit.step,newdata=ex1,type="response")
+data.mlr <- data.frame(response=ex1$FC,fitted_values=pred.mlr)
+ggplot(data.mlr, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Multiple Linear Regression)")
+```
+
+
 ### Generalized Linear Model
 #### FC의 경우 counting variable이므로 포아송 로그모형(poisson log model)을 가정
 
@@ -286,6 +341,17 @@ par(mfrow=c(2,2))
 plot(m.step)
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.glm <- predict(m.step,newdata=ex1,type="response")
+data.glm <- data.frame(response=ex1$FC,fitted_values=pred.glm)
+ggplot(data.glm, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Linear Model)")
+```
+
 
 ### Generalized Additive Model
 #### FC의 경우 counting variable이므로 포아송 로그모형(poisson log model)을 가정
@@ -314,6 +380,17 @@ par(mfrow=c(2,2))
 gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.gam <- predict(mm.shrink,newdata=ex1,type="response")
+data.gam <- data.frame(response=ex1$FC,fitted_values=pred.gam)
+ggplot(data.gam, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Additive Model)")
+```
+
 
 ### Time Varying Coefficient Model
 #### FC의 경우 counting variable이므로 포아송 로그모형(poisson log model)을 가정
@@ -344,6 +421,17 @@ par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.tvcm <- predict(vc.shrink,newdata=ex1,type="response")
+data.tvcm <- data.frame(response=ex1$FC,fitted_values=pred.tvcm)
+ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
+```
+
 
 #### 최종선택된 모형의 설명력 : 61.7%(다중선형회귀모형), 69.7%(일반화선형모형), 93.4%(일반화가법모형), 94.6%(시간에 따른 계수변화모형) 
 
@@ -407,6 +495,17 @@ dwtest(Chla~pH+DO+BOD+COD+SS+TP+TOC+WT+TC+NH3N+PO4P,data=ex1_scale) # 잔차가 
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
+#### response vs fitted_values
+
+```{r}
+pred.mlr <- predict(fit.step,newdata=ex1_scale,type="response")
+data.mlr <- data.frame(response=ex1_scale$Chla,fitted_values=pred.mlr)
+ggplot(data.mlr, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Multiple Linear Regression)")
+```
+
+
 ### Generalized Linear Model
 #### Chl-a의 경우는 연속형 변수이므로 일반적인 정규동일모형(normal identity model)을 가정해도 무방함.
 
@@ -430,6 +529,17 @@ par(mfrow=c(2,2))
 plot(m.step)
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.glm <- predict(m.step,newdata=ex1_scale,type="response")
+data.glm <- data.frame(response=ex1_scale$Chla,fitted_values=pred.glm)
+ggplot(data.glm, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Linear Model)")
+```
+
 
 ### Generalized Additive Model
 #### Chl-a의 경우는 연속형 변수이므로 일반적인 정규동일모형(normal identity model)을 가정해도 무방함.
@@ -458,6 +568,17 @@ par(mfrow=c(2,2))
 gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.gam <- predict(mm.shrink,newdata=ex1_scale,type="response")
+data.gam <- data.frame(response=ex1_scale$Chla,fitted_values=pred.gam)
+ggplot(data.gam, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Additive Model)")
+```
+
 
 ### Time Varying Coefficient Model
 #### Chl-a의 경우는 연속형 변수이므로 일반적인 정규동일모형(normal identity model)을 가정해도 무방함.
@@ -488,6 +609,17 @@ par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.tvcm <- predict(vc.shrink,newdata=ex1_scale,type="response")
+data.tvcm <- data.frame(response=ex1_scale$Chla,fitted_values=pred.tvcm)
+ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
+```
+
 
 #### 최종선택된 모형의 설명력 : 65.6%(다중선형회귀모형), 65.6%(일반화선형모형), 73.3%(일반화가법모형), 75.2%(시간에 따른 계수변화모형) 
 
@@ -587,6 +719,17 @@ dwtest(TC~DO+TP+WT+EC+FC+Flow,data=ex2) # 잔차가 양의 자기상관성을 �
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
+#### response vs fitted_values
+
+```{r}
+pred.mlr <- predict(gfit.step,newdata=ex2,type="response")
+data.mlr <- data.frame(response=ex2$TC,fitted_values=pred.mlr)
+ggplot(data.mlr, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Multiple Linear Regression)")
+```
+
+
 ### Generalized Linear Model
 #### TC의 경우 counting variable이므로 포아송 로그모형(poisson log model)을 가정
 
@@ -610,6 +753,17 @@ par(mfrow=c(2,2))
 plot(m.step)
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.glm <- predict(m.step,newdata=ex2,type="response")
+data.glm <- data.frame(response=ex2$TC,fitted_values=pred.glm)
+ggplot(data.glm, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Linear Model)")
+```
+
 
 ### Generalized Additive Model
 #### TC의 경우 counting variable이므로 포아송 로그모형(poisson log model)을 가정
@@ -637,6 +791,17 @@ par(mfrow=c(2,2))
 gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.gam <- predict(mm.shrink,newdata=ex2,type="response")
+data.gam <- data.frame(response=ex2$TC,fitted_values=pred.gam)
+ggplot(data.gam, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Additive Model)")
+```
+
 
 ### Time Varying Coefficient Model
 #### TC의 경우 counting variable이므로 포아송 로그모형(poisson log model)을 가정
@@ -667,6 +832,17 @@ par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.tvcm <- predict(vc.shrink,newdata=ex2,type="response")
+data.tvcm <- data.frame(response=ex2$TC,fitted_values=pred.tvcm)
+ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
+```
+
 
 #### 최종선택된 모형의 설명력 : 48.9%(다중선형회귀모형), 42.2%(일반화선형모형), 76.8%(일반화가법모형), 80.8%(시간에 따른 계수변화모형) 
 
@@ -729,6 +905,17 @@ dwtest(FC~TC+Rain,data=ex2) # 잔차가 양의 자기상관성을 가지고 있�
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
+#### response vs fitted_values
+
+```{r}
+pred.mlr <- predict(gfit.step,newdata=ex2,type="response")
+data.mlr <- data.frame(response=ex2$FC,fitted_values=pred.mlr)
+ggplot(data.mlr, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Multiple Linear Regression)")
+```
+
+
 ### Generalized Linear Model
 #### FC의 경우 counting variable이므로 포아송 로그모형(poisson log model)을 가정
 
@@ -752,6 +939,17 @@ par(mfrow=c(2,2))
 plot(m.step)
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.glm <- predict(m.step,newdata=ex2,type="response")
+data.glm <- data.frame(response=ex2$FC,fitted_values=pred.glm)
+ggplot(data.glm, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Linear Model)")
+```
+
 
 ### Generalized Additive Model
 #### FC의 경우 counting variable이므로 포아송 로그모형(poisson log model)을 가정
@@ -779,6 +977,17 @@ par(mfrow=c(2,2))
 gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.gam <- predict(mm.shrink,newdata=ex2,type="response")
+data.gam <- data.frame(response=ex2$FC,fitted_values=pred.gam)
+ggplot(data.gam, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Additive Model)")
+```
+
 
 ### Time Varying Coefficient Model
 #### FC의 경우 counting variable이므로 포아송 로그모형(poisson log model)을 가정
@@ -809,6 +1018,17 @@ par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.tvcm <- predict(vc.shrink,newdata=ex2,type="response")
+data.tvcm <- data.frame(response=ex2$FC,fitted_values=pred.tvcm)
+ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
+```
+
 
 #### 최종선택된 모형의 설명력 : 40.3%(다중선형회귀모형), 60.6%(일반화선형모형), 88.7%(일반화가법모형), 90.7%(시간에 따른 계수변화모형)  
 
@@ -872,6 +1092,17 @@ dwtest(Chla~pH+DO+BOD+COD+TN+TP+WT+EC+NH3N+PO4P+Rain,data=ex2_scale) # 잔차가
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
+#### response vs fitted_values
+
+```{r}
+pred.mlr <- predict(gfit.step,newdata=ex2_scale,type="response")
+data.mlr <- data.frame(response=ex2_scale$Chla,fitted_values=pred.mlr)
+ggplot(data.mlr, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Multiple Linear Regression)")
+```
+
+
 ### Generalized Linear Model
 #### Chl-a의 경우는 연속형 변수이므로 일반적인 정규동일모형(normal identity model)을 가정해도 무방함.
 
@@ -895,6 +1126,17 @@ par(mfrow=c(2,2))
 plot(m.step)
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.glm <- predict(m.step,newdata=ex2_scale,type="response")
+data.glm <- data.frame(response=ex2_scale$Chla,fitted_values=pred.glm)
+ggplot(data.glm, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Linear Model)")
+```
+
 
 ### Generalized Additive Model
 #### Chl-a의 경우는 연속형 변수이므로 일반적인 정규동일모형(normal identity model)을 가정해도 무방함.
@@ -923,6 +1165,17 @@ par(mfrow=c(2,2))
 gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.gam <- predict(mm.shrink,newdata=ex2_scale,type="response")
+data.gam <- data.frame(response=ex2_scale$Chla,fitted_values=pred.gam)
+ggplot(data.gam, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Additive Model)")
+```
+
 
 ### Time Varying Coefficient Model
 #### Chl-a의 경우는 연속형 변수이므로 일반적인 정규동일모형(normal identity model)을 가정해도 무방함.
@@ -953,6 +1206,17 @@ par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
 ```
+
+#### response vs fitted_values
+
+```{r}
+pred.tvcm <- predict(vc.shrink,newdata=ex2_scale,type="response")
+data.tvcm <- data.frame(response=ex2_scale$Chla,fitted_values=pred.tvcm)
+ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
+```
+
 
 #### 최종선택된 모형의 설명력 : 70.5%(다중선형회귀모형), 71.2%(일반화선형모형), 77.1%(일반화가법모형), 81.4%(시간에 따른 계수변화모형) 
 
