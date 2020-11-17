@@ -52,7 +52,7 @@ par(oma=c(0.5,0.5,0.5,0.5))
 ### Correlation Analysis
 
 ```{r}
-ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- read.csv("C:/Users/stat/Desktop/광산(2010-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
 X1 <- round(cor(ex1, method='spearman'),4) 
 corrplot(X1)
@@ -76,7 +76,7 @@ ggcorrplot(X1, hc.order=T, type="lower", p.mat=p.mat1) +
 ### Multiple Linear Regression
 
 ```{r}
-ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- read.csv("C:/Users/stat/Desktop/광산(2010-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
 ex1 <- as.data.frame(ex1)
 p1 <- ggplot(data=ex1,aes(x=pH,y=TC)) + geom_point() + stat_smooth(method=lm)
@@ -172,7 +172,9 @@ ggplot(data.glm, aes(x=fitted_values, y=response)) +
 ```{r}
 # GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
 mm <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1,family=poisson(link="log"))
+par(mfrow=c(2,2))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+par(mfrow=c(1,1))
 ggGam(mm)
 summary(mm) # Deviance explained = 89.9%
 concurvity(mm,full=TRUE) # 공선성 존재
@@ -185,7 +187,9 @@ par(mfrow=c(1,1))
 
 ```{r}
 mm.shrink <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1,family=poisson(link="log"),method="GCV.Cp",select=TRUE) 
+par(mfrow=c(2,2))
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+par(mfrow=c(1,1))
 ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, FC, Flow, Rain
 summary(mm.shrink) # Deviance explained = 89.8%
 concurvity(mm.shrink,full=TRUE) # 공선성 존재
@@ -215,7 +219,9 @@ nrow(ex1)
 ex1$time <- 1:nrow(ex1)
 head(ex1)
 vc <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=poisson(link="log"))
+par(mfrow=c(2,2))
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-50,50))
+par(mfrow=c(1,1))
 ggGam(vc)
 summary(vc) # Deviance explained = 90.8%
 par(mfrow=c(2,2))
@@ -227,7 +233,9 @@ par(mfrow=c(1,1))
 
 ```{r}
 vc.shrink <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=poisson(link="log"),method="GCV.Cp",select=TRUE)
+par(mfrow=c(2,2))
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-50,50))
+par(mfrow=c(1,1))
 ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, FC, Flow, Rain
 summary(vc.shrink) # Deviance explained = 90.7%
 par(mfrow=c(2,2))
@@ -256,7 +264,7 @@ ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
 ### Multiple Linear Regression
 
 ```{r}
-ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- read.csv("C:/Users/stat/Desktop/광산(2010-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
 ex1 <- as.data.frame(ex1)
 p1 <- ggplot(data=ex1,aes(x=pH,y=FC)) + geom_point() + stat_smooth(method=lm)
@@ -352,7 +360,9 @@ ggplot(data.glm, aes(x=fitted_values, y=response)) +
 ```{r}
 # GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
 mm <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(TC)+s(Flow)+s(Rain),data=ex1,family=poisson(link="log"))
+par(mfrow=c(2,2))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+par(mfrow=c(1,1))
 ggGam(mm)
 summary(mm) # Deviance explained = 93.4%
 concurvity(mm,full=TRUE) # 공선성 존재
@@ -365,7 +375,9 @@ par(mfrow=c(1,1))
 
 ```{r}
 mm.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(TC)+s(Flow)+s(Rain),data=ex1,family=poisson(link="log"),method="GCV.Cp",select=TRUE) 
+par(mfrow=c(2,2))
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+par(mfrow=c(1,1))
 ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, TC, Flow, Rain
 summary(mm.shrink) # Deviance explained = 93.4%
 concurvity(mm.shrink,full=TRUE) # 공선성 존재
@@ -395,7 +407,9 @@ nrow(ex1)
 ex1$time <- 1:nrow(ex1)
 head(ex1)
 vc <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=poisson(link="log"))
+par(mfrow=c(2,2))
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-50,50))
+par(mfrow=c(1,1))
 ggGam(vc)
 summary(vc) # Deviance explained = 94.7%
 par(mfrow=c(2,2))
@@ -407,7 +421,9 @@ par(mfrow=c(1,1))
 
 ```{r}
 vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=poisson(link="log"),method="GCV.Cp",select=TRUE)
+par(mfrow=c(2,2))
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-50,50)) 
+par(mfrow=c(1,1))
 ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, TC, Flow, Rain
 summary(vc.shrink) # Deviance explained = 94.6%
 par(mfrow=c(2,2))
@@ -437,7 +453,7 @@ ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
 ### Multiple Linear Regression
 
 ```{r}
-ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- read.csv("C:/Users/stat/Desktop/광산(2010-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
 ex1 <- as.data.frame(ex1)
 p1 <- ggplot(data=ex1,aes(x=pH,y=Chla)) + geom_point() + stat_smooth(method=lm)
@@ -533,7 +549,9 @@ ggplot(data.glm, aes(x=fitted_values, y=response)) +
 ```{r}
 # GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
 mm <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1,family=Gamma(link="log"))
+par(mfrow=c(2,2))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+par(mfrow=c(1,1))
 ggGam(mm)
 summary(mm) # Deviance explained = 72.2% 
 concurvity(mm,full=TRUE) # 공선성 존재
@@ -546,7 +564,9 @@ par(mfrow=c(1,1))
 
 ```{r}
 mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1,family=Gamma(link="log"),method="GCV.Cp",select=TRUE) 
+par(mfrow=c(2,2))
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+par(mfrow=c(1,1))
 ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P, FC, Flow, Rain 
 summary(mm.shrink) # Deviance explained = 72.2% 
 concurvity(mm.shrink,full=TRUE) # 공선성 존재
@@ -576,7 +596,9 @@ nrow(ex1)
 ex1$time <- 1:nrow(ex1)
 head(ex1)
 vc <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=Gamma(link="log"))
+par(mfrow=c(2,2))
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1])
+par(mfrow=c(1,1))
 ggGam(vc)
 summary(vc) # Deviance explained = 75.4%
 par(mfrow=c(2,2))
@@ -588,7 +610,9 @@ par(mfrow=c(1,1))
 
 ```{r}
 vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=Gamma(link="log"),method="GCV.Cp",select=TRUE)
+par(mfrow=c(2,2))
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1])
+par(mfrow=c(1,1))
 ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P, Flow, Rain 
 summary(vc.shrink) # Deviance explained = 72.8% 
 par(mfrow=c(2,2))
@@ -631,7 +655,7 @@ ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
 ### Correlation Analysis
 
 ```{r}
-ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- read.csv("C:/Users/stat/Desktop/우치(2010-2019).csv", sep=",", header=T)
 ex2 <- ex2[,-1]
 X2 <- round(cor(ex2, method='spearman'),4) 
 corrplot(X2)
@@ -655,7 +679,7 @@ ggcorrplot(X2, hc.order=T, type="lower", p.mat=p.mat2) +
 ### Multiple Linear Regression
 
 ```{r}
-ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- read.csv("C:/Users/stat/Desktop/우치(2010-2019).csv", sep=",", header=T)
 ex2 <- ex2[,-1]
 ex2 <- as.data.frame(ex2)
 g1 <- ggplot(data=ex2,aes(x=pH,y=TC)) + geom_point() + stat_smooth(method=lm)
@@ -750,7 +774,9 @@ ggplot(data.glm, aes(x=fitted_values, y=response)) +
 
 ```{r}
 mm <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2,family=poisson(link="log"))
+par(mfrow=c(2,2))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+par(mfrow=c(1,1))
 ggGam(mm)
 summary(mm) # Deviance explained = 76.9%
 concurvity(mm,full=TRUE) # 공선성 존재
@@ -763,7 +789,9 @@ par(mfrow=c(1,1))
 
 ```{r}
 mm.shrink <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2,family=poisson(link="log"),method="GCV.Cp",select=TRUE) 
+par(mfrow=c(2,2))
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+par(mfrow=c(1,1))
 ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, FC, Flow, Rain
 summary(mm.shrink) # Deviance explained = 76.8%
 concurvity(mm.shrink,full=TRUE) # 공선성 존재
@@ -793,7 +821,9 @@ nrow(ex2)
 ex2$time <- 1:nrow(ex2)
 head(ex2)
 vc <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=poisson(link="log"))
+par(mfrow=c(2,2))
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-50,50))
+par(mfrow=c(1,1))
 ggGam(vc)
 summary(vc) # Deviance explained = 81.3%
 par(mfrow=c(2,2))
@@ -805,7 +835,9 @@ par(mfrow=c(1,1))
 
 ```{r}
 vc.shrink <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=poisson(link="log"),method="GCV.Cp",select=TRUE) 
+par(mfrow=c(2,2))
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-50,50))
+par(mfrow=c(1,1))
 ggGam(vc.shrink) # 선택변수 : DO, COD, SS, TN, TP, TOC, WT, EC, NH3N, PO4P, FC, Flow, Rain
 summary(vc.shrink) # Deviance explained = 80.8% 
 par(mfrow=c(2,2))
@@ -835,7 +867,7 @@ ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
 ### Multiple Linear Regression
 
 ```{r}
-ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- read.csv("C:/Users/stat/Desktop/우치(2010-2019).csv", sep=",", header=T)
 ex2 <- ex2[,-1]
 ex2 <- as.data.frame(ex2)
 g1 <- ggplot(data=ex2,aes(x=pH,y=FC)) + geom_point() + stat_smooth(method=lm)
@@ -930,7 +962,9 @@ ggplot(data.glm, aes(x=fitted_values, y=response)) +
 
 ```{r}
 mm <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(Chla)+s(Flow)+s(Rain),data=ex2,family=poisson(link="log"))
+par(mfrow=c(2,2))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+par(mfrow=c(1,1))
 ggGam(mm)
 summary(mm) # Deviance explained = 88.8%
 concurvity(mm,full=TRUE) # 공선성 존재
@@ -943,7 +977,9 @@ par(mfrow=c(1,1))
 
 ```{r}
 mm.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(Chla)+s(Flow)+s(Rain),data=ex2,family=poisson(link="log"),method="GCV.Cp",select=TRUE) 
+par(mfrow=c(2,2))
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+par(mfrow=c(1,1))
 ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P, Chla, Flow, Rain
 summary(mm.shrink) # Deviance explained = 88.7%
 concurvity(mm.shrink,full=TRUE) # 공선성 존재
@@ -973,7 +1009,9 @@ nrow(ex2)
 ex2$time <- 1:nrow(ex2)
 head(ex2)
 vc <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Chla)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=poisson(link="log"))
+par(mfrow=c(2,2))
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-50,50))
+par(mfrow=c(1,1))
 ggGam(vc)
 summary(vc) # Deviance explained = 90.7%
 par(mfrow=c(2,2))
@@ -984,8 +1022,10 @@ par(mfrow=c(1,1))
 #### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
 
 ```{r}
-vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Chla)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=poisson(link="log"),method="GCV.Cp",select=TRUE) 
+vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Chla)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=poisson(link="log"),method="GCV.Cp",select=TRUE)
+par(mfrow=c(2,2))
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-50,50))
+par(mfrow=c(1,1))
 ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P, Chla, Flow, Rain
 summary(vc.shrink) # Deviance explained = 90.7%
 par(mfrow=c(2,2))
@@ -1015,7 +1055,7 @@ ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
 #### scaling data 사용
 
 ```{r}
-ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- read.csv("C:/Users/stat/Desktop/우치(2010-2019).csv", sep=",", header=T)
 ex2 <- ex2[,-1]
 ex2 <- as.data.frame(ex2)
 p1 <- ggplot(data=ex2,aes(x=pH,y=Chla)) + geom_point() + stat_smooth(method=lm)
@@ -1111,7 +1151,9 @@ ggplot(data.glm, aes(x=fitted_values, y=response)) +
 ```{r}
 # GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
 mm <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2,family=Gamma(link="log"))
+par(mfrow=c(2,2))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+par(mfrow=c(1,1))
 ggGam(mm)
 summary(mm) # Deviance explained = 79.5% 
 concurvity(mm,full=TRUE) # 공선성 존재
@@ -1124,7 +1166,9 @@ par(mfrow=c(1,1))
 
 ```{r}
 mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2,family=Gamma(link="log"),method="GCV.Cp",select=TRUE) 
+par(mfrow=c(2,2))
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+par(mfrow=c(1,1))
 ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P, Rain 
 summary(mm.shrink) # Deviance explained = 79.2% 
 concurvity(mm.shrink,full=TRUE) # 공선성 존재
@@ -1154,7 +1198,9 @@ nrow(ex2)
 ex2$time <- 1:nrow(ex2)
 head(ex2)
 vc <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=Gamma(link="log"))
+par(mfrow=c(2,2))
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1])
+par(mfrow=c(1,1))
 ggGam(vc)
 summary(vc) # Deviance explained = 80.2% 
 par(mfrow=c(2,2))
@@ -1166,7 +1212,9 @@ par(mfrow=c(1,1))
 
 ```{r}
 vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=Gamma(link="log"),method="GCV.Cp",select=TRUE)
+par(mfrow=c(2,2))
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1])
+par(mfrow=c(1,1))
 ggGam(vc.shrink) # 선택변수 : DO, BOD, SS, TN, TP, TOC, EC, NH3N, PO4P, Flow, Rain 
 summary(vc.shrink) # Deviance explained =   80% 
 par(mfrow=c(2,2))
