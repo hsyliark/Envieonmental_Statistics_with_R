@@ -1,7 +1,7 @@
 ---
-title: "Example4-2"
+title: "Example4-3"
 author: "Hwang Seong-Yun"
-date: '2020 11 17 '
+date: '2020 11 20 '
 output: html_document
 ---
 
@@ -29,7 +29,11 @@ par(oma=c(0.5,0.5,0.5,0.5))
 ```
 
 
-### 모형적합 시 반응변수의 분포에 대한 당위성을 위하여 TC와 FC의 경우(counting variable)는 잔차의 분포를 포아송분포(Poisson Distribution)로, Chla의 경우(positive real number variable)는 잔차의 분포를 감마분포(Gamma Distribution)로 가정함.
+#### 모형적합 시 반응변수의 분포에 대한 당위성을 위하여 TC와 FC의 경우(counting variable)는 포아송분포(Poisson Distribution)를, Chla의 경우(positive real number variable)는 감마분포(Gamma Distribution)를 가정함.
+
+#### 변수 time은 2010년 1월 1일 기준으로 경과된 날짜를 계산하여 반영함.
+
+#### 모형의 설명력은 Deviance explained(다양한 형태의 모형을 비교하기 위해 R-square 통계량을 확장한 형태) 통계량 기준으로 해석함.
 
 #### Poisson Distribution : https://en.wikipedia.org/wiki/Poisson_distribution 
 
@@ -52,7 +56,7 @@ par(oma=c(0.5,0.5,0.5,0.5))
 ### Correlation Analysis
 
 ```{r}
-ex1 <- read.csv("C:/Users/stat/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
 X1 <- round(cor(ex1, method='spearman'),4) 
 corrplot(X1)
@@ -76,7 +80,7 @@ ggcorrplot(X1, hc.order=T, type="lower", p.mat=p.mat1) +
 ### Multiple Linear Regression
 
 ```{r}
-ex1 <- read.csv("C:/Users/stat/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
 ex1 <- as.data.frame(ex1)
 p1 <- ggplot(data=ex1,aes(x=pH,y=TC)) + geom_point() + stat_smooth(method=lm)
@@ -96,13 +100,13 @@ p14 <- ggplot(data=ex1,aes(x=FC,y=TC)) + geom_point() + stat_smooth(method=lm)
 p15 <- ggplot(data=ex1,aes(x=Flow,y=TC)) + geom_point() + stat_smooth(method=lm)
 p16 <- ggplot(data=ex1,aes(x=Rain,y=TC)) + geom_point() + stat_smooth(method=lm)
 grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,nrow=4,ncol=4)
-fit <- glm(TC~.,data=ex1,family=gaussian(link="identity"))
+fit <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+FC+Flow+Rain,data=ex1,family=gaussian(link="identity"))
 summary(fit) # Deviance explained:  0.6548
 vif(fit) # 다중공선성(multicollinearity) 존재
 par(mfrow=c(2,2))
 plot(fit)
 par(mfrow=c(1,1))
-dwtest(TC~.,data=ex1) # 잔차가 양의 자기상관성을 가지고 있음.
+dwtest(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+FC+Flow+Rain,data=ex1) # 잔차가 양의 자기상관성을 가지고 있음.
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
@@ -172,7 +176,7 @@ ggplot(data.glm, aes(x=fitted_values, y=response)) +
 ```{r}
 # GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
 mm <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1,family=poisson(link="log"))
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
 par(mfrow=c(1,1))
 ggGam(mm)
@@ -187,7 +191,7 @@ par(mfrow=c(1,1))
 
 ```{r}
 mm.shrink <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1,family=poisson(link="log"),method="GCV.Cp",select=TRUE) 
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
 par(mfrow=c(1,1))
 ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, FC, Flow, Rain
@@ -215,15 +219,12 @@ ggplot(data.gam, aes(x=fitted_values, y=response)) +
 ```{r}
 par(mar=c(4,4,4,4))
 par(oma=c(0.5,0.5,0.5,0.5))
-nrow(ex1)
-ex1$time <- 1:nrow(ex1)
-head(ex1)
 vc <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=poisson(link="log"))
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-50,50))
 par(mfrow=c(1,1))
 ggGam(vc)
-summary(vc) # Deviance explained = 90.8%
+summary(vc) # Deviance explained = 90.8% 
 par(mfrow=c(2,2))
 gam.check(vc) 
 par(mfrow=c(1,1))
@@ -233,11 +234,11 @@ par(mfrow=c(1,1))
 
 ```{r}
 vc.shrink <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=poisson(link="log"),method="GCV.Cp",select=TRUE)
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-50,50))
 par(mfrow=c(1,1))
-ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, FC, Flow, Rain
-summary(vc.shrink) # Deviance explained = 90.7%
+ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, FC, Flow, Rain 
+summary(vc.shrink) # Deviance explained = 90.7% 
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
@@ -264,7 +265,7 @@ ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
 ### Multiple Linear Regression
 
 ```{r}
-ex1 <- read.csv("C:/Users/stat/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
 ex1 <- as.data.frame(ex1)
 p1 <- ggplot(data=ex1,aes(x=pH,y=FC)) + geom_point() + stat_smooth(method=lm)
@@ -284,13 +285,13 @@ p14 <- ggplot(data=ex1,aes(x=TC,y=FC)) + geom_point() + stat_smooth(method=lm)
 p15 <- ggplot(data=ex1,aes(x=Flow,y=FC)) + geom_point() + stat_smooth(method=lm)
 p16 <- ggplot(data=ex1,aes(x=Rain,y=FC)) + geom_point() + stat_smooth(method=lm)
 grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,nrow=4,ncol=4)
-fit <- glm(FC~.,data=ex1,family=gaussian(link="identity"))
+fit <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+TC+Flow+Rain,data=ex1,family=gaussian(link="identity"))
 summary(fit) # Deviance explained:  0.6260
 vif(fit) # 다중공선성(multicollinearity) 존재
 par(mfrow=c(2,2))
 plot(fit)
 par(mfrow=c(1,1))
-dwtest(FC~.,data=ex1) # 잔차가 양의 자기상관성을 가지고 있음.
+dwtest(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+TC+Flow+Rain,data=ex1) # 잔차가 양의 자기상관성을 가지고 있음.
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
@@ -360,7 +361,7 @@ ggplot(data.glm, aes(x=fitted_values, y=response)) +
 ```{r}
 # GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
 mm <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(TC)+s(Flow)+s(Rain),data=ex1,family=poisson(link="log"))
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
 par(mfrow=c(1,1))
 ggGam(mm)
@@ -375,7 +376,7 @@ par(mfrow=c(1,1))
 
 ```{r}
 mm.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(TC)+s(Flow)+s(Rain),data=ex1,family=poisson(link="log"),method="GCV.Cp",select=TRUE) 
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
 par(mfrow=c(1,1))
 ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, TC, Flow, Rain
@@ -403,15 +404,12 @@ ggplot(data.gam, aes(x=fitted_values, y=response)) +
 ```{r}
 par(mar=c(4,4,4,4))
 par(oma=c(0.5,0.5,0.5,0.5))
-nrow(ex1)
-ex1$time <- 1:nrow(ex1)
-head(ex1)
 vc <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=poisson(link="log"))
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-50,50))
 par(mfrow=c(1,1))
 ggGam(vc)
-summary(vc) # Deviance explained = 94.7%
+summary(vc) # Deviance explained = 94.7% 
 par(mfrow=c(2,2))
 gam.check(vc) 
 par(mfrow=c(1,1))
@@ -421,11 +419,11 @@ par(mfrow=c(1,1))
 
 ```{r}
 vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=poisson(link="log"),method="GCV.Cp",select=TRUE)
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-50,50)) 
 par(mfrow=c(1,1))
-ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, TC, Flow, Rain
-summary(vc.shrink) # Deviance explained = 94.6%
+ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, Chla, NH3N, PO4P, Flow, Rain 
+summary(vc.shrink) # Deviance explained = 94.4%
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
@@ -442,7 +440,7 @@ ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
 ```
 
 
-#### 최종선택된 모형의 설명력 : 62.1%(다중선형회귀모형), 69.7%(일반화선형모형), 93.4%(일반화가법모형), 94.6%(시간에 따른 계수변화모형) 
+#### 최종선택된 모형의 설명력 : 62.1%(다중선형회귀모형), 69.7%(일반화선형모형), 93.4%(일반화가법모형), 94.4%(시간에 따른 계수변화모형) 
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
@@ -453,7 +451,7 @@ ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
 ### Multiple Linear Regression
 
 ```{r}
-ex1 <- read.csv("C:/Users/stat/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
 ex1 <- as.data.frame(ex1)
 p1 <- ggplot(data=ex1,aes(x=pH,y=Chla)) + geom_point() + stat_smooth(method=lm)
@@ -473,13 +471,13 @@ p14 <- ggplot(data=ex1,aes(x=FC,y=Chla)) + geom_point() + stat_smooth(method=lm)
 p15 <- ggplot(data=ex1,aes(x=Flow,y=Chla)) + geom_point() + stat_smooth(method=lm)
 p16 <- ggplot(data=ex1,aes(x=Rain,y=Chla)) + geom_point() + stat_smooth(method=lm)
 grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,nrow=4,ncol=4)
-fit <- glm(Chla~.,data=ex1,family=gaussian(link="identity"))
+fit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+FC+NH3N+PO4P+TC+Flow+Rain,data=ex1,family=gaussian(link="identity"))
 summary(fit) # Deviance explained:  0.6581  
 vif(fit) # 다중공선성(multicollinearity) 존재
 par(mfrow=c(2,2))
 plot(fit)
 par(mfrow=c(1,1))
-dwtest(Chla~.,data=ex1) # 잔차가 양의 자기상관성을 가지고 있음.
+dwtest(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+FC+NH3N+PO4P+TC+Flow+Rain,data=ex1) # 잔차가 양의 자기상관성을 가지고 있음.
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
@@ -549,7 +547,7 @@ ggplot(data.glm, aes(x=fitted_values, y=response)) +
 ```{r}
 # GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
 mm <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1,family=Gamma(link="log"))
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
 par(mfrow=c(1,1))
 ggGam(mm)
@@ -564,7 +562,7 @@ par(mfrow=c(1,1))
 
 ```{r}
 mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1,family=Gamma(link="log"),method="GCV.Cp",select=TRUE) 
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
 par(mfrow=c(1,1))
 ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P, FC, Flow, Rain 
@@ -592,15 +590,12 @@ ggplot(data.gam, aes(x=fitted_values, y=response)) +
 ```{r}
 par(mar=c(4,4,4,4))
 par(oma=c(0.5,0.5,0.5,0.5))
-nrow(ex1)
-ex1$time <- 1:nrow(ex1)
-head(ex1)
 vc <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=Gamma(link="log"))
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1])
 par(mfrow=c(1,1))
 ggGam(vc)
-summary(vc) # Deviance explained = 75.4%
+summary(vc) # Deviance explained = 76.3% 
 par(mfrow=c(2,2))
 gam.check(vc) 
 par(mfrow=c(1,1))
@@ -610,11 +605,11 @@ par(mfrow=c(1,1))
 
 ```{r}
 vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=Gamma(link="log"),method="GCV.Cp",select=TRUE)
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1])
 par(mfrow=c(1,1))
-ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P, Flow, Rain 
-summary(vc.shrink) # Deviance explained = 72.8% 
+ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, EC, TC, PO4P, Flow, Rain 
+summary(vc.shrink) # Deviance explained = 71.4%  
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
@@ -631,7 +626,7 @@ ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
 ```
 
 
-#### 최종선택된 모형의 설명력 : 65.6%(다중선형회귀모형), 60.2%(일반화선형모형), 72.2%(일반화가법모형), 72.8%(시간에 따른 계수변화모형) 
+#### 최종선택된 모형의 설명력 : 65.6%(다중선형회귀모형), 60.2%(일반화선형모형), 72.2%(일반화가법모형), 71.4%(시간에 따른 계수변화모형) 
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
@@ -655,7 +650,7 @@ ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
 ### Correlation Analysis
 
 ```{r}
-ex2 <- read.csv("C:/Users/stat/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
 ex2 <- ex2[,-1]
 X2 <- round(cor(ex2, method='spearman'),4) 
 corrplot(X2)
@@ -679,7 +674,7 @@ ggcorrplot(X2, hc.order=T, type="lower", p.mat=p.mat2) +
 ### Multiple Linear Regression
 
 ```{r}
-ex2 <- read.csv("C:/Users/stat/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
 ex2 <- ex2[,-1]
 ex2 <- as.data.frame(ex2)
 g1 <- ggplot(data=ex2,aes(x=pH,y=TC)) + geom_point() + stat_smooth(method=lm)
@@ -699,13 +694,13 @@ g14 <- ggplot(data=ex2,aes(x=Chla,y=TC)) + geom_point() + stat_smooth(method=lm)
 g15 <- ggplot(data=ex2,aes(x=Flow,y=TC)) + geom_point() + stat_smooth(method=lm)
 g16 <- ggplot(data=ex2,aes(x=Rain,y=TC)) + geom_point() + stat_smooth(method=lm)
 grid.arrange(g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,nrow=4,ncol=4)
-gfit <- glm(TC~.,data=ex2,family=gaussian(link="identity"))
+gfit <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+FC+Flow+Rain,data=ex2,family=gaussian(link="identity"))
 summary(gfit) # Deviance explained:  0.5017
 vif(gfit) 
 par(mfrow=c(2,2))
 plot(gfit)
 par(mfrow=c(1,1))
-dwtest(TC~.,data=ex2) # 잔차가 양의 자기상관성을 가지고 있음.
+dwtest(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+FC+Flow+Rain,data=ex2) # 잔차가 양의 자기상관성을 가지고 있음.
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
@@ -774,7 +769,7 @@ ggplot(data.glm, aes(x=fitted_values, y=response)) +
 
 ```{r}
 mm <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2,family=poisson(link="log"))
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
 par(mfrow=c(1,1))
 ggGam(mm)
@@ -789,7 +784,7 @@ par(mfrow=c(1,1))
 
 ```{r}
 mm.shrink <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2,family=poisson(link="log"),method="GCV.Cp",select=TRUE) 
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
 par(mfrow=c(1,1))
 ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, FC, Flow, Rain
@@ -817,15 +812,12 @@ ggplot(data.gam, aes(x=fitted_values, y=response)) +
 ```{r}
 par(mar=c(4,4,4,4))
 par(oma=c(0.5,0.5,0.5,0.5))
-nrow(ex2)
-ex2$time <- 1:nrow(ex2)
-head(ex2)
 vc <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=poisson(link="log"))
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-50,50))
 par(mfrow=c(1,1))
 ggGam(vc)
-summary(vc) # Deviance explained = 81.3%
+summary(vc) # Deviance explained = 81.3% 
 par(mfrow=c(2,2))
 gam.check(vc) 
 par(mfrow=c(1,1))
@@ -835,10 +827,10 @@ par(mfrow=c(1,1))
 
 ```{r}
 vc.shrink <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=poisson(link="log"),method="GCV.Cp",select=TRUE) 
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-50,50))
 par(mfrow=c(1,1))
-ggGam(vc.shrink) # 선택변수 : DO, COD, SS, TN, TP, TOC, WT, EC, NH3N, PO4P, FC, Flow, Rain
+ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, FC, Flow, Rain 
 summary(vc.shrink) # Deviance explained = 80.8% 
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
@@ -867,7 +859,7 @@ ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
 ### Multiple Linear Regression
 
 ```{r}
-ex2 <- read.csv("C:/Users/stat/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
 ex2 <- ex2[,-1]
 ex2 <- as.data.frame(ex2)
 g1 <- ggplot(data=ex2,aes(x=pH,y=FC)) + geom_point() + stat_smooth(method=lm)
@@ -887,13 +879,13 @@ g14 <- ggplot(data=ex2,aes(x=Chla,y=FC)) + geom_point() + stat_smooth(method=lm)
 g15 <- ggplot(data=ex2,aes(x=Flow,y=FC)) + geom_point() + stat_smooth(method=lm)
 g16 <- ggplot(data=ex2,aes(x=Rain,y=FC)) + geom_point() + stat_smooth(method=lm)
 grid.arrange(g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,nrow=4,ncol=4)
-gfit <- glm(FC~.,data=ex2,family=gaussian(link="identity"))
+gfit <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+TC+Flow+Rain,data=ex2,family=gaussian(link="identity"))
 summary(gfit) # Deviance explained:  0.4145
 vif(gfit) 
 par(mfrow=c(2,2))
 plot(gfit)
 par(mfrow=c(1,1))
-dwtest(FC~.,data=ex2) # 잔차가 양의 자기상관성을 가지고 있음.
+dwtest(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+TC+Flow+Rain,data=ex2) # 잔차가 양의 자기상관성을 가지고 있음.
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
@@ -962,7 +954,7 @@ ggplot(data.glm, aes(x=fitted_values, y=response)) +
 
 ```{r}
 mm <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(Chla)+s(Flow)+s(Rain),data=ex2,family=poisson(link="log"))
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
 par(mfrow=c(1,1))
 ggGam(mm)
@@ -977,7 +969,7 @@ par(mfrow=c(1,1))
 
 ```{r}
 mm.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(Chla)+s(Flow)+s(Rain),data=ex2,family=poisson(link="log"),method="GCV.Cp",select=TRUE) 
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
 par(mfrow=c(1,1))
 ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P, Chla, Flow, Rain
@@ -1005,15 +997,12 @@ ggplot(data.gam, aes(x=fitted_values, y=response)) +
 ```{r}
 par(mar=c(4,4,4,4))
 par(oma=c(0.5,0.5,0.5,0.5))
-nrow(ex2)
-ex2$time <- 1:nrow(ex2)
-head(ex2)
 vc <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Chla)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=poisson(link="log"))
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-50,50))
 par(mfrow=c(1,1))
 ggGam(vc)
-summary(vc) # Deviance explained = 90.7%
+summary(vc) # Deviance explained = 90.7% 
 par(mfrow=c(2,2))
 gam.check(vc) 
 par(mfrow=c(1,1))
@@ -1023,11 +1012,11 @@ par(mfrow=c(1,1))
 
 ```{r}
 vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Chla)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=poisson(link="log"),method="GCV.Cp",select=TRUE)
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-50,50))
 par(mfrow=c(1,1))
-ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P, Chla, Flow, Rain
-summary(vc.shrink) # Deviance explained = 90.7%
+ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P, Chla, Flow, Rain 
+summary(vc.shrink) # Deviance explained = 90.6% 
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
@@ -1044,7 +1033,7 @@ ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
 ```
 
 
-#### 최종선택된 모형의 설명력 : 40.6%(다중선형회귀모형), 60.6%(일반화선형모형), 88.7%(일반화가법모형), 90.7%(시간에 따른 계수변화모형)  
+#### 최종선택된 모형의 설명력 : 40.6%(다중선형회귀모형), 60.6%(일반화선형모형), 88.7%(일반화가법모형), 90.6%(시간에 따른 계수변화모형)  
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
@@ -1055,7 +1044,7 @@ ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
 #### scaling data 사용
 
 ```{r}
-ex2 <- read.csv("C:/Users/stat/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
 ex2 <- ex2[,-1]
 ex2 <- as.data.frame(ex2)
 p1 <- ggplot(data=ex2,aes(x=pH,y=Chla)) + geom_point() + stat_smooth(method=lm)
@@ -1075,13 +1064,13 @@ p14 <- ggplot(data=ex2,aes(x=FC,y=Chla)) + geom_point() + stat_smooth(method=lm)
 p15 <- ggplot(data=ex2,aes(x=Flow,y=Chla)) + geom_point() + stat_smooth(method=lm)
 p16 <- ggplot(data=ex2,aes(x=Rain,y=Chla)) + geom_point() + stat_smooth(method=lm)
 grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,nrow=4,ncol=4)
-gfit <- glm(Chla~.,data=ex2,family=gaussian(link="identity"))
+gfit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+FC+NH3N+PO4P+TC+Flow+Rain,data=ex2,family=gaussian(link="identity"))
 summary(gfit) # Deviance explained: 0.7130  
 vif(gfit) 
 par(mfrow=c(2,2))
 plot(gfit)
 par(mfrow=c(1,1))
-dwtest(Chla~.,data=ex2) # 잔차가 양의 자기상관성을 가지고 있음.
+dwtest(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+FC+NH3N+PO4P+TC+Flow+Rain,data=ex2) # 잔차가 양의 자기상관성을 가지고 있음.
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
@@ -1151,7 +1140,7 @@ ggplot(data.glm, aes(x=fitted_values, y=response)) +
 ```{r}
 # GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
 mm <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2,family=Gamma(link="log"))
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
 par(mfrow=c(1,1))
 ggGam(mm)
@@ -1166,7 +1155,7 @@ par(mfrow=c(1,1))
 
 ```{r}
 mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2,family=Gamma(link="log"),method="GCV.Cp",select=TRUE) 
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
 par(mfrow=c(1,1))
 ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P, Rain 
@@ -1194,15 +1183,12 @@ ggplot(data.gam, aes(x=fitted_values, y=response)) +
 ```{r}
 par(mar=c(4,4,4,4))
 par(oma=c(0.5,0.5,0.5,0.5))
-nrow(ex2)
-ex2$time <- 1:nrow(ex2)
-head(ex2)
 vc <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=Gamma(link="log"))
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1])
 par(mfrow=c(1,1))
 ggGam(vc)
-summary(vc) # Deviance explained = 80.2% 
+summary(vc) # Deviance explained = 80.6%  
 par(mfrow=c(2,2))
 gam.check(vc) 
 par(mfrow=c(1,1))
@@ -1212,11 +1198,11 @@ par(mfrow=c(1,1))
 
 ```{r}
 vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=Gamma(link="log"),method="GCV.Cp",select=TRUE)
-par(mfrow=c(2,2))
+par(mfrow=c(1,2))
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1])
 par(mfrow=c(1,1))
-ggGam(vc.shrink) # 선택변수 : DO, BOD, SS, TN, TP, TOC, EC, NH3N, PO4P, Flow, Rain 
-summary(vc.shrink) # Deviance explained =   80% 
+ggGam(vc.shrink) # 선택변수 : DO, BOD, SS, TN, TP, TOC, EC, NH3N, PO4P, Flow, Rain  
+summary(vc.shrink) # Deviance explained = 80.2%    
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
@@ -1233,6 +1219,6 @@ ggplot(data.tvcm, aes(x=fitted_values, y=response)) +
 ```
 
 
-#### 최종선택된 모형의 설명력 : 71.2%(다중선형회귀모형), 69.0%(일반화선형모형), 79.2%(일반화가법모형), 80.0%(시간에 따른 계수변화모형) 
+#### 최종선택된 모형의 설명력 : 71.2%(다중선형회귀모형), 69.0%(일반화선형모형), 79.2%(일반화가법모형), 80.2%(시간에 따른 계수변화모형) 
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
