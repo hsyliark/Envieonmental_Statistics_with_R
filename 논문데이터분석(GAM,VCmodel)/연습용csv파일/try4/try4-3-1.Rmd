@@ -586,7 +586,7 @@ ggplot(data.gam, aes(x=response, y=fitted_values)) +
 par(mar=c(4,4,4,4))
 par(oma=c(0.5,0.5,0.5,0.5))
 vc <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=quasi(link="log"))
-plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-20,20))
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
 ggGam(vc)
 summary(vc) # Deviance explained = 80.5%  
 par(mfrow=c(2,2))
@@ -598,7 +598,7 @@ par(mfrow=c(1,1))
 
 ```{r}
 vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=quasi(link="log"),method="GCV.Cp",select=TRUE)
-plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-20,20))
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
 ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, EC, NH3N, PO4P, FC, Flow 
 summary(vc.shrink) # Deviance explained = 77.7%  
 par(mfrow=c(2,2))
@@ -1137,8 +1137,8 @@ par(mfrow=c(1,1))
 ```{r}
 mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2,family=quasi(link="log"),method="GCV.Cp",select=TRUE) 
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
-ggGam(mm.shrink) # 선택변수 : 
-summary(mm.shrink) # Deviance explained =  
+ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P, FC, Flow, Rain 
+summary(mm.shrink) # Deviance explained = 87.4%  
 concurvity(mm.shrink,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
@@ -1150,7 +1150,7 @@ par(mfrow=c(1,1))
 ```{r}
 pred.gam <- predict(mm.shrink,newdata=ex2,type="response")
 data.gam <- data.frame(response=ex2$Chla,fitted_values=pred.gam)
-sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response) # MSE =
+sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response) # MSE = 69.5277
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Generalized Additive Model)")
@@ -1163,9 +1163,9 @@ ggplot(data.gam, aes(x=response, y=fitted_values)) +
 par(mar=c(4,4,4,4))
 par(oma=c(0.5,0.5,0.5,0.5))
 vc <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=quasi(link="log"))
-plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-20,20))
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
 ggGam(vc)
-summary(vc) # Deviance explained =   
+summary(vc) # Deviance explained = 89.4%   
 par(mfrow=c(2,2))
 gam.check(vc) 
 par(mfrow=c(1,1))
@@ -1175,7 +1175,7 @@ par(mfrow=c(1,1))
 
 ```{r}
 vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=quasi(link="log"),method="GCV.Cp",select=TRUE)
-plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-20,20))
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
 ggGam(vc.shrink) # 선택변수 : 
 summary(vc.shrink) # Deviance explained =    
 par(mfrow=c(2,2))
