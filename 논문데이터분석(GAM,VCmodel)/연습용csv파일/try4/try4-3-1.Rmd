@@ -996,8 +996,8 @@ par(mfrow=c(1,1))
 ```{r}
 vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Chla)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=quasipoisson(link="log"),method="GCV.Cp",select=TRUE)
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
-ggGam(vc.shrink) # 선택변수 :  
-summary(vc.shrink) # Deviance explained =  
+ggGam(vc.shrink) # 선택변수 : pH, COD, SS, TN, TOC, WT, EC, TC, NH3N, PO4P, Chla, Flow, Rain  
+summary(vc.shrink) # Deviance explained = 86.8%  
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
@@ -1008,16 +1008,16 @@ par(mfrow=c(1,1))
 ```{r}
 pred.tvcm <- predict(vc.shrink,newdata=ex2,type="response")
 data.tvcm <- data.frame(response=ex2$FC,fitted_values=pred.tvcm)
-sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response) # MSE =
+sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response) # MSE = 330211
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
 ```
 
 
-#### 최종선택된 모형의 설명력(Deviance explained) : %(다중선형회귀모형), %(일반화선형모형), %(일반화가법모형), %(시간에 따른 계수변화모형) 
+#### 최종선택된 모형의 설명력(Deviance explained) : 40.6%(다중선형회귀모형), 60.6%(일반화선형모형), 87.1%(일반화가법모형), 86.8%(시간에 따른 계수변화모형) 
 
-#### 최종선택된 모형의 예측력(Mean Squared Error) : %(다중선형회귀모형), %(일반화선형모형), %(일반화가법모형), %(시간에 따른 계수변화모형)
+#### 최종선택된 모형의 예측력(Mean Squared Error) : 4042476(다중선형회귀모형), 2196318(일반화선형모형), 362007.2(일반화가법모형), 330211(시간에 따른 계수변화모형)
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
@@ -1048,7 +1048,7 @@ p15 <- ggplot(data=ex2,aes(x=Flow,y=Chla)) + geom_point() + stat_smooth(method=l
 p16 <- ggplot(data=ex2,aes(x=Rain,y=Chla)) + geom_point() + stat_smooth(method=lm)
 grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,nrow=4,ncol=4)
 gfit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+FC+NH3N+PO4P+TC+Flow+Rain,data=ex2,family=gaussian(link="identity"))
-summary(gfit) # Deviance explained:   
+summary(gfit) # Deviance explained: 0.7130   
 vif(gfit) 
 par(mfrow=c(2,2))
 plot(gfit)
@@ -1061,8 +1061,8 @@ dwtest(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+FC+NH3N+PO4P+TC+Flow+Rain,data=ex2)
 
 ```{r}
 gfit.step <- stepAIC(gfit, direction="both", trace=TRUE)
-gfit.step # 선택변수 :  
-summary(gfit.step) # Deviance explained:   
+gfit.step # 선택변수 : pH, DO, BOD, COD, TN, TP, WT, EC, NH3N, PO4P, Rain  
+summary(gfit.step) # Deviance explained: 0.7117   
 vif(gfit.step)  
 par(mfrow=c(2,2))
 plot(gfit.step)
@@ -1076,7 +1076,7 @@ dwtest(Chla~pH+DO+BOD+COD+TN+TP+WT+EC+NH3N+PO4P+Rain,data=ex2) # 잔차가 양�
 ```{r}
 pred.mlr <- predict(gfit.step,newdata=ex2,type="response")
 data.mlr <- data.frame(response=ex2$Chla,fitted_values=pred.mlr)
-sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response) # MSE =
+sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response) # MSE = 159.7184
 ggplot(data.mlr, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Multiple Linear Regression)")
@@ -1087,7 +1087,7 @@ ggplot(data.mlr, aes(x=response, y=fitted_values)) +
 
 ```{r}
 m <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+FC+NH3N+PO4P+TC+Flow+Rain,data=ex2,family=Gamma(link="log"))
-summary(m) # Deviance explained :  
+summary(m) # Deviance explained : 0.6920  
 vif(m) 
 par(mfrow=c(2,2))
 plot(m)
@@ -1098,8 +1098,8 @@ par(mfrow=c(1,1))
 
 ```{r}
 m.step <- stepAIC(m, direction="both", trace=TRUE)
-m.step # 선택변수 :  
-summary(m.step) # Deviance explained : 
+m.step # 선택변수 : pH, BOD, SS, TN, TP, TOC, EC, NH3N, PO4P, Rain  
+summary(m.step) # Deviance explained : 0.6870 
 vif(m.step) 
 par(mfrow=c(2,2))
 plot(m.step)
@@ -1111,7 +1111,7 @@ par(mfrow=c(1,1))
 ```{r}
 pred.glm <- predict(m.step,newdata=ex2,type="response")
 data.glm <- data.frame(response=ex2$Chla,fitted_values=pred.glm)
-sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response) # MSE =
+sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response) # MSE = 522.3904
 ggplot(data.glm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Generalized Linear Model)")
@@ -1125,7 +1125,7 @@ ggplot(data.glm, aes(x=response, y=fitted_values)) +
 mm <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2,family=quasi(link="log"))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
 ggGam(mm)
-summary(mm) # Deviance explained =  
+summary(mm) # Deviance explained = 87.7%  
 concurvity(mm,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm) # 적합결여 존재 (기저함수 부족)
