@@ -1176,8 +1176,8 @@ par(mfrow=c(1,1))
 ```{r}
 vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=quasi(link="log"),method="GCV.Cp",select=TRUE)
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
-ggGam(vc.shrink) # 선택변수 : 
-summary(vc.shrink) # Deviance explained =    
+ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, EC, NH3N, PO4P, Flow 
+summary(vc.shrink) # Deviance explained = 87.3%    
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
@@ -1188,15 +1188,15 @@ par(mfrow=c(1,1))
 ```{r}
 pred.tvcm <- predict(vc.shrink,newdata=ex2,type="response")
 data.tvcm <- data.frame(response=ex2$Chla,fitted_values=pred.tvcm)
-sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response) # MSE =
+sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response) # MSE = 70.10814
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
 ```
 
 
-#### 최종선택된 모형의 설명력(Deviance explained) : %(다중선형회귀모형), %(일반화선형모형), %(일반화가법모형), %(시간에 따른 계수변화모형) 
+#### 최종선택된 모형의 설명력(Deviance explained) : 71.2%(다중선형회귀모형), 69.0%(일반화선형모형), 87.4%(일반화가법모형), 87.3%(시간에 따른 계수변화모형) 
 
-#### 최종선택된 모형의 예측력(Mean Squared Error) : %(다중선형회귀모형), %(일반화선형모형), %(일반화가법모형), %(시간에 따른 계수변화모형)
+#### 최종선택된 모형의 예측력(Mean Squared Error) : 159.7184(다중선형회귀모형), 522.3904(일반화선형모형), 69.5277(일반화가법모형), 70.10814(시간에 따른 계수변화모형)
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
