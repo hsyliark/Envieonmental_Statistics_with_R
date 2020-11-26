@@ -32,7 +32,7 @@ par(oma=c(0.5,0.5,0.5,0.5))
 
 #### 변수 time은 2010년 1월 1일 기준으로 경과된 날짜를 계산하여 반영함.
 
-#### 모형의 설명력은 Deviance explained(다양한 형태의 모형을 비교하기 위해 R-square 통계량을 확장한 형태) 통계량 기준으로(산출된 값이 클수록 좋음.), 모형의 예측력은 MSE(Mean Squared Error) 통계량 기준으로 해석함(산출된 값이 작을수록 좋음.). 
+#### 모형의 설명력은 Deviance explained(다양한 형태의 모형을 비교하기 위해 R-square 통계량을 확장한 형태) 통계량 기준으로(산출된 값이 클수록 좋음.), 모형의 예측력은 RMSE(Root Mean Squared Error) 통계량 기준으로 해석함(산출된 값이 작을수록 좋음.). 
 
 #### 환경데이터에서는 분산이 평균보다 큰 과분포(overdispersion) 현상이 자주 발생함. 이에 따라 GAM, TVCM 모형에 대해서는 Quasi Distribution을 적용함.
 
@@ -136,9 +136,12 @@ dwtest(TC~DO+BOD+COD+SS+TN+TP+WT+Chla+FC,data=ex1) # 잔차가 양의 자기상�
 #### response vs fitted_values
 
 ```{r}
-pred.mlr <- predict(fit.step,newdata=ex1,type="response")
-data.mlr <- data.frame(response=ex1$TC,fitted_values=pred.mlr)
-sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response) # MSE = 508449377  
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.mlr <- predict(fit.step,newdata=ex1_1,type="response")
+data.mlr <- data.frame(response=ex1_1$TC,fitted_values=pred.mlr)
+sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE =   
 ggplot(data.mlr, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Multiple Linear Regression)")
@@ -171,9 +174,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.glm <- predict(m.step,newdata=ex1,type="response")
-data.glm <- data.frame(response=ex1$TC,fitted_values=pred.glm)
-sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response) # MSE = 689792898 
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.glm <- predict(m.step,newdata=ex1_1,type="response")
+data.glm <- data.frame(response=ex1_1$TC,fitted_values=pred.glm)
+sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE =  
 ggplot(data.glm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Generalized Linear Model)")
@@ -210,9 +216,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.gam <- predict(mm.shrink,newdata=ex1,type="response")
-data.gam <- data.frame(response=ex1$TC,fitted_values=pred.gam)
-sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response) # MSE = 189284707 
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.gam <- predict(mm.shrink,newdata=ex1_1,type="response")
+data.gam <- data.frame(response=ex1_1$TC,fitted_values=pred.gam)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE =  
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Generalized Additive Model)")
@@ -248,9 +257,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.tvcm <- predict(vc.shrink,newdata=ex1,type="response")
-data.tvcm <- data.frame(response=ex1$TC,fitted_values=pred.tvcm)
-sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response) # MSE = 153730821 
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.tvcm <- predict(vc.shrink,newdata=ex1_1,type="response")
+data.tvcm <- data.frame(response=ex1_1$TC,fitted_values=pred.tvcm)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
@@ -259,7 +271,7 @@ ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
 
 #### 최종선택된 모형의 설명력(Deviance explained) : 65.2%(다중선형회귀모형), 62.1%(일반화선형모형), 87.2%(일반화가법모형), 86.8%(시간에 따른 계수변화모형) 
 
-#### 최종선택된 모형의 예측력(Mean Squared Error) : 508449377(다중선형회귀모형), 689792898(일반화선형모형), 189284707(일반화가법모형), 153730821(시간에 따른 계수변화모형)
+#### 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형), (일반화가법모형), (시간에 따른 계수변화모형)
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
@@ -316,9 +328,12 @@ dwtest(FC~BOD+TOC+WT+EC+TC+NH3N,data=ex1) # 잔차가 양의 자기상관성을 
 #### response vs fitted_values
 
 ```{r}
-pred.mlr <- predict(fit.step,newdata=ex1,type="response")
-data.mlr <- data.frame(response=ex1$FC,fitted_values=pred.mlr)
-sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response) # MSE = 54327884
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.mlr <- predict(fit.step,newdata=ex1_1,type="response")
+data.mlr <- data.frame(response=ex1_1$FC,fitted_values=pred.mlr)
+sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE = 
 ggplot(data.mlr, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Multiple Linear Regression)")
@@ -351,9 +366,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.glm <- predict(m.step,newdata=ex1,type="response")
-data.glm <- data.frame(response=ex1$FC,fitted_values=pred.glm)
-sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response) # MSE = 68413583 
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.glm <- predict(m.step,newdata=ex1_1,type="response")
+data.glm <- data.frame(response=ex1_1$FC,fitted_values=pred.glm)
+sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE = 
 ggplot(data.glm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Generalized Linear Model)")
@@ -390,9 +408,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.gam <- predict(mm.shrink,newdata=ex1,type="response")
-data.gam <- data.frame(response=ex1$FC,fitted_values=pred.gam)
-sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response) # MSE = 8020085 
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.gam <- predict(mm.shrink,newdata=ex1_1,type="response")
+data.gam <- data.frame(response=ex1_1$FC,fitted_values=pred.gam)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Generalized Additive Model)")
@@ -428,9 +449,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.tvcm <- predict(vc.shrink,newdata=ex1,type="response")
-data.tvcm <- data.frame(response=ex1$FC,fitted_values=pred.tvcm)
-sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response) # MSE = 8817523 
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.tvcm <- predict(vc.shrink,newdata=ex1_1,type="response")
+data.tvcm <- data.frame(response=ex1_1$FC,fitted_values=pred.tvcm)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE =  
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
@@ -439,7 +463,7 @@ ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
 
 #### 최종선택된 모형의 설명력(Deviance explanied) : 62.1%(다중선형회귀모형), 69.7%(일반화선형모형), 92.1%(일반화가법모형), 91.3%(시간에 따른 계수변화모형) 
 
-#### 최종선택된 모형의 예측력(Mean Squared Error) : 54327884(다중선형회귀모형), 68413583(일반화선형모형), 8020085(일반화가법모형), 8817523(시간에 따른 계수변화모형)
+#### 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형), (일반화가법모형), (시간에 따른 계수변화모형)
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
@@ -497,9 +521,12 @@ dwtest(Chla~pH+DO+BOD+COD+SS+TP+TOC+WT+TC+NH3N+PO4P,data=ex1) # 잔차가 양의
 #### response vs fitted_values
 
 ```{r}
-pred.mlr <- predict(fit.step,newdata=ex1,type="response")
-data.mlr <- data.frame(response=ex1$Chla,fitted_values=pred.mlr)
-sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response) # MSE = 385.3183 
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.mlr <- predict(fit.step,newdata=ex1_1,type="response")
+data.mlr <- data.frame(response=ex1_1$Chla,fitted_values=pred.mlr)
+sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE =  
 ggplot(data.mlr, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Multiple Linear Regression)")
@@ -532,9 +559,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.glm <- predict(m.step,newdata=ex1,type="response")
-data.glm <- data.frame(response=ex1$Chla,fitted_values=pred.glm)
-sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response) # MSE = 955.7093
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.glm <- predict(m.step,newdata=ex1_1,type="response")
+data.glm <- data.frame(response=ex1_1$Chla,fitted_values=pred.glm)
+sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE = 
 ggplot(data.glm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Generalized Linear Model)")
@@ -571,9 +601,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.gam <- predict(mm.shrink,newdata=ex1,type="response")
-data.gam <- data.frame(response=ex1$Chla,fitted_values=pred.gam)
-sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response) # MSE = 260.9037 
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.gam <- predict(mm.shrink,newdata=ex1_1,type="response")
+data.gam <- data.frame(response=ex1_1$Chla,fitted_values=pred.gam)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Generalized Additive Model)")
@@ -609,9 +642,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.tvcm <- predict(vc.shrink,newdata=ex1,type="response")
-data.tvcm <- data.frame(response=ex1$Chla,fitted_values=pred.tvcm)
-sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response) # MSE = 249.6875 
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.tvcm <- predict(vc.shrink,newdata=ex1_1,type="response")
+data.tvcm <- data.frame(response=ex1_1$Chla,fitted_values=pred.tvcm)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
@@ -620,7 +656,7 @@ ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
 
 #### 최종선택된 모형의 설명력(Deviance explained) : 65.6%(다중선형회귀모형), 60.2%(일반화선형모형), 76.7%(일반화가법모형), 77.7%(시간에 따른 계수변화모형) 
 
-#### 최종선택된 모형의 예측력(Mean Squared Error) : 385.3183(다중선형회귀모형), 955.7093(일반화선형모형), 260.9037(일반화가법모형), 249.6875(시간에 따른 계수변화모형)
+#### 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형), (일반화가법모형), (시간에 따른 계수변화모형)
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
@@ -715,9 +751,12 @@ dwtest(TC~DO+TP+WT+EC+FC+Flow,data=ex2) # 잔차가 양의 자기상관성을 �
 #### response vs fitted_values
 
 ```{r}
-pred.mlr <- predict(gfit.step,newdata=ex2,type="response")
-data.mlr <- data.frame(response=ex2$TC,fitted_values=pred.mlr)
-sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response) # MSE = 56031284
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.mlr <- predict(gfit.step,newdata=ex2_1,type="response")
+data.mlr <- data.frame(response=ex2_1$TC,fitted_values=pred.mlr)
+sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE = 
 ggplot(data.mlr, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Multiple Linear Regression)")
@@ -750,9 +789,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.glm <- predict(m.step,newdata=ex2,type="response")
-data.glm <- data.frame(response=ex2$TC,fitted_values=pred.glm)
-sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response) # MSE = 66313189
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.glm <- predict(m.step,newdata=ex2_1,type="response")
+data.glm <- data.frame(response=ex2_1$TC,fitted_values=pred.glm)
+sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE = 
 ggplot(data.glm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Generalized Linear Model)")
@@ -788,9 +830,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.gam <- predict(mm.shrink,newdata=ex2,type="response")
-data.gam <- data.frame(response=ex2$TC,fitted_values=pred.gam)
-sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response) # MSE = 31328586
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.gam <- predict(mm.shrink,newdata=ex2_1,type="response")
+data.gam <- data.frame(response=ex2_1$TC,fitted_values=pred.gam)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Generalized Additive Model)")
@@ -826,9 +871,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.tvcm <- predict(vc.shrink,newdata=ex2,type="response")
-data.tvcm <- data.frame(response=ex2$TC,fitted_values=pred.tvcm)
-sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response) # MSE = 25575507
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.tvcm <- predict(vc.shrink,newdata=ex2_1,type="response")
+data.tvcm <- data.frame(response=ex2_1$TC,fitted_values=pred.tvcm)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
@@ -837,7 +885,7 @@ ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
 
 #### 최종선택된 모형의 설명력(Deviance explained) : 49.5%(다중선형회귀모형), 42.1%(일반화선형모형), 72.8%(일반화가법모형), 73.4%(시간에 따른 계수변화모형)
 
-#### 최종선택된 모형의 예측력(Mean Squared Error) : 56031284(다중선형회귀모형), 66313189(일반화선형모형), 31328586(일반화가법모형), 25575507(시간에 따른 계수변화모형)
+#### 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형), (일반화가법모형), (시간에 따른 계수변화모형)
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
@@ -895,9 +943,12 @@ dwtest(FC~TC+Rain,data=ex2) # 잔차가 양의 자기상관성을 가지고 있�
 #### response vs fitted_values
 
 ```{r}
-pred.mlr <- predict(gfit.step,newdata=ex2,type="response")
-data.mlr <- data.frame(response=ex2$FC,fitted_values=pred.mlr)
-sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response) # MSE = 4042476
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.mlr <- predict(gfit.step,newdata=ex2_1,type="response")
+data.mlr <- data.frame(response=ex2_1$FC,fitted_values=pred.mlr)
+sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE = 
 ggplot(data.mlr, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Multiple Linear Regression)")
@@ -930,9 +981,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.glm <- predict(m.step,newdata=ex2,type="response")
-data.glm <- data.frame(response=ex2$FC,fitted_values=pred.glm)
-sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response) # MSE = 2196318
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.glm <- predict(m.step,newdata=ex2_1,type="response")
+data.glm <- data.frame(response=ex2_1$FC,fitted_values=pred.glm)
+sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE = 
 ggplot(data.glm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Generalized Linear Model)")
@@ -968,9 +1022,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.gam <- predict(mm.shrink,newdata=ex2,type="response")
-data.gam <- data.frame(response=ex2$FC,fitted_values=pred.gam)
-sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response) # MSE = 362007.2
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.gam <- predict(mm.shrink,newdata=ex2_1,type="response")
+data.gam <- data.frame(response=ex2_1$FC,fitted_values=pred.gam)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Generalized Additive Model)")
@@ -1006,9 +1063,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.tvcm <- predict(vc.shrink,newdata=ex2,type="response")
-data.tvcm <- data.frame(response=ex2$FC,fitted_values=pred.tvcm)
-sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response) # MSE = 330211
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.tvcm <- predict(vc.shrink,newdata=ex2_1,type="response")
+data.tvcm <- data.frame(response=ex2_1$FC,fitted_values=pred.tvcm)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
@@ -1017,7 +1077,7 @@ ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
 
 #### 최종선택된 모형의 설명력(Deviance explained) : 40.6%(다중선형회귀모형), 60.6%(일반화선형모형), 87.1%(일반화가법모형), 86.8%(시간에 따른 계수변화모형) 
 
-#### 최종선택된 모형의 예측력(Mean Squared Error) : 4042476(다중선형회귀모형), 2196318(일반화선형모형), 362007.2(일반화가법모형), 330211(시간에 따른 계수변화모형)
+#### 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형), (일반화가법모형), (시간에 따른 계수변화모형)
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
@@ -1074,9 +1134,12 @@ dwtest(Chla~pH+DO+BOD+COD+TN+TP+WT+EC+NH3N+PO4P+Rain,data=ex2) # 잔차가 양�
 #### response vs fitted_values
 
 ```{r}
-pred.mlr <- predict(gfit.step,newdata=ex2,type="response")
-data.mlr <- data.frame(response=ex2$Chla,fitted_values=pred.mlr)
-sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response) # MSE = 159.7184
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.mlr <- predict(gfit.step,newdata=ex2_1,type="response")
+data.mlr <- data.frame(response=ex2_1$Chla,fitted_values=pred.mlr)
+sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE = 
 ggplot(data.mlr, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Multiple Linear Regression)")
@@ -1109,9 +1172,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.glm <- predict(m.step,newdata=ex2,type="response")
-data.glm <- data.frame(response=ex2$Chla,fitted_values=pred.glm)
-sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response) # MSE = 522.3904
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.glm <- predict(m.step,newdata=ex2_1,type="response")
+data.glm <- data.frame(response=ex2_1$Chla,fitted_values=pred.glm)
+sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE = 
 ggplot(data.glm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Generalized Linear Model)")
@@ -1148,9 +1214,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.gam <- predict(mm.shrink,newdata=ex2,type="response")
-data.gam <- data.frame(response=ex2$Chla,fitted_values=pred.gam)
-sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response) # MSE = 69.5277
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.gam <- predict(mm.shrink,newdata=ex2_1,type="response")
+data.gam <- data.frame(response=ex2_1$Chla,fitted_values=pred.gam)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Generalized Additive Model)")
@@ -1186,9 +1255,12 @@ par(mfrow=c(1,1))
 #### response vs fitted_values
 
 ```{r}
-pred.tvcm <- predict(vc.shrink,newdata=ex2,type="response")
-data.tvcm <- data.frame(response=ex2$Chla,fitted_values=pred.tvcm)
-sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response) # MSE = 70.10814
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.tvcm <- predict(vc.shrink,newdata=ex2_1,type="response")
+data.tvcm <- data.frame(response=ex2_1$Chla,fitted_values=pred.tvcm)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
@@ -1197,6 +1269,6 @@ ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
 
 #### 최종선택된 모형의 설명력(Deviance explained) : 71.2%(다중선형회귀모형), 69.0%(일반화선형모형), 87.4%(일반화가법모형), 87.3%(시간에 따른 계수변화모형) 
 
-#### 최종선택된 모형의 예측력(Mean Squared Error) : 159.7184(다중선형회귀모형), 522.3904(일반화선형모형), 69.5277(일반화가법모형), 70.10814(시간에 따른 계수변화모형)
+#### 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형), (일반화가법모형), (시간에 따른 계수변화모형)
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
