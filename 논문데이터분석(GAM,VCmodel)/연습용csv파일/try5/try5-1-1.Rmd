@@ -1,0 +1,1378 @@
+---
+title: "Example5-1-1"
+author: "Hwang Seong-Yun"
+date: '2020 11 30 '
+output: html_document
+---
+
+### 필요 패키지 
+
+```{r}
+library(tidyverse)
+library(mgcv)
+library(ggplot2)
+library(gridExtra)
+library(moonBook)
+library(ztable)
+library(survival)
+library(ggGam)
+library(corrplot)
+library(ggcorrplot)
+library(car)
+library(lmtest)
+library(fda)
+library(refund)
+library(MASS)
+library(boot)
+library(kohonen)
+library(SOMbrero)
+par(mar=c(4,4,4,4))
+par(oma=c(0.5,0.5,0.5,0.5))
+```
+
+#### 다중선형회귀모형 적용 시 TC, FC, Chla의 예측값이 음수가 나오는 경우가 발생할 수 있음. 이에 따라 변수의 특성에 맞는 분포를 가정해서 모형을 적합할 필요가 있음.
+
+#### 변수 time은 2010년 1월 1일 기준으로 경과된 날짜를 계산하여 반영함.
+
+#### 모형의 설명력은 Deviance explained(다양한 형태의 모형을 비교하기 위해 R-square 통계량을 확장한 형태) 통계량 기준으로(산출된 값이 클수록 좋음.), 모형의 예측력은 RMSE(Root Mean Squared Error) 통계량 기준으로 해석함(산출된 값이 작을수록 좋음.). 
+
+#### 환경데이터에서는 분산이 평균보다 큰 과분포(overdispersion) 현상이 자주 발생함. 이에 따라 GAM, TVCM 모형에 대해서는 Quasi Distribution을 적용함.
+
+#### TC, FC의 경우는 셀 수 있는 변수(counting variable)이므로 포아송분포를 적용하되 다음과 같이 분포를 가정함. -> GLM : poisson / GAM, TVCM : quasipoisson
+
+#### Chla의 경우는 양의 실수값만을 가지므로(positive real number) GLM 적용 시 감마분포를 적용하지만 그 분포의 형태를 확실히 규정짓기 어려우므로 다음과 같이 분포를 가정함. -> GLM : Gamma / GAM, TVCM : quasi
+
+#### Poisson Distribution : https://en.wikipedia.org/wiki/Poisson_distribution 
+
+#### Gamma Distribution : https://en.wikipedia.org/wiki/Gamma_distribution
+
+#### Quasi Distribution : https://en.wikipedia.org/wiki/Quasiprobability_distribution, https://m.blog.naver.com/jinp7/222041237039
+
+#### Quasi 분포는 과분포(overdispersion) 현상이 있거나 분포를 규정짓기 어려운 경우에 적용할 수 있음. 
+
+
+### 사용데이터 : 광산 지점 데이터
+
+#### 모니터링 기간 : 2010~2019년 (일별 주단위자료) 
+
+#### 반응변수 : Chla, TC, FC
+
+#### 설명변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, Flow, Rain, TC, FC (반응변수 제외)
+
+#### 상관분석이나 모형적합 시 각 수질항목의 원값을 그대로 사용하여 표현하는 것이 모형의 설명력이나 예측력 비교 등의 측면에서 더 적절할 수 있다고 판단하여 표준화를 하지 않았음.
+
+
+
+
+### Correlation Analysis
+
+```{r}
+ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- ex1[,-1]
+X1 <- round(cor(ex1[,-18], method='spearman'),4) 
+corrplot(X1)
+p.mat1 <- cor_pmat(ex1[,-18], method='spearman')
+ggcorrplot(X1, hc.order=T, type="lower", lab=T) +
+  ggtitle("Correlation plot(Spearman) for water quality data") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+ggcorrplot(X1, hc.order=T, type="lower", p.mat=p.mat1) +
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+```
+
+
+
+### SOM(Self-Organizing Map) pattern
+
+```{r}
+ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- ex1[,-1]
+ex1 <- as.data.frame(ex1)
+ex1_matrix <- as.matrix(ex1)
+som_grid <- somgrid(xdim=17, ydim=30, topo="hexagonal")
+som_model <- som(ex1_matrix, grid=som_grid)
+coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
+par(mfrow=c(1,2))
+for (i in 1:17) {
+  plot(som_model, type="property", property=getCodes(som_model)[,i], 
+       main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}
+par(mfrow=c(1,1))
+```
+
+
+
+### Dependent(Response) variable : TC
+
+### Multiple Linear Regression
+
+```{r}
+ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- ex1[,-1]
+ex1 <- as.data.frame(ex1)
+p1 <- ggplot(data=ex1,aes(x=pH,y=TC)) + geom_point() + stat_smooth(method=lm)
+p2 <- ggplot(data=ex1,aes(x=DO,y=TC)) + geom_point() + stat_smooth(method=lm)
+p3 <- ggplot(data=ex1,aes(x=BOD,y=TC)) + geom_point() + stat_smooth(method=lm)
+p4 <- ggplot(data=ex1,aes(x=COD,y=TC)) + geom_point() + stat_smooth(method=lm)
+p5 <- ggplot(data=ex1,aes(x=SS,y=TC)) + geom_point() + stat_smooth(method=lm)
+p6 <- ggplot(data=ex1,aes(x=TN,y=TC)) + geom_point() + stat_smooth(method=lm)
+p7 <- ggplot(data=ex1,aes(x=TP,y=TC)) + geom_point() + stat_smooth(method=lm)
+p8 <- ggplot(data=ex1,aes(x=TOC,y=TC)) + geom_point() + stat_smooth(method=lm)
+p9 <- ggplot(data=ex1,aes(x=WT,y=TC)) + geom_point() + stat_smooth(method=lm)
+p10 <- ggplot(data=ex1,aes(x=EC,y=TC)) + geom_point() + stat_smooth(method=lm)
+p11 <- ggplot(data=ex1,aes(x=Chla,y=TC)) + geom_point() + stat_smooth(method=lm)
+p12 <- ggplot(data=ex1,aes(x=NH3N,y=TC)) + geom_point() + stat_smooth(method=lm)
+p13 <- ggplot(data=ex1,aes(x=PO4P,y=TC)) + geom_point() + stat_smooth(method=lm)
+p14 <- ggplot(data=ex1,aes(x=FC,y=TC)) + geom_point() + stat_smooth(method=lm)
+p15 <- ggplot(data=ex1,aes(x=Flow,y=TC)) + geom_point() + stat_smooth(method=lm)
+p16 <- ggplot(data=ex1,aes(x=Rain,y=TC)) + geom_point() + stat_smooth(method=lm)
+grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,nrow=4,ncol=4)
+fit <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+FC+Flow+Rain,data=ex1,family=gaussian(link="identity"))
+summary(fit) # Deviance explained: 0.6548  
+vif(fit) # 다중공선성(multicollinearity) 존재
+par(mfrow=c(2,2))
+plot(fit)
+par(mfrow=c(1,1))
+dwtest(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+FC+Flow+Rain,data=ex1) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+fit.step <- stepAIC(fit, direction="both", trace=TRUE)
+fit.step # 선택변수 : DO, BOD, COD, SS, TN, TP, WT, Chla, FC 
+summary(fit.step) # Deviance explained: 0.6524  
+vif(fit.step) 
+par(mfrow=c(2,2))
+plot(fit.step)
+par(mfrow=c(1,1))
+dwtest(TC~DO+BOD+COD+SS+TN+TP+WT+Chla+FC,data=ex1) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### response vs fitted_values
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.mlr <- predict(fit.step,newdata=ex1_1,type="response")
+data.mlr <- data.frame(response=ex1_1$TC,fitted_values=pred.mlr,time=ex1_1$time)
+sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE = 20221.02   
+ggplot(data.mlr, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Multiple Linear Regression)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.mlr$time,data.mlr$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Multiple Linear Regression)")
+lines(data.mlr$time,data.mlr$response,type='o',col='blue')
+legend(3650,120000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+
+### Generalized Linear Model
+
+```{r}
+m <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+FC+Flow+Rain,data=ex1,family=poisson(link="log"))
+summary(m) # Deviance explained : 0.6208 
+vif(m) # 다중공선성(multicollinearity) 존재
+par(mfrow=c(2,2))
+plot(m)
+par(mfrow=c(1,1))
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+m.step <- stepAIC(m, direction="both", trace=TRUE)
+m.step # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, FC, Flow, Rain 
+summary(m.step) # Deviance explained : 0.6208 
+vif(m.step) # 다중공선성(multicollinearity) 존재 
+par(mfrow=c(2,2))
+plot(m.step)
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.glm <- predict(m.step,newdata=ex1_1,type="response")
+data.glm <- data.frame(response=ex1_1$TC,fitted_values=pred.glm,time=ex1_1$time)
+sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE = 28138.29  
+ggplot(data.glm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Linear Model)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.glm$time,data.glm$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Generalized Linear Model)")
+lines(data.glm$time,data.glm$response,type='o',col='blue')
+legend(3650,150000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+
+### Generalized Additive Model
+
+```{r}
+# GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
+mm <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1,family=quasipoisson(link="log"))
+plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+ggGam(mm)
+summary(mm) # Deviance explained = 87.3% 
+concurvity(mm,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+mm.shrink <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1,family=quasipoisson(link="log"),method="GCV.Cp",select=TRUE) 
+plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+ggGam(mm.shrink) # 선택변수 : pH, DO, COD, SS, TN, TP, TOC, WT, EC, Chla, PO4P, FC, Flow, Rain 
+summary(mm.shrink) # Deviance explained = 87.2% 
+concurvity(mm.shrink,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.gam <- predict(mm.shrink,newdata=ex1_1,type="response")
+data.gam <- data.frame(response=ex1_1$TC,fitted_values=pred.gam,time=ex1_1$time)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 24703.02  
+ggplot(data.gam, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Additive Model)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.gam$time,data.gam$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Generalized Additive Model)")
+lines(data.gam$time,data.gam$response,type='o',col='blue')
+legend(3650,150000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+
+### Time Varying Coefficient Model
+
+```{r}
+par(mar=c(4,4,4,4))
+par(oma=c(0.5,0.5,0.5,0.5))
+vc <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=quasipoisson(link="log"))
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
+ggGam(vc)
+summary(vc) # Deviance explained = 88.9%  
+par(mfrow=c(2,2))
+gam.check(vc) 
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+vc.shrink <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=quasipoisson(link="log"),method="GCV.Cp",select=TRUE)
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
+ggGam(vc.shrink) # 선택변수 : DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, FC, Flow, Rain  
+summary(vc.shrink) # Deviance explained = 86.8%  
+par(mfrow=c(2,2))
+gam.check(vc.shrink) 
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.tvcm <- predict(vc.shrink,newdata=ex1_1,type="response")
+data.tvcm <- data.frame(response=ex1_1$TC,fitted_values=pred.tvcm,time=ex1_1$time)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 92907.23 
+ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Time Varying Coefficient Model)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.tvcm$time,data.tvcm$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Time Varying Coefficient Model)")
+lines(data.tvcm$time,data.tvcm$response,type='o',col='blue')
+legend(3650,5e+05,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+
+#### 최종선택된 모형의 설명력(Deviance explained) : 65.2%(다중선형회귀모형), 62.1%(일반화선형모형), 87.2%(일반화가법모형), 86.8%(시간에 따른 계수변화모형) 
+
+#### 최종선택된 모형의 예측력(Root Mean Squared Error) : 20221.02(다중선형회귀모형), 28138.29(일반화선형모형), 24703.02(일반화가법모형), 92907.23(시간에 따른 계수변화모형)
+
+#### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
+
+#### RMSE의 경우 MLR이 가장 작게 나왔다. 하지만, MLR의 경우 적절한 확률분포를 가정하고 있지 않고 있고 TC의 예측값을 음수로 추정해주는 과오를 범하고 있기 때문에 최적의 모형이라고 할 수는 없다. 그리고 GLM, GAM, TVCM의 경우 예측값을 과대 또는 과소추정하는 경우가 있어서 RMSE의 기준으로 과소평가를 받을 수 있기 때문에 x축과 y축의 범위를 동일하게 조절한 산점도를 볼 필요가 있겠다.
+
+```{r}
+ggplot(data.mlr, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Multiple Linear Regression)") +
+  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+ggplot(data.glm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Linear Model)") +
+  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+ggplot(data.gam, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Additive Model)") +
+  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Time Varying Coefficient Model)") +
+  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+```
+
+#### 추가로 time vs TC 그래프에 대해서도 y축 범위를 통일시켜 그려보면 다음과 같다.
+
+```{r}
+par(mfrow=c(1,1))
+plot(data.mlr$time,data.mlr$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Multiple Linear Regression)",ylim=c(-40000,5e+05))
+lines(data.mlr$time,data.mlr$response,type='o',col='blue')
+legend(3650,5e+05,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+plot(data.glm$time,data.glm$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Generalized Linear Model)",ylim=c(-40000,5e+05))
+lines(data.glm$time,data.glm$response,type='o',col='blue')
+legend(3650,5e+05,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+plot(data.gam$time,data.gam$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Generalized Additive Model)",ylim=c(-40000,5e+05))
+lines(data.gam$time,data.gam$response,type='o',col='blue')
+legend(3650,5e+05,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+plot(data.tvcm$time,data.tvcm$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Time Varying Coefficient Model)",ylim=c(-40000,5e+05))
+lines(data.tvcm$time,data.tvcm$response,type='o',col='blue')
+legend(3650,5e+05,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+
+
+### Dependent(Response) variable : FC
+
+### Multiple Linear Regression
+
+```{r}
+ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- ex1[,-1]
+ex1 <- as.data.frame(ex1)
+p1 <- ggplot(data=ex1,aes(x=pH,y=FC)) + geom_point() + stat_smooth(method=lm)
+p2 <- ggplot(data=ex1,aes(x=DO,y=FC)) + geom_point() + stat_smooth(method=lm)
+p3 <- ggplot(data=ex1,aes(x=BOD,y=FC)) + geom_point() + stat_smooth(method=lm)
+p4 <- ggplot(data=ex1,aes(x=COD,y=FC)) + geom_point() + stat_smooth(method=lm)
+p5 <- ggplot(data=ex1,aes(x=SS,y=FC)) + geom_point() + stat_smooth(method=lm)
+p6 <- ggplot(data=ex1,aes(x=TN,y=FC)) + geom_point() + stat_smooth(method=lm)
+p7 <- ggplot(data=ex1,aes(x=TP,y=FC)) + geom_point() + stat_smooth(method=lm)
+p8 <- ggplot(data=ex1,aes(x=TOC,y=FC)) + geom_point() + stat_smooth(method=lm)
+p9 <- ggplot(data=ex1,aes(x=WT,y=FC)) + geom_point() + stat_smooth(method=lm)
+p10 <- ggplot(data=ex1,aes(x=EC,y=FC)) + geom_point() + stat_smooth(method=lm)
+p11 <- ggplot(data=ex1,aes(x=Chla,y=FC)) + geom_point() + stat_smooth(method=lm)
+p12 <- ggplot(data=ex1,aes(x=NH3N,y=FC)) + geom_point() + stat_smooth(method=lm)
+p13 <- ggplot(data=ex1,aes(x=PO4P,y=FC)) + geom_point() + stat_smooth(method=lm)
+p14 <- ggplot(data=ex1,aes(x=TC,y=FC)) + geom_point() + stat_smooth(method=lm)
+p15 <- ggplot(data=ex1,aes(x=Flow,y=FC)) + geom_point() + stat_smooth(method=lm)
+p16 <- ggplot(data=ex1,aes(x=Rain,y=FC)) + geom_point() + stat_smooth(method=lm)
+grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,nrow=4,ncol=4)
+fit <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+TC+Flow+Rain,data=ex1,family=gaussian(link="identity"))
+summary(fit) # Deviance explained:  0.6260
+vif(fit) # 다중공선성(multicollinearity) 존재
+par(mfrow=c(2,2))
+plot(fit)
+par(mfrow=c(1,1))
+dwtest(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+TC+Flow+Rain,data=ex1) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+fit.step <- stepAIC(fit, direction="both", trace=TRUE)
+fit.step # 선택변수 : BOD, TOC, WT, EC, NH3N, TC 
+summary(fit.step) # Deviance explained: 0.6211  
+vif(fit.step) 
+par(mfrow=c(2,2))
+plot(fit.step)
+par(mfrow=c(1,1))
+dwtest(FC~BOD+TOC+WT+EC+TC+NH3N,data=ex1) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### response vs fitted_values
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.mlr <- predict(fit.step,newdata=ex1_1,type="response")
+data.mlr <- data.frame(response=ex1_1$FC,fitted_values=pred.mlr)
+sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE = 
+ggplot(data.mlr, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Multiple Linear Regression)")
+```
+
+
+### Generalized Linear Model
+
+```{r}
+m <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+TC+Flow+Rain,data=ex1,family=poisson(link="log"))
+summary(m) # Deviance explained : 0.6968 
+vif(m) # 다중공선성(multicollinearity) 존재
+par(mfrow=c(2,2))
+plot(m)
+par(mfrow=c(1,1))
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+m.step <- stepAIC(m, direction="both", trace=TRUE)
+m.step # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, TC, Flow, Rain 
+summary(m.step) # Deviance explained : 0.6968 
+vif(m.step) # 다중공선성(multicollinearity) 존재 
+par(mfrow=c(2,2))
+plot(m.step)
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.glm <- predict(m.step,newdata=ex1_1,type="response")
+data.glm <- data.frame(response=ex1_1$FC,fitted_values=pred.glm)
+sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE = 
+ggplot(data.glm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Linear Model)")
+```
+
+
+### Generalized Additive Model
+
+```{r}
+# GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
+mm <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(TC)+s(Flow)+s(Rain),data=ex1,family=quasipoisson(link="log"))
+plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+ggGam(mm)
+summary(mm) # Deviance explained = 91.7% 
+concurvity(mm,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+mm.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(TC)+s(Flow)+s(Rain),data=ex1,family=quasipoisson(link="log"),method="GCV.Cp",select=TRUE) 
+plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, EC, NH3N, PO4P, TC, Flow, Rain 
+summary(mm.shrink) # Deviance explained = 92.1% 
+concurvity(mm.shrink,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.gam <- predict(mm.shrink,newdata=ex1_1,type="response")
+data.gam <- data.frame(response=ex1_1$FC,fitted_values=pred.gam)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 
+ggplot(data.gam, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Additive Model)")
+```
+
+
+### Time Varying Coefficient Model
+
+```{r}
+par(mar=c(4,4,4,4))
+par(oma=c(0.5,0.5,0.5,0.5))
+vc <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=quasipoisson(link="log"))
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
+ggGam(vc)
+summary(vc) # Deviance explained = 93.7%  
+par(mfrow=c(2,2))
+gam.check(vc) 
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=quasipoisson(link="log"),method="GCV.Cp",select=TRUE)
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40)) 
+ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, Chla, NH3N, PO4P, Flow, Rain   
+summary(vc.shrink) # Deviance explained = 91.3%
+par(mfrow=c(2,2))
+gam.check(vc.shrink) 
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.tvcm <- predict(vc.shrink,newdata=ex1_1,type="response")
+data.tvcm <- data.frame(response=ex1_1$FC,fitted_values=pred.tvcm)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE =  
+ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
+```
+
+
+#### 최종선택된 모형의 설명력(Deviance explanied) : 62.1%(다중선형회귀모형), 69.7%(일반화선형모형), 92.1%(일반화가법모형), 91.3%(시간에 따른 계수변화모형) 
+
+#### 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형), (일반화가법모형), (시간에 따른 계수변화모형)
+
+#### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
+
+
+
+### Dependent(Response) variable : Chla
+
+### Multiple Linear Regression
+
+```{r}
+ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- ex1[,-1]
+ex1 <- as.data.frame(ex1)
+p1 <- ggplot(data=ex1,aes(x=pH,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p2 <- ggplot(data=ex1,aes(x=DO,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p3 <- ggplot(data=ex1,aes(x=BOD,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p4 <- ggplot(data=ex1,aes(x=COD,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p5 <- ggplot(data=ex1,aes(x=SS,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p6 <- ggplot(data=ex1,aes(x=TN,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p7 <- ggplot(data=ex1,aes(x=TP,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p8 <- ggplot(data=ex1,aes(x=TOC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p9 <- ggplot(data=ex1,aes(x=WT,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p10 <- ggplot(data=ex1,aes(x=EC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p11 <- ggplot(data=ex1,aes(x=TC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p12 <- ggplot(data=ex1,aes(x=NH3N,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p13 <- ggplot(data=ex1,aes(x=PO4P,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p14 <- ggplot(data=ex1,aes(x=FC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p15 <- ggplot(data=ex1,aes(x=Flow,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p16 <- ggplot(data=ex1,aes(x=Rain,y=Chla)) + geom_point() + stat_smooth(method=lm)
+grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,nrow=4,ncol=4)
+fit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+FC+NH3N+PO4P+TC+Flow+Rain,data=ex1,family=gaussian(link="identity"))
+summary(fit) # Deviance explained: 0.6581    
+vif(fit) # 다중공선성(multicollinearity) 존재
+par(mfrow=c(2,2))
+plot(fit)
+par(mfrow=c(1,1))
+dwtest(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+FC+NH3N+PO4P+TC+Flow+Rain,data=ex1) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+fit.step <- stepAIC(fit, direction="both", trace=TRUE)
+fit.step # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, NH3N, PO4P, TC  
+summary(fit.step) # Deviance explained: 0.6560     
+vif(fit.step) # 다중공선성(multicollinearity) 존재 
+par(mfrow=c(2,2))
+plot(fit.step)
+par(mfrow=c(1,1))
+dwtest(Chla~pH+DO+BOD+COD+SS+TP+TOC+WT+TC+NH3N+PO4P,data=ex1) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### response vs fitted_values
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.mlr <- predict(fit.step,newdata=ex1_1,type="response")
+data.mlr <- data.frame(response=ex1_1$Chla,fitted_values=pred.mlr)
+sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE =  
+ggplot(data.mlr, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Multiple Linear Regression)")
+```
+
+
+### Generalized Linear Model
+
+```{r}
+m <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+FC+NH3N+PO4P+TC+Flow+Rain,data=ex1,family=Gamma(link="log"))
+summary(m) # Deviance explained : 0.6067  
+vif(m) # 다중공선성(multicollinearity) 존재
+par(mfrow=c(2,2))
+plot(m)
+par(mfrow=c(1,1))
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+m.step <- stepAIC(m, direction="both", trace=TRUE)
+m.step # 선택변수 : DO, BOD, SS, TP, TOC, WT, PO4P, TC, Rain  
+summary(m.step) # Deviance explained : 0.6024  
+vif(m.step) # 다중공선성(multicollinearity) 존재 
+par(mfrow=c(2,2))
+plot(m.step)
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.glm <- predict(m.step,newdata=ex1_1,type="response")
+data.glm <- data.frame(response=ex1_1$Chla,fitted_values=pred.glm)
+sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE = 
+ggplot(data.glm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Linear Model)")
+```
+
+
+### Generalized Additive Model
+
+```{r}
+# GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
+mm <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1,family=quasi(link="log"))
+plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+ggGam(mm)
+summary(mm) # Deviance explained = 76.7%  
+concurvity(mm,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex1,family=quasi(link="log"),method="GCV.Cp",select=TRUE) 
+plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, EC, TC, NH3N, PO4P, FC, Rain 
+summary(mm.shrink) # Deviance explained = 76.7% 
+concurvity(mm.shrink,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.gam <- predict(mm.shrink,newdata=ex1_1,type="response")
+data.gam <- data.frame(response=ex1_1$Chla,fitted_values=pred.gam)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 
+ggplot(data.gam, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Additive Model)")
+```
+
+
+### Time Varying Coefficient Model
+
+```{r}
+par(mar=c(4,4,4,4))
+par(oma=c(0.5,0.5,0.5,0.5))
+vc <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=quasi(link="log"))
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
+ggGam(vc)
+summary(vc) # Deviance explained = 80.5%  
+par(mfrow=c(2,2))
+gam.check(vc) 
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=quasi(link="log"),method="GCV.Cp",select=TRUE)
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
+ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, EC, NH3N, PO4P, FC, Flow 
+summary(vc.shrink) # Deviance explained = 77.7%  
+par(mfrow=c(2,2))
+gam.check(vc.shrink) 
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.tvcm <- predict(vc.shrink,newdata=ex1_1,type="response")
+data.tvcm <- data.frame(response=ex1_1$Chla,fitted_values=pred.tvcm)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 
+ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
+```
+
+
+#### 최종선택된 모형의 설명력(Deviance explained) : 65.6%(다중선형회귀모형), 60.2%(일반화선형모형), 76.7%(일반화가법모형), 77.7%(시간에 따른 계수변화모형) 
+
+#### 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형), (일반화가법모형), (시간에 따른 계수변화모형)
+
+#### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
+
+
+
+
+### 사용데이터 : 우치 지점 데이터
+
+#### 모니터링 기간 : 2010~2019년 (일별 주단위자료) 
+
+#### 반응변수 : Chla, TC, FC
+
+#### 설명변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, Flow, Rain, TC, FC (반응변수 제외)
+
+#### 상관분석이나 모형적합 시 각 수질항목의 원값을 그대로 사용하여 표현하는 것이 모형의 설명력이나 예측력 비교 등의 측면에서 더 적절할 수 있다고 판단하여 표준화를 하지 않았음.
+
+
+
+
+
+### Correlation Analysis
+
+```{r}
+ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- ex2[,-1]
+X2 <- round(cor(ex2[,-18], method='spearman'),4) 
+corrplot(X2)
+p.mat2 <- cor_pmat(ex2[,-18], method='spearman')
+ggcorrplot(X2, hc.order=T, type="lower", lab=T) +
+  ggtitle("Correlation plot(Spearman) for water quality data") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+ggcorrplot(X2, hc.order=T, type="lower", p.mat=p.mat2) +
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+```
+
+
+
+### SOM(Self-Organizing Map) pattern
+
+```{r}
+ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- ex2[,-1]
+ex2 <- as.data.frame(ex2)
+ex2_matrix <- as.matrix(ex2)
+som_grid <- somgrid(xdim=17, ydim=30, topo="hexagonal")
+som_model <- som(ex2_matrix, grid=som_grid)
+coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
+par(mfrow=c(1,2))
+for (i in 1:17) {
+  plot(som_model, type="property", property=getCodes(som_model)[,i], 
+       main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}
+par(mfrow=c(1,1))
+```
+
+
+
+### Dependent(Response) variable : TC
+
+### Multiple Linear Regression
+
+```{r}
+ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- ex2[,-1]
+ex2 <- as.data.frame(ex2)
+g1 <- ggplot(data=ex2,aes(x=pH,y=TC)) + geom_point() + stat_smooth(method=lm)
+g2 <- ggplot(data=ex2,aes(x=DO,y=TC)) + geom_point() + stat_smooth(method=lm)
+g3 <- ggplot(data=ex2,aes(x=BOD,y=TC)) + geom_point() + stat_smooth(method=lm)
+g4 <- ggplot(data=ex2,aes(x=COD,y=TC)) + geom_point() + stat_smooth(method=lm)
+g5 <- ggplot(data=ex2,aes(x=SS,y=TC)) + geom_point() + stat_smooth(method=lm)
+g6 <- ggplot(data=ex2,aes(x=TN,y=TC)) + geom_point() + stat_smooth(method=lm)
+g7 <- ggplot(data=ex2,aes(x=TP,y=TC)) + geom_point() + stat_smooth(method=lm)
+g8 <- ggplot(data=ex2,aes(x=TOC,y=TC)) + geom_point() + stat_smooth(method=lm)
+g9 <- ggplot(data=ex2,aes(x=WT,y=TC)) + geom_point() + stat_smooth(method=lm)
+g10 <- ggplot(data=ex2,aes(x=EC,y=TC)) + geom_point() + stat_smooth(method=lm)
+g11 <- ggplot(data=ex2,aes(x=FC,y=TC)) + geom_point() + stat_smooth(method=lm)
+g12 <- ggplot(data=ex2,aes(x=NH3N,y=TC)) + geom_point() + stat_smooth(method=lm)
+g13 <- ggplot(data=ex2,aes(x=PO4P,y=TC)) + geom_point() + stat_smooth(method=lm)
+g14 <- ggplot(data=ex2,aes(x=Chla,y=TC)) + geom_point() + stat_smooth(method=lm)
+g15 <- ggplot(data=ex2,aes(x=Flow,y=TC)) + geom_point() + stat_smooth(method=lm)
+g16 <- ggplot(data=ex2,aes(x=Rain,y=TC)) + geom_point() + stat_smooth(method=lm)
+grid.arrange(g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,nrow=4,ncol=4)
+gfit <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+FC+Flow+Rain,data=ex2,family=gaussian(link="identity"))
+summary(gfit) # Deviance explained: 0.5017  
+vif(gfit) 
+par(mfrow=c(2,2))
+plot(gfit)
+par(mfrow=c(1,1))
+dwtest(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+FC+Flow+Rain,data=ex2) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+gfit.step <- stepAIC(gfit, direction="both", trace=TRUE)
+gfit.step # 선택변수 : DO, TP, WT, EC, FC, Flow 
+summary(gfit.step) # Deviance explained: 0.4952   
+vif(gfit.step) 
+par(mfrow=c(2,2))
+plot(gfit.step)
+par(mfrow=c(1,1))
+dwtest(TC~DO+TP+WT+EC+FC+Flow,data=ex2) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### response vs fitted_values
+
+```{r}
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.mlr <- predict(gfit.step,newdata=ex2_1,type="response")
+data.mlr <- data.frame(response=ex2_1$TC,fitted_values=pred.mlr)
+sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE = 
+ggplot(data.mlr, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Multiple Linear Regression)")
+```
+
+
+### Generalized Linear Model
+
+```{r}
+m <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+FC+Flow+Rain,data=ex2,family=poisson(link="log"))
+summary(m) # Deviance explained : 0.4215 
+vif(m) 
+par(mfrow=c(2,2))
+plot(m)
+par(mfrow=c(1,1))
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+m.step <- stepAIC(m, direction="both", trace=TRUE)
+m.step # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, FC, Flow, Rain 
+summary(m.step) # Deviance explained : 0.4215 
+vif(m.step) 
+par(mfrow=c(2,2))
+plot(m.step)
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.glm <- predict(m.step,newdata=ex2_1,type="response")
+data.glm <- data.frame(response=ex2_1$TC,fitted_values=pred.glm)
+sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE = 
+ggplot(data.glm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Linear Model)")
+```
+
+
+### Generalized Additive Model
+
+```{r}
+mm <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2,family=quasipoisson(link="log"))
+plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+ggGam(mm)
+summary(mm) # Deviance explained = 72.9% 
+concurvity(mm,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+mm.shrink <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(Chla)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2,family=quasipoisson(link="log"),method="GCV.Cp",select=TRUE) 
+plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, FC, Flow, Rain 
+summary(mm.shrink) # Deviance explained = 72.8% 
+concurvity(mm.shrink,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.gam <- predict(mm.shrink,newdata=ex2_1,type="response")
+data.gam <- data.frame(response=ex2_1$TC,fitted_values=pred.gam)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 
+ggplot(data.gam, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Additive Model)")
+```
+
+
+### Time Varying Coefficient Model
+
+```{r}
+par(mar=c(4,4,4,4))
+par(oma=c(0.5,0.5,0.5,0.5))
+vc <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=quasipoisson(link="log"))
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
+ggGam(vc)
+summary(vc) # Deviance explained = 76.3% 
+par(mfrow=c(2,2))
+gam.check(vc) 
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+vc.shrink <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=Chla)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=quasipoisson(link="log"),method="GCV.Cp",select=TRUE) 
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
+ggGam(vc.shrink) # 선택변수 : pH, BOD, COD, SS, TP, TOC, WT, EC, Chla, NH3N, PO4P, FC, Flow, Rain  
+summary(vc.shrink) # Deviance explained = 73.4%  
+par(mfrow=c(2,2))
+gam.check(vc.shrink) 
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.tvcm <- predict(vc.shrink,newdata=ex2_1,type="response")
+data.tvcm <- data.frame(response=ex2_1$TC,fitted_values=pred.tvcm)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 
+ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
+```
+
+
+#### 최종선택된 모형의 설명력(Deviance explained) : 49.5%(다중선형회귀모형), 42.1%(일반화선형모형), 72.8%(일반화가법모형), 73.4%(시간에 따른 계수변화모형)
+
+#### 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형), (일반화가법모형), (시간에 따른 계수변화모형)
+
+#### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
+
+
+
+### Dependent(Response) variable : FC
+
+### Multiple Linear Regression
+
+```{r}
+ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- ex2[,-1]
+ex2 <- as.data.frame(ex2)
+g1 <- ggplot(data=ex2,aes(x=pH,y=FC)) + geom_point() + stat_smooth(method=lm)
+g2 <- ggplot(data=ex2,aes(x=DO,y=FC)) + geom_point() + stat_smooth(method=lm)
+g3 <- ggplot(data=ex2,aes(x=BOD,y=FC)) + geom_point() + stat_smooth(method=lm)
+g4 <- ggplot(data=ex2,aes(x=COD,y=FC)) + geom_point() + stat_smooth(method=lm)
+g5 <- ggplot(data=ex2,aes(x=SS,y=FC)) + geom_point() + stat_smooth(method=lm)
+g6 <- ggplot(data=ex2,aes(x=TN,y=FC)) + geom_point() + stat_smooth(method=lm)
+g7 <- ggplot(data=ex2,aes(x=TP,y=FC)) + geom_point() + stat_smooth(method=lm)
+g8 <- ggplot(data=ex2,aes(x=TOC,y=FC)) + geom_point() + stat_smooth(method=lm)
+g9 <- ggplot(data=ex2,aes(x=WT,y=FC)) + geom_point() + stat_smooth(method=lm)
+g10 <- ggplot(data=ex2,aes(x=EC,y=FC)) + geom_point() + stat_smooth(method=lm)
+g11 <- ggplot(data=ex2,aes(x=TC,y=FC)) + geom_point() + stat_smooth(method=lm)
+g12 <- ggplot(data=ex2,aes(x=NH3N,y=FC)) + geom_point() + stat_smooth(method=lm)
+g13 <- ggplot(data=ex2,aes(x=PO4P,y=FC)) + geom_point() + stat_smooth(method=lm)
+g14 <- ggplot(data=ex2,aes(x=Chla,y=FC)) + geom_point() + stat_smooth(method=lm)
+g15 <- ggplot(data=ex2,aes(x=Flow,y=FC)) + geom_point() + stat_smooth(method=lm)
+g16 <- ggplot(data=ex2,aes(x=Rain,y=FC)) + geom_point() + stat_smooth(method=lm)
+grid.arrange(g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,nrow=4,ncol=4)
+gfit <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+TC+Flow+Rain,data=ex2,family=gaussian(link="identity"))
+summary(gfit) # Deviance explained: 0.4145  
+vif(gfit) 
+par(mfrow=c(2,2))
+plot(gfit)
+par(mfrow=c(1,1))
+dwtest(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+TC+Flow+Rain,data=ex2) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+gfit.step <- stepAIC(gfit, direction="both", trace=TRUE)
+gfit.step # 선택변수 : TC, Rain 
+summary(gfit.step) # Deviance explained: 0.4057   
+vif(gfit.step) 
+par(mfrow=c(2,2))
+plot(gfit.step)
+par(mfrow=c(1,1))
+dwtest(FC~TC+Rain,data=ex2) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### response vs fitted_values
+
+```{r}
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.mlr <- predict(gfit.step,newdata=ex2_1,type="response")
+data.mlr <- data.frame(response=ex2_1$FC,fitted_values=pred.mlr)
+sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE = 
+ggplot(data.mlr, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Multiple Linear Regression)")
+```
+
+
+### Generalized Linear Model
+
+```{r}
+m <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+Chla+NH3N+PO4P+TC+Flow+Rain,data=ex2,family=poisson(link="log"))
+summary(m) # Deviance explained : 0.6064 
+vif(m) 
+par(mfrow=c(2,2))
+plot(m)
+par(mfrow=c(1,1))
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+m.step <- stepAIC(m, direction="both", trace=TRUE)
+m.step # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, Chla, NH3N, PO4P, TC, Flow, Rain 
+summary(m.step) # Deviance explained : 0.6064 
+vif(m.step) 
+par(mfrow=c(2,2))
+plot(m.step)
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.glm <- predict(m.step,newdata=ex2_1,type="response")
+data.glm <- data.frame(response=ex2_1$FC,fitted_values=pred.glm)
+sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE = 
+ggplot(data.glm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Linear Model)")
+```
+
+
+### Generalized Additive Model
+
+```{r}
+mm <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(Chla)+s(Flow)+s(Rain),data=ex2,family=quasipoisson(link="log"))
+plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+ggGam(mm)
+summary(mm) # Deviance explained = 87.1% 
+concurvity(mm,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+mm.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(Chla)+s(Flow)+s(Rain),data=ex2,family=quasipoisson(link="log"),method="GCV.Cp",select=TRUE) 
+plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, TC, NH3N, PO4P, Flow, Rain 
+summary(mm.shrink) # Deviance explained = 87.1% 
+concurvity(mm.shrink,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.gam <- predict(mm.shrink,newdata=ex2_1,type="response")
+data.gam <- data.frame(response=ex2_1$FC,fitted_values=pred.gam)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 
+ggplot(data.gam, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Additive Model)")
+```
+
+
+### Time Varying Coefficient Model
+
+```{r}
+par(mar=c(4,4,4,4))
+par(oma=c(0.5,0.5,0.5,0.5))
+vc <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Chla)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=quasipoisson(link="log"))
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
+ggGam(vc)
+summary(vc) # Deviance explained = 88.8%  
+par(mfrow=c(2,2))
+gam.check(vc) 
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Chla)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=quasipoisson(link="log"),method="GCV.Cp",select=TRUE)
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
+ggGam(vc.shrink) # 선택변수 : pH, COD, SS, TN, TOC, WT, EC, TC, NH3N, PO4P, Chla, Flow, Rain  
+summary(vc.shrink) # Deviance explained = 86.8%  
+par(mfrow=c(2,2))
+gam.check(vc.shrink) 
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.tvcm <- predict(vc.shrink,newdata=ex2_1,type="response")
+data.tvcm <- data.frame(response=ex2_1$FC,fitted_values=pred.tvcm)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 
+ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
+```
+
+
+#### 최종선택된 모형의 설명력(Deviance explained) : 40.6%(다중선형회귀모형), 60.6%(일반화선형모형), 87.1%(일반화가법모형), 86.8%(시간에 따른 계수변화모형) 
+
+#### 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형), (일반화가법모형), (시간에 따른 계수변화모형)
+
+#### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
+
+
+### Dependent(Response) variable : Chla
+
+### Multiple Linear Regression
+
+```{r}
+ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- ex2[,-1]
+ex2 <- as.data.frame(ex2)
+p1 <- ggplot(data=ex2,aes(x=pH,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p2 <- ggplot(data=ex2,aes(x=DO,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p3 <- ggplot(data=ex2,aes(x=BOD,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p4 <- ggplot(data=ex2,aes(x=COD,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p5 <- ggplot(data=ex2,aes(x=SS,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p6 <- ggplot(data=ex2,aes(x=TN,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p7 <- ggplot(data=ex2,aes(x=TP,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p8 <- ggplot(data=ex2,aes(x=TOC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p9 <- ggplot(data=ex2,aes(x=WT,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p10 <- ggplot(data=ex2,aes(x=EC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p11 <- ggplot(data=ex2,aes(x=TC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p12 <- ggplot(data=ex2,aes(x=NH3N,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p13 <- ggplot(data=ex2,aes(x=PO4P,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p14 <- ggplot(data=ex2,aes(x=FC,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p15 <- ggplot(data=ex2,aes(x=Flow,y=Chla)) + geom_point() + stat_smooth(method=lm)
+p16 <- ggplot(data=ex2,aes(x=Rain,y=Chla)) + geom_point() + stat_smooth(method=lm)
+grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,nrow=4,ncol=4)
+gfit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+FC+NH3N+PO4P+TC+Flow+Rain,data=ex2,family=gaussian(link="identity"))
+summary(gfit) # Deviance explained: 0.7130   
+vif(gfit) 
+par(mfrow=c(2,2))
+plot(gfit)
+par(mfrow=c(1,1))
+dwtest(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+FC+NH3N+PO4P+TC+Flow+Rain,data=ex2) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+gfit.step <- stepAIC(gfit, direction="both", trace=TRUE)
+gfit.step # 선택변수 : pH, DO, BOD, COD, TN, TP, WT, EC, NH3N, PO4P, Rain  
+summary(gfit.step) # Deviance explained: 0.7117   
+vif(gfit.step)  
+par(mfrow=c(2,2))
+plot(gfit.step)
+par(mfrow=c(1,1))
+dwtest(Chla~pH+DO+BOD+COD+TN+TP+WT+EC+NH3N+PO4P+Rain,data=ex2) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### response vs fitted_values
+
+```{r}
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.mlr <- predict(gfit.step,newdata=ex2_1,type="response")
+data.mlr <- data.frame(response=ex2_1$Chla,fitted_values=pred.mlr)
+sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE = 
+ggplot(data.mlr, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Multiple Linear Regression)")
+```
+
+
+### Generalized Linear Model
+
+```{r}
+m <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+FC+NH3N+PO4P+TC+Flow+Rain,data=ex2,family=Gamma(link="log"))
+summary(m) # Deviance explained : 0.6920  
+vif(m) 
+par(mfrow=c(2,2))
+plot(m)
+par(mfrow=c(1,1))
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+m.step <- stepAIC(m, direction="both", trace=TRUE)
+m.step # 선택변수 : pH, BOD, SS, TN, TP, TOC, EC, NH3N, PO4P, Rain  
+summary(m.step) # Deviance explained : 0.6870 
+vif(m.step) 
+par(mfrow=c(2,2))
+plot(m.step)
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.glm <- predict(m.step,newdata=ex2_1,type="response")
+data.glm <- data.frame(response=ex2_1$Chla,fitted_values=pred.glm)
+sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE = 
+ggplot(data.glm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Linear Model)")
+```
+
+
+### Generalized Additive Model
+
+```{r}
+# GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
+mm <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2,family=quasi(link="log"))
+plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+ggGam(mm)
+summary(mm) # Deviance explained = 87.7%  
+concurvity(mm,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(TC)+s(NH3N)+s(PO4P)+s(FC)+s(Flow)+s(Rain),data=ex2,family=quasi(link="log"),method="GCV.Cp",select=TRUE) 
+plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, TC, NH3N, PO4P, FC, Flow, Rain 
+summary(mm.shrink) # Deviance explained = 87.4%  
+concurvity(mm.shrink,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.gam <- predict(mm.shrink,newdata=ex2_1,type="response")
+data.gam <- data.frame(response=ex2_1$Chla,fitted_values=pred.gam)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 
+ggplot(data.gam, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Additive Model)")
+```
+
+
+### Time Varying Coefficient Model
+
+```{r}
+par(mar=c(4,4,4,4))
+par(oma=c(0.5,0.5,0.5,0.5))
+vc <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=quasi(link="log"))
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
+ggGam(vc)
+summary(vc) # Deviance explained = 89.4%   
+par(mfrow=c(2,2))
+gam.check(vc) 
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection with Generalized Cross-Validation Criterion or Mallow's Cp statistic
+
+```{r}
+vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=TC)+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=FC)+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=quasi(link="log"),method="GCV.Cp",select=TRUE)
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
+ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, EC, NH3N, PO4P, Flow 
+summary(vc.shrink) # Deviance explained = 87.3%    
+par(mfrow=c(2,2))
+gam.check(vc.shrink) 
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values
+
+```{r}
+ex2_1 <- read.csv("C:/Users/HSY/Desktop/우치(2020).csv",sep=",",header=T)
+ex2_1 <- ex2_1[,-1]
+ex2_1 <- as.data.frame(ex2_1)
+pred.tvcm <- predict(vc.shrink,newdata=ex2_1,type="response")
+data.tvcm <- data.frame(response=ex2_1$Chla,fitted_values=pred.tvcm)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 
+ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
+```
+
+
+#### 최종선택된 모형의 설명력(Deviance explained) : 71.2%(다중선형회귀모형), 69.0%(일반화선형모형), 87.4%(일반화가법모형), 87.3%(시간에 따른 계수변화모형) 
+
+#### 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형), (일반화가법모형), (시간에 따른 계수변화모형)
+
+#### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
