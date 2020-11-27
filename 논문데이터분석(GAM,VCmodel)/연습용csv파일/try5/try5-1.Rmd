@@ -24,6 +24,8 @@ library(fda)
 library(refund)
 library(MASS)
 library(boot)
+library(kohonen)
+library(SOMbrero)
 par(mar=c(4,4,4,4))
 par(oma=c(0.5,0.5,0.5,0.5))
 ```
@@ -67,9 +69,9 @@ par(oma=c(0.5,0.5,0.5,0.5))
 ```{r}
 ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
-X1 <- round(cor(ex1, method='spearman'),4) 
+X1 <- round(cor(ex1[,-18], method='spearman'),4) 
 corrplot(X1)
-p.mat1 <- cor_pmat(ex1, method='spearman')
+p.mat1 <- cor_pmat(ex1[,-18], method='spearman')
 ggcorrplot(X1, hc.order=T, type="lower", lab=T) +
   ggtitle("Correlation plot(Spearman) for water quality data") +   
   theme(plot.title = element_text(family = "serif", 
@@ -80,6 +82,25 @@ ggcorrplot(X1, hc.order=T, type="lower", p.mat=p.mat1) +
   theme(plot.title = element_text(family = "serif", 
                                   face = "bold", hjust = 0.5, 
                                   size = 15, color = "black"))
+```
+
+
+
+### SOM(Self-Organizing Map) pattern
+
+```{r}
+ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- ex1[,-1]
+ex1 <- as.data.frame(ex1)
+ex1_matrix <- as.matrix(ex1)
+som_grid <- somgrid(xdim=17, ydim=30, topo="hexagonal")
+som_model <- som(ex1_matrix, grid=som_grid)
+coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
+par(mfrow=c(1,2))
+for (i in 1:17) {
+  plot(som_model, type="property", property=getCodes(som_model)[,i], 
+       main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}
+par(mfrow=c(1,1))
 ```
 
 
@@ -140,11 +161,16 @@ ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
 ex1_1 <- ex1_1[,-1]
 ex1_1 <- as.data.frame(ex1_1)
 pred.mlr <- predict(fit.step,newdata=ex1_1,type="response")
-data.mlr <- data.frame(response=ex1_1$TC,fitted_values=pred.mlr)
-sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE =   
+data.mlr <- data.frame(response=ex1_1$TC,fitted_values=pred.mlr,time=ex1_1$time)
+sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE = 20221.02   
 ggplot(data.mlr, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Multiple Linear Regression)")
+  ggtitle("response vs fitted_values (Multiple Linear Regression)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.mlr$time,data.mlr$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Multiple Linear Regression)")
+lines(data.mlr$time,data.mlr$response,type='o',col='blue')
+legend(3650,120000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 ```
 
 
@@ -178,11 +204,16 @@ ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
 ex1_1 <- ex1_1[,-1]
 ex1_1 <- as.data.frame(ex1_1)
 pred.glm <- predict(m.step,newdata=ex1_1,type="response")
-data.glm <- data.frame(response=ex1_1$TC,fitted_values=pred.glm)
-sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE =  
+data.glm <- data.frame(response=ex1_1$TC,fitted_values=pred.glm,time=ex1_1$time)
+sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE = 28138.29  
 ggplot(data.glm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Generalized Linear Model)")
+  ggtitle("response vs fitted_values (Generalized Linear Model)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.glm$time,data.glm$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Generalized Linear Model)")
+lines(data.glm$time,data.glm$response,type='o',col='blue')
+legend(3650,150000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 ```
 
 
@@ -220,11 +251,16 @@ ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
 ex1_1 <- ex1_1[,-1]
 ex1_1 <- as.data.frame(ex1_1)
 pred.gam <- predict(mm.shrink,newdata=ex1_1,type="response")
-data.gam <- data.frame(response=ex1_1$TC,fitted_values=pred.gam)
-sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE =  
+data.gam <- data.frame(response=ex1_1$TC,fitted_values=pred.gam,time=ex1_1$time)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 24703.02  
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Generalized Additive Model)")
+  ggtitle("response vs fitted_values (Generalized Additive Model)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.gam$time,data.gam$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Generalized Additive Model)")
+lines(data.gam$time,data.gam$response,type='o',col='blue')
+legend(3650,150000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 ```
 
 
@@ -261,19 +297,68 @@ ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
 ex1_1 <- ex1_1[,-1]
 ex1_1 <- as.data.frame(ex1_1)
 pred.tvcm <- predict(vc.shrink,newdata=ex1_1,type="response")
-data.tvcm <- data.frame(response=ex1_1$TC,fitted_values=pred.tvcm)
-sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 
+data.tvcm <- data.frame(response=ex1_1$TC,fitted_values=pred.tvcm,time=ex1_1$time)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 92907.23 
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Time Varying Coefficient Model)")
+  ggtitle("response vs fitted_values (Time Varying Coefficient Model)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.tvcm$time,data.tvcm$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Time Varying Coefficient Model)")
+lines(data.tvcm$time,data.tvcm$response,type='o',col='blue')
+legend(3650,5e+05,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 ```
 
 
 #### 최종선택된 모형의 설명력(Deviance explained) : 65.2%(다중선형회귀모형), 62.1%(일반화선형모형), 87.2%(일반화가법모형), 86.8%(시간에 따른 계수변화모형) 
 
-#### 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형), (일반화가법모형), (시간에 따른 계수변화모형)
+#### 최종선택된 모형의 예측력(Root Mean Squared Error) : 20221.02(다중선형회귀모형), 28138.29(일반화선형모형), 24703.02(일반화가법모형), 92907.23(시간에 따른 계수변화모형)
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
+
+#### RMSE의 경우 MLR이 가장 작게 나왔다. 하지만, MLR의 경우 적절한 확률분포를 가정하고 있지 않고 있고 TC의 예측값을 음수로 추정해주는 과오를 범하고 있기 때문에 최적의 모형이라고 할 수는 없다. 그리고 GLM, GAM, TVCM의 경우 예측값을 과대 또는 과소추정하는 경우가 있어서 RMSE의 기준으로 과소평가를 받을 수 있기 때문에 x축과 y축의 범위를 동일하게 조절한 산점도를 볼 필요가 있겠다.
+
+```{r}
+ggplot(data.mlr, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Multiple Linear Regression)") +
+  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+ggplot(data.glm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Linear Model)") +
+  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+ggplot(data.gam, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Generalized Additive Model)") +
+  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("response vs fitted_values (Time Varying Coefficient Model)") +
+  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+```
+
+#### 추가로 time vs TC 그래프에 대해서도 y축 범위를 통일시켜 그려보면 다음과 같다.
+
+```{r}
+par(mfrow=c(1,1))
+plot(data.mlr$time,data.mlr$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Multiple Linear Regression)",ylim=c(-40000,5e+05))
+lines(data.mlr$time,data.mlr$response,type='o',col='blue')
+legend(3650,5e+05,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+plot(data.glm$time,data.glm$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Generalized Linear Model)",ylim=c(-40000,5e+05))
+lines(data.glm$time,data.glm$response,type='o',col='blue')
+legend(3650,5e+05,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+plot(data.gam$time,data.gam$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Generalized Additive Model)",ylim=c(-40000,5e+05))
+lines(data.gam$time,data.gam$response,type='o',col='blue')
+legend(3650,5e+05,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+plot(data.tvcm$time,data.tvcm$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Time Varying Coefficient Model)",ylim=c(-40000,5e+05))
+lines(data.tvcm$time,data.tvcm$response,type='o',col='blue')
+legend(3650,5e+05,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
 
 
 ### Dependent(Response) variable : FC
@@ -682,9 +767,9 @@ ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
 ```{r}
 ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
 ex2 <- ex2[,-1]
-X2 <- round(cor(ex2, method='spearman'),4) 
+X2 <- round(cor(ex2[,-18], method='spearman'),4) 
 corrplot(X2)
-p.mat2 <- cor_pmat(ex2, method='spearman')
+p.mat2 <- cor_pmat(ex2[,-18], method='spearman')
 ggcorrplot(X2, hc.order=T, type="lower", lab=T) +
   ggtitle("Correlation plot(Spearman) for water quality data") +   
   theme(plot.title = element_text(family = "serif", 
@@ -695,6 +780,25 @@ ggcorrplot(X2, hc.order=T, type="lower", p.mat=p.mat2) +
   theme(plot.title = element_text(family = "serif", 
                                   face = "bold", hjust = 0.5, 
                                   size = 15, color = "black"))
+```
+
+
+
+### SOM(Self-Organizing Map) pattern
+
+```{r}
+ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- ex2[,-1]
+ex2 <- as.data.frame(ex2)
+ex2_matrix <- as.matrix(ex2)
+som_grid <- somgrid(xdim=17, ydim=30, topo="hexagonal")
+som_model <- som(ex2_matrix, grid=som_grid)
+coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
+par(mfrow=c(1,2))
+for (i in 1:17) {
+  plot(som_model, type="property", property=getCodes(som_model)[,i], 
+       main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}
+par(mfrow=c(1,1))
 ```
 
 
