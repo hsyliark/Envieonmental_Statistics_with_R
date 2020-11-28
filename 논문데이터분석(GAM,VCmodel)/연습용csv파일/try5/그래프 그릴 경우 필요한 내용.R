@@ -1,106 +1,153 @@
-# MLR
-ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
-ex1_1 <- ex1_1[,-1]
-ex1_1 <- as.data.frame(ex1_1)
-pred.mlr <- predict(fit.step,newdata=ex1_1,type="response")
-data.mlr <- data.frame(response=ex1_1$TC,fitted_values=pred.mlr,time=ex1_1$time)
-sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE = 20221.02   
+### MLR
+
+#### response vs fitted_values (train data (2010-2019))
+
+```{r}
+pred.mlr <- predict(fit.step,newdata=ex1,type="response")
+data.mlr <- data.frame(response=ex1$TC,fitted_values=pred.mlr,time=ex1$time)
+sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE = 28850.56   
 ggplot(data.mlr, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Multiple Linear Regression)") +
+  ggtitle("[Gwangsan TC train data] response vs fitted_values (Multiple Linear Regression)") +
   geom_abline(intercept=0,slope=1,color='blue',size=1.5)
 par(mfrow=c(1,1))
-plot(data.mlr$time,data.mlr$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Multiple Linear Regression)")
-lines(data.mlr$time,data.mlr$response,type='o',col='blue')
-legend(3650,120000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+plot(data.mlr$time,data.mlr$response,type='o',col='blue',xlab="time",ylab="TC",main="[Gwangsan TC train data] response vs fitted_values (Multiple Linear Regression)",ylim=c(-100000,500000))
+lines(data.mlr$time,data.mlr$fitted_values,type='o',col='red')
+legend(0,500000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
 
-# GLM
+#### response vs fitted_values (test data (2020))
+
+```{r}
 ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
 ex1_1 <- ex1_1[,-1]
 ex1_1 <- as.data.frame(ex1_1)
-pred.glm <- predict(m.step,newdata=ex1_1,type="response")
-data.glm <- data.frame(response=ex1_1$TC,fitted_values=pred.glm,time=ex1_1$time)
-sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE = 28138.29  
+pred.mlr1 <- predict(fit.step,newdata=ex1_1,type="response")
+data.mlr1 <- data.frame(response=ex1_1$TC,fitted_values=pred.mlr1,time=ex1_1$time)
+sqrt(sum((data.mlr1$response-data.mlr1$fitted_values)^2)/length(data.mlr1$response)) # RMSE = 18872.23   
+ggplot(data.mlr1, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("[Gwangsan TC test data] response vs fitted_values (Multiple Linear Regression)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.mlr1$time,data.mlr1$response,type='o',col='blue',xlab="time",ylab="TC",main="[Gwangsan TC test data] response vs fitted_values (Multiple Linear Regression)",ylim=c(-100000,500000))
+lines(data.mlr1$time,data.mlr1$fitted_values,type='o',col='red')
+legend(3650,500000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+
+
+### GLM
+
+#### response vs fitted_values (train data (2010-2019))
+
+```{r}
+pred.glm <- predict(m.step,newdata=ex1,type="response")
+data.glm <- data.frame(response=ex1$TC,fitted_values=pred.glm,time=ex1$time)
+sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE = 21249.7    
 ggplot(data.glm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Generalized Linear Model)") +
+  ggtitle("[Gwangsan TC train data] response vs fitted_values (Generalized Linear Model)") +
   geom_abline(intercept=0,slope=1,color='blue',size=1.5)
 par(mfrow=c(1,1))
-plot(data.glm$time,data.glm$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Generalized Linear Model)")
-lines(data.glm$time,data.glm$response,type='o',col='blue')
-legend(3650,150000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+plot(data.glm$time,data.glm$response,type='o',col='blue',xlab="time",ylab="TC",main="[Gwangsan TC train data] response vs fitted_values (Generalized Linear Model)",ylim=c(-100000,500000))
+lines(data.glm$time,data.glm$fitted_values,type='o',col='red')
+legend(0,500000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
 
-# GAM
+#### response vs fitted_values (test data (2020))
+
+```{r}
 ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
 ex1_1 <- ex1_1[,-1]
 ex1_1 <- as.data.frame(ex1_1)
-pred.gam <- predict(mm.shrink,newdata=ex1_1,type="response")
-data.gam <- data.frame(response=ex1_1$TC,fitted_values=pred.gam,time=ex1_1$time)
-sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 24703.02  
-ggplot(data.gam, aes(x=response, y=fitted_values)) +
+pred.glm1 <- predict(m.step,newdata=ex1_1,type="response")
+data.glm1 <- data.frame(response=ex1_1$TC,fitted_values=pred.glm1,time=ex1_1$time)
+sqrt(sum((data.glm1$response-data.glm1$fitted_values)^2)/length(data.glm1$response)) # RMSE = 28977.33  
+ggplot(data.glm1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Generalized Additive Model)") +
+  ggtitle("[Gwangsan TC test data] response vs fitted_values (Generalized Linear Model)") +
   geom_abline(intercept=0,slope=1,color='blue',size=1.5)
 par(mfrow=c(1,1))
-plot(data.gam$time,data.gam$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Generalized Additive Model)")
-lines(data.gam$time,data.gam$response,type='o',col='blue')
-legend(3650,150000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+plot(data.glm1$time,data.glm1$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="[Gwangsan TC test data] response vs fitted_values (Generalized Linear Model)",ylim=c(-100000,500000))
+lines(data.glm1$time,data.glm1$response,type='o',col='blue')
+legend(3650,500000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
 
-# TVCM
+
+
+### GAM
+
+#### response vs fitted_values (train data (2010-2019))
+
+```{r}
+pred.gam <- predict(mm.shrink,newdata=ex1,type="response")
+data.gam <- data.frame(response=ex1$TC,fitted_values=pred.gam,time=ex1$time)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE =     
+ggplot(data.gam, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("[Gwangsan TC train data] response vs fitted_values (Generalized Additive Model)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.gam$time,data.gam$response,type='o',col='blue',xlab="time",ylab="TC",main="[Gwangsan TC train data] response vs fitted_values (Generalized Additive Model)",ylim=c(-100000,500000))
+lines(data.gam$time,data.gam$fitted_values,type='o',col='red')
+legend(0,500000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+#### response vs fitted_values (test data (2020))
+
+```{r}
 ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
 ex1_1 <- ex1_1[,-1]
 ex1_1 <- as.data.frame(ex1_1)
-pred.tvcm <- predict(vc.shrink,newdata=ex1_1,type="response")
-data.tvcm <- data.frame(response=ex1_1$TC,fitted_values=pred.tvcm,time=ex1_1$time)
-sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 92907.23 
-ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
+pred.gam1 <- predict(mm.shrink,newdata=ex1_1,type="response")
+data.gam1 <- data.frame(response=ex1_1$TC,fitted_values=pred.gam1,time=ex1_1$time)
+sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/length(data.gam1$response)) # RMSE =   
+ggplot(data.gam1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Time Varying Coefficient Model)") +
+  ggtitle("[Gwangsan TC test data] response vs fitted_values (Generalized Additive Model)") +
   geom_abline(intercept=0,slope=1,color='blue',size=1.5)
 par(mfrow=c(1,1))
-plot(data.tvcm$time,data.tvcm$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Time Varying Coefficient Model)")
-lines(data.tvcm$time,data.tvcm$response,type='o',col='blue')
-legend(3650,5e+05,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+plot(data.gam1$time,data.gam1$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="[Gwangsan TC test data] response vs fitted_values (Generalized Additive Model)",ylim=c(-100000,500000))
+lines(data.gam1$time,data.gam1$response,type='o',col='blue')
+legend(3650,500000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
 
 
 
+### TVCM
 
+#### response vs fitted_values (train data (2010-2019))
 
-ggplot(data.mlr, aes(x=response, y=fitted_values)) +
-  geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Multiple Linear Regression)") +
-  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
-  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
-ggplot(data.glm, aes(x=response, y=fitted_values)) +
-  geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Generalized Linear Model)") +
-  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
-  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
-ggplot(data.gam, aes(x=response, y=fitted_values)) +
-  geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Generalized Additive Model)") +
-  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
-  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+```{r}
+pred.tvcm <- predict(vc.shrink,newdata=ex1,type="response")
+data.tvcm <- data.frame(response=ex1$TC,fitted_values=pred.tvcm,time=ex1$time)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE =     
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Time Varying Coefficient Model)") +
-  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
+  ggtitle("[Gwangsan TC train data] response vs fitted_values (Time Varying Coefficient Model)") +
   geom_abline(intercept=0,slope=1,color='blue',size=1.5)
-
-
-
-
-
 par(mfrow=c(1,1))
-plot(data.mlr$time,data.mlr$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Multiple Linear Regression)",ylim=c(-40000,5e+05))
-lines(data.mlr$time,data.mlr$response,type='o',col='blue')
-legend(3650,5e+05,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
-plot(data.glm$time,data.glm$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Generalized Linear Model)",ylim=c(-40000,5e+05))
-lines(data.glm$time,data.glm$response,type='o',col='blue')
-legend(3650,5e+05,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
-plot(data.gam$time,data.gam$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Generalized Additive Model)",ylim=c(-40000,5e+05))
-lines(data.gam$time,data.gam$response,type='o',col='blue')
-legend(3650,5e+05,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
-plot(data.tvcm$time,data.tvcm$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Time Varying Coefficient Model)",ylim=c(-40000,5e+05))
-lines(data.tvcm$time,data.tvcm$response,type='o',col='blue')
-legend(3650,5e+05,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+plot(data.tvcm$time,data.tvcm$response,type='o',col='blue',xlab="time",ylab="TC",main="[Gwangsan TC train data] response vs fitted_values (Time Varying Coefficient Model)",ylim=c(-100000,500000))
+lines(data.tvcm$time,data.tvcm$fitted_values,type='o',col='red')
+legend(0,500000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+#### response vs fitted_values (test data (2020))
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/광산(2020).csv",sep=",",header=T)
+ex1_1 <- ex1_1[,-1]
+ex1_1 <- as.data.frame(ex1_1)
+pred.tvcm1 <- predict(vc.shrink,newdata=ex1_1,type="response")
+data.tvcm1 <- data.frame(response=ex1_1$TC,fitted_values=pred.tvcm1,time=ex1_1$time)
+sqrt(sum((data.tvcm1$response-data.tvcm1$fitted_values)^2)/length(data.tvcm1$response)) # RMSE =   
+ggplot(data.tvcm1, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("[Gwangsan TC test data] response vs fitted_values (Time Varying Coefficient Model)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.tvcm1$time,data.tvcm1$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="[Gwangsan TC test data] response vs fitted_values (Time Varying Coefficient Model)",ylim=c(-100000,500000))
+lines(data.tvcm1$time,data.tvcm1$response,type='o',col='blue')
+legend(3650,500000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
