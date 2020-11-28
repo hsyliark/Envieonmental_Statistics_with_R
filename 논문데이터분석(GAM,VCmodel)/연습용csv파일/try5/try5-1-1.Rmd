@@ -385,7 +385,7 @@ legend(3650,500000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
-#### RMSE의 경우 MLR이 가장 작게 나왔다. 하지만, MLR의 경우 적절한 확률분포를 가정하고 있지 않고 있고 TC의 예측값을 음수로 추정해주는 과오를 범하고 있기 때문에 최적의 모형이라고 할 수는 없다. 그리고 GLM, GAM, TVCM의 경우 예측값을 과대 또는 과소추정하는 경우가 있어서 RMSE의 기준으로 과소평가를 받을 수 있기 때문에 x축과 y축의 범위를 동일하게 조절한 산점도를 볼 필요가 있겠다.
+#### test RMSE의 경우 MLR이 가장 작게 나왔다. 하지만, MLR의 경우 적절한 확률분포를 가정하고 있지 않고 있고 TC의 예측값을 음수로 추정해주는 과오를 범하고 있기 때문에 최적의 모형이라고 할 수는 없다. 그리고 GLM, GAM, TVCM의 경우 예측값을 과대 또는 과소추정하는 경우가 있어서 RMSE의 기준으로 과소평가를 받을 수 있기 때문에 x축과 y축의 범위를 동일하게 조절한 산점도를 볼 필요가 있겠다.
 
 ```{r}
 ggplot(data.mlr1, aes(x=response, y=fitted_values)) +
@@ -586,7 +586,7 @@ legend(3650,200000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 mm <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(log(Chla))+s(NH3N)+s(PO4P)+s(log(TC))+s(Flow)+s(Rain),data=ex1,family=quasipoisson(link="log"))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
 ggGam(mm)
-summary(mm) # Deviance explained =  
+summary(mm) # Deviance explained = 93.2%  
 concurvity(mm,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm) # 적합결여 존재 (기저함수 부족)
@@ -598,8 +598,8 @@ par(mfrow=c(1,1))
 ```{r}
 mm.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(log(Chla))+s(NH3N)+s(PO4P)+s(log(TC))+s(Flow)+s(Rain),data=ex1,family=quasipoisson(link="log"),method="GCV.Cp",select=TRUE) 
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
-ggGam(mm.shrink) # 선택변수 : 
-summary(mm.shrink) # Deviance explained =  
+ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, EC, log(Chla), NH3N, PO4P, log(TC) 
+summary(mm.shrink) # Deviance explained = 92.4%  
 concurvity(mm.shrink,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
@@ -611,7 +611,7 @@ par(mfrow=c(1,1))
 ```{r}
 pred.gam <- predict(mm.shrink,newdata=ex1,type="response")
 data.gam <- data.frame(response=ex1$FC,fitted_values=pred.gam,time=ex1$time)
-sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE =     
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 2849.492     
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan FC train data] response vs fitted_values (Generalized Additive Model)") +
@@ -630,7 +630,7 @@ ex1_1 <- ex1_1[,-1]
 ex1_1 <- as.data.frame(ex1_1)
 pred.gam1 <- predict(mm.shrink,newdata=ex1_1,type="response")
 data.gam1 <- data.frame(response=ex1_1$FC,fitted_values=pred.gam1,time=ex1_1$time)
-sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/length(data.gam1$response)) # RMSE =   
+sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/length(data.gam1$response)) # RMSE = 7579.399   
 ggplot(data.gam1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan FC test data] response vs fitted_values (Generalized Additive Model)") +
@@ -650,7 +650,7 @@ par(oma=c(0.5,0.5,0.5,0.5))
 vc <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=log(TC))+s(time,by=log(Chla))+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=quasipoisson(link="log"))
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
 ggGam(vc)
-summary(vc) # Deviance explained =   
+summary(vc) # Deviance explained = 95.3%   
 par(mfrow=c(2,2))
 gam.check(vc) 
 par(mfrow=c(1,1))
@@ -661,8 +661,8 @@ par(mfrow=c(1,1))
 ```{r}
 vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=log(TC))+s(time,by=log(Chla))+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=quasipoisson(link="log"),method="GCV.Cp",select=TRUE)
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40)) 
-ggGam(vc.shrink) # 선택변수 :    
-summary(vc.shrink) # Deviance explained = 
+ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, log(TC), log(Chla), PO4P, Flow    
+summary(vc.shrink) # Deviance explained = 94.1% 
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
@@ -673,7 +673,7 @@ par(mfrow=c(1,1))
 ```{r}
 pred.tvcm <- predict(vc.shrink,newdata=ex1,type="response")
 data.tvcm <- data.frame(response=ex1$FC,fitted_values=pred.tvcm,time=ex1$time)
-sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE =     
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 2715.987     
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan FC train data] response vs fitted_values (Time Varying Coefficient Model)") +
@@ -692,7 +692,7 @@ ex1_1 <- ex1_1[,-1]
 ex1_1 <- as.data.frame(ex1_1)
 pred.tvcm1 <- predict(vc.shrink,newdata=ex1_1,type="response")
 data.tvcm1 <- data.frame(response=ex1_1$FC,fitted_values=pred.tvcm1,time=ex1_1$time)
-sqrt(sum((data.tvcm1$response-data.tvcm1$fitted_values)^2)/length(data.tvcm1$response)) # RMSE =   
+sqrt(sum((data.tvcm1$response-data.tvcm1$fitted_values)^2)/length(data.tvcm1$response)) # RMSE = 8650.803   
 ggplot(data.tvcm1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan FC test data] response vs fitted_values (Time Varying Coefficient Model)") +
@@ -704,13 +704,15 @@ legend(3650,200000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 ```
 
 
-#### 최종선택된 모형의 설명력(Deviance explanied) : 62.1%(다중선형회귀모형), 69.7%(일반화선형모형), 92.1%(일반화가법모형), 91.3%(시간에 따른 계수변화모형) 
+#### 최종선택된 모형의 설명력(Deviance explanied) : 34.1%(다중선형회귀모형), 85.1%(일반화선형모형), 92.4%(일반화가법모형), 94.1%(시간에 따른 계수변화모형) 
 
-#### 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형), (일반화가법모형), (시간에 따른 계수변화모형)
+#### train data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 9718.065(다중선형회귀모형), 5923.131(일반화선형모형), 2849.492(일반화가법모형), 2715.987(시간에 따른 계수변화모형)
+
+#### test data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 7476.463(다중선형회귀모형), 7499.139(일반화선형모형), 7579.399(일반화가법모형), 8650.803(시간에 따른 계수변화모형)
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
-#### RMSE의 경우 MLR이 가장 작게 나왔다. 하지만, MLR의 경우 적절한 확률분포를 가정하고 있지 않고 있고 FC의 예측값을 음수로 추정해주는 과오를 범하고 있기 때문에 최적의 모형이라고 할 수는 없다. 그리고 GLM, GAM, TVCM의 경우 예측값을 과대 또는 과소추정하는 경우가 있어서 RMSE의 기준으로 과소평가를 받을 수 있기 때문에 x축과 y축의 범위를 동일하게 조절한 산점도를 볼 필요가 있겠다.
+#### test RMSE의 경우 MLR이 가장 작게 나왔다. 하지만, MLR의 경우 적절한 확률분포를 가정하고 있지 않고 있고 FC의 예측값을 음수로 추정해주는 과오를 범하고 있기 때문에 최적의 모형이라고 할 수는 없다. 그리고 GLM, GAM, TVCM의 경우 예측값을 과대 또는 과소추정하는 경우가 있어서 RMSE의 기준으로 과소평가를 받을 수 있기 때문에 x축과 y축의 범위를 동일하게 조절한 산점도를 볼 필요가 있겠다.
 
 ```{r}
 ggplot(data.mlr1, aes(x=response, y=fitted_values)) +
@@ -756,7 +758,7 @@ lines(data.tvcm1$time,data.tvcm1$response,type='o',col='blue')
 legend(3650,200000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 ```
 
-#### 여러가지 사항을 고려했을 때 광산 FC 예측에 대한 최적의 모형은 GAM과 TVCM이라고 판단됨.
+#### 여러가지 사항을 고려했을 때 광산 FC 예측에 대한 최적의 모형은 TVCM이라고 판단됨.
 
 
 
