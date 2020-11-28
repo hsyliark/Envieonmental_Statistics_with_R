@@ -283,7 +283,7 @@ par(mfrow=c(1,1))
 ```{r}
 pred.gam <- predict(mm.shrink,newdata=ex1,type="response")
 data.gam <- data.frame(response=ex1$TC,fitted_values=pred.gam,time=ex1$time)
-sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE =     
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 13705.35     
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan TC train data] response vs fitted_values (Generalized Additive Model)") +
@@ -302,7 +302,7 @@ ex1_1 <- ex1_1[,-1]
 ex1_1 <- as.data.frame(ex1_1)
 pred.gam1 <- predict(mm.shrink,newdata=ex1_1,type="response")
 data.gam1 <- data.frame(response=ex1_1$TC,fitted_values=pred.gam1,time=ex1_1$time)
-sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/length(data.gam1$response)) # RMSE =   
+sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/length(data.gam1$response)) # RMSE = 24377.83   
 ggplot(data.gam1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan TC test data] response vs fitted_values (Generalized Additive Model)") +
@@ -377,53 +377,58 @@ legend(3650,500000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 
 
 
-#### 최종선택된 모형의 설명력(Deviance explained) : 43.1%(다중선형회귀모형), 78.8%(일반화선형모형), 88.0%(일반화가법모형), 92.6%(시간에 따른 계수변화모형) 
+#### 최종선택된 모형의 설명력(Deviance explained) : 43.1%(다중선형회귀모형), 78.8%(일반화선형모형), 88.0%(일반화가법모형), 92.6%(시간에 따른 계수변화모형)
 
-#### 최종선택된 모형의 예측력(Root Mean Squared Error) : 18872.23(다중선형회귀모형), 28977.33(일반화선형모형), 24377.83(일반화가법모형), 37901.47(시간에 따른 계수변화모형)
+#### train data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 28850.56(다중선형회귀모형), 21249.70(일반화선형모형), 13705.35(일반화가법모형), (시간에 따른 계수변화모형)
+
+#### test data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 18872.23(다중선형회귀모형), 28977.33(일반화선형모형), 24377.83(일반화가법모형), 37901.47(시간에 따른 계수변화모형)
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
 #### RMSE의 경우 MLR이 가장 작게 나왔다. 하지만, MLR의 경우 적절한 확률분포를 가정하고 있지 않고 있고 TC의 예측값을 음수로 추정해주는 과오를 범하고 있기 때문에 최적의 모형이라고 할 수는 없다. 그리고 GLM, GAM, TVCM의 경우 예측값을 과대 또는 과소추정하는 경우가 있어서 RMSE의 기준으로 과소평가를 받을 수 있기 때문에 x축과 y축의 범위를 동일하게 조절한 산점도를 볼 필요가 있겠다.
 
 ```{r}
-ggplot(data.mlr, aes(x=response, y=fitted_values)) +
+ggplot(data.mlr1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Multiple Linear Regression)") +
-  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
-  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
-ggplot(data.glm, aes(x=response, y=fitted_values)) +
+  ggtitle("[Gwangsan TC test data] response vs fitted_values (Multiple Linear Regression)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5) +
+  coord_cartesian(xlim = c(0,100000), ylim = c(0,100000))
+ggplot(data.glm1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Generalized Linear Model)") +
-  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
-  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
-ggplot(data.gam, aes(x=response, y=fitted_values)) +
+  ggtitle("[Gwangsan TC test data] response vs fitted_values (Generalized Linear Model)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5) +
+  coord_cartesian(xlim = c(0,100000), ylim = c(0,100000))
+ggplot(data.gam1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Generalized Additive Model)") +
-  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
-  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
-ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
+  ggtitle("[Gwangsan TC test data] response vs fitted_values (Generalized Additive Model)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5) +
+  coord_cartesian(xlim = c(0,100000), ylim = c(0,100000))
+ggplot(data.tvcm1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
-  ggtitle("response vs fitted_values (Time Varying Coefficient Model)") +
-  coord_cartesian(xlim=c(0,100000),ylim=c(0,100000)) +
-  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+  ggtitle("[Gwangsan TC test data] response vs fitted_values (Time Varying Coefficient Model)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5) +
+  coord_cartesian(xlim = c(0,100000), ylim = c(0,100000))
 ```
 
 #### 추가로 time vs TC 그래프에 대해서도 y축 범위를 통일시켜 그려보면 다음과 같다.
 
 ```{r}
 par(mfrow=c(1,1))
-plot(data.mlr$time,data.mlr$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Multiple Linear Regression)",ylim=c(-50000,200000))
-lines(data.mlr$time,data.mlr$response,type='o',col='blue')
-legend(3650,200000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
-plot(data.glm$time,data.glm$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Generalized Linear Model)",ylim=c(-50000,200000))
-lines(data.glm$time,data.glm$response,type='o',col='blue')
-legend(3650,200000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
-plot(data.gam$time,data.gam$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Generalized Additive Model)",ylim=c(-50000,200000))
-lines(data.gam$time,data.gam$response,type='o',col='blue')
-legend(3650,200000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
-plot(data.tvcm$time,data.tvcm$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="response vs fitted_values (Time Varying Coefficient Model)",ylim=c(-50000,200000))
-lines(data.tvcm$time,data.tvcm$response,type='o',col='blue')
-legend(3650,200000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+plot(data.mlr1$time,data.mlr1$response,type='o',col='blue',xlab="time",ylab="TC",main="[Gwangsan TC test data] response vs fitted_values (Multiple Linear Regression)",ylim=c(-100000,500000))
+lines(data.mlr1$time,data.mlr1$fitted_values,type='o',col='red')
+legend(3650,500000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+par(mfrow=c(1,1))
+plot(data.glm1$time,data.glm1$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="[Gwangsan TC test data] response vs fitted_values (Generalized Linear Model)",ylim=c(-100000,500000))
+lines(data.glm1$time,data.glm1$response,type='o',col='blue')
+legend(3650,500000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+par(mfrow=c(1,1))
+plot(data.gam1$time,data.gam1$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="[Gwangsan TC test data] response vs fitted_values (Generalized Additive Model)",ylim=c(-100000,500000))
+lines(data.gam1$time,data.gam1$response,type='o',col='blue')
+legend(3650,500000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+par(mfrow=c(1,1))
+plot(data.tvcm1$time,data.tvcm1$fitted_values,type='o',col='red',xlab="time",ylab="TC",main="[Gwangsan TC test data] response vs fitted_values (Time Varying Coefficient Model)",ylim=c(-100000,500000))
+lines(data.tvcm1$time,data.tvcm1$response,type='o',col='blue')
+legend(3650,500000,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 ```
 
 #### 여러가지 사항을 고려했을 때 광산 TC 예측에 대한 최적의 모형은 GAM이라고 판단됨.
