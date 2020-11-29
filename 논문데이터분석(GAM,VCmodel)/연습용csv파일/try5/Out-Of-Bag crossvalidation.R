@@ -1,4 +1,4 @@
-## 10-fold crossvalidation
+## Out-Of-Bag crossvalidation
 
 ## 광산 TC
 
