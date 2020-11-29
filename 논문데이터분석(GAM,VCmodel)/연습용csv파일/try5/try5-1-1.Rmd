@@ -989,8 +989,8 @@ par(mfrow=c(1,1))
 ```{r}
 vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=log(TC))+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(FC))+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=quasi(link="log"),method="GCV.Cp",select=TRUE)
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
-ggGam(vc.shrink) # 선택변수 : 
-summary(vc.shrink) # Deviance explained =   
+ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, EC, log(TC), NH3N, PO4P, log(FC), Flow, Rain 
+summary(vc.shrink) # Deviance explained = 80.3%   
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
@@ -1001,7 +1001,7 @@ par(mfrow=c(1,1))
 ```{r}
 pred.tvcm <- predict(vc.shrink,newdata=ex1,type="response")
 data.tvcm <- data.frame(response=ex1$Chla,fitted_values=pred.tvcm,time=ex1$time)
-sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE =     
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 14.85056     
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan Chla train data] response vs fitted_values (Time Varying Coefficient Model)") +
@@ -1020,7 +1020,7 @@ ex1_1 <- ex1_1[,-1]
 ex1_1 <- as.data.frame(ex1_1)
 pred.tvcm1 <- predict(vc.shrink,newdata=ex1_1,type="response")
 data.tvcm1 <- data.frame(response=ex1_1$Chla,fitted_values=pred.tvcm1,time=ex1_1$time)
-sqrt(sum((data.tvcm1$response-data.tvcm1$fitted_values)^2)/length(data.tvcm1$response)) # RMSE =   
+sqrt(sum((data.tvcm1$response-data.tvcm1$fitted_values)^2)/length(data.tvcm1$response)) # RMSE = 48.43549   
 ggplot(data.tvcm1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan Chla test data] response vs fitted_values (Time Varying Coefficient Model)") +
@@ -1032,15 +1032,15 @@ legend(3650,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 ```
 
 
-#### 최종선택된 모형의 설명력(Deviance explained) : %(다중선형회귀모형), %(일반화선형모형), %(일반화가법모형), %(시간에 따른 계수변화모형) 
+#### 최종선택된 모형의 설명력(Deviance explained) : 64.8%(다중선형회귀모형), 59.7%(일반화선형모형), 76.9%(일반화가법모형), 80.3%(시간에 따른 계수변화모형) 
 
-#### train data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형), (일반화가법모형), (시간에 따른 계수변화모형)
+#### train data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 19.85979(다중선형회귀모형), 31.34176(일반화선형모형), 16.08552(일반화가법모형), 14.85056(시간에 따른 계수변화모형)
 
-#### test data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형), (일반화가법모형), (시간에 따른 계수변화모형)
+#### test data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 39.45355(다중선형회귀모형), 46.81785(일반화선형모형), 37.13758(일반화가법모형), 48.43549(시간에 따른 계수변화모형)
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
-#### test RMSE의 경우 MLR이 가장 작게 나왔다. 하지만, MLR의 경우 적절한 확률분포를 가정하고 있지 않고 있고 Chla의 예측값을 음수로 추정해주는 과오를 범하고 있기 때문에 최적의 모형이라고 할 수는 없다. 그리고 GLM, GAM, TVCM의 경우 예측값을 과대 또는 과소추정하는 경우가 있어서 RMSE의 기준으로 과소평가를 받을 수 있기 때문에 x축과 y축의 범위를 동일하게 조절한 산점도를 볼 필요가 있겠다.
+#### MLR의 경우 적절한 확률분포를 가정하고 있지 않고 있고 Chla의 예측값을 음수로 추정해주는 과오를 범하고 있기 때문에 최적의 모형이라고 할 수는 없다. 그리고 GLM, GAM, TVCM의 경우 예측값을 과대 또는 과소추정하는 경우가 있어서 RMSE의 기준으로 과소평가를 받을 수 있기 때문에 x축과 y축의 범위를 동일하게 조절한 산점도를 볼 필요가 있겠다.
 
 ```{r}
 ggplot(data.mlr1, aes(x=response, y=fitted_values)) +
@@ -1086,7 +1086,7 @@ lines(data.tvcm1$time,data.tvcm1$response,type='o',col='blue')
 legend(3650,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 ```
 
-#### 여러가지 사항을 고려했을 때 광산 Chla 예측에 대한 최적의 모형은 TVCM이라고 판단됨.
+#### 여러가지 사항을 고려했을 때 광산 Chla 예측에 대한 최적의 모형은 GAM이라고 판단됨.
 
 
 
@@ -1174,7 +1174,7 @@ g15 <- ggplot(data=ex2,aes(x=Flow,y=TC)) + geom_point() + stat_smooth(method=lm)
 g16 <- ggplot(data=ex2,aes(x=Rain,y=TC)) + geom_point() + stat_smooth(method=lm)
 grid.arrange(g1,g2,g3,g4,g5,g6,g7,g8,g9,g10,g11,g12,g13,g14,g15,g16,nrow=4,ncol=4)
 gfit <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)+NH3N+PO4P+log(FC)+Flow+Rain,data=ex2,family=gaussian(link="identity"))
-summary(gfit) # Deviance explained:   
+summary(gfit) # Deviance explained: 0.3354   
 vif(gfit) 
 par(mfrow=c(2,2))
 plot(gfit)
@@ -1187,8 +1187,8 @@ dwtest(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)+NH3N+PO4P+log(FC)+Flow+Rain
 
 ```{r}
 gfit.step <- stepAIC(gfit, direction="both", trace=TRUE)
-gfit.step # 선택변수 : 
-summary(gfit.step) # Deviance explained:    
+gfit.step # 선택변수 : BOD, SS, TP, EC, log(FC), Flow 
+summary(gfit.step) # Deviance explained: 0.3292    
 vif(gfit.step) 
 par(mfrow=c(2,2))
 plot(gfit.step)
