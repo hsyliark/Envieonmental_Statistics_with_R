@@ -6,8 +6,8 @@ TC1.RMSE.mlr <- c()
 TC1.RMSE.glm <- c()
 TC1.RMSE.gam <- c()
 TC1.RMSE.tvcm <- c()
-for (i in 1:10) {
-  a <- sample(1:nrow(ex1),round(4*nrow(ex1)/10))
+for (i in 1:1000) {
+  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
   train <- ex1[-a,] ; test <- ex1[a,]
   # Multiple Linear Regression
   fit <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)
@@ -77,8 +77,8 @@ FC1.RMSE.mlr <- c()
 FC1.RMSE.glm <- c()
 FC1.RMSE.gam <- c()
 FC1.RMSE.tvcm <- c()
-for (i in 1:10) {
-  a <- sample(1:nrow(ex1),round(4*nrow(ex1)/10))
+for (i in 1:1000) {
+  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
   train <- ex1[-a,] ; test <- ex1[a,]
   # Multiple Linear Regression
   fit <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)
@@ -148,8 +148,8 @@ Chla1.RMSE.mlr <- c()
 Chla1.RMSE.glm <- c()
 Chla1.RMSE.gam <- c()
 Chla1.RMSE.tvcm <- c()
-for (i in 1:10) {
-  a <- sample(1:nrow(ex1),round(4*nrow(ex1)/10))
+for (i in 1:1000) {
+  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
   train <- ex1[-a,] ; test <- ex1[a,]
   # Multiple Linear Regression
   fit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)
@@ -231,8 +231,8 @@ TC2.RMSE.mlr <- c()
 TC2.RMSE.glm <- c()
 TC2.RMSE.gam <- c()
 TC2.RMSE.tvcm <- c()
-for (i in 1:10) {
-  a <- sample(1:nrow(ex2),round(4*nrow(ex2)/10))
+for (i in 1:1000) {
+  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
   train <- ex2[-a,] ; test <- ex2[a,]
   # Multiple Linear Regression
   fit <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)
@@ -302,8 +302,8 @@ FC2.RMSE.mlr <- c()
 FC2.RMSE.glm <- c()
 FC2.RMSE.gam <- c()
 FC2.RMSE.tvcm <- c()
-for (i in 1:10) {
-  a <- sample(1:nrow(ex2),round(4*nrow(ex2)/10))
+for (i in 1:1000) {
+  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
   train <- ex2[-a,] ; test <- ex2[a,]
   # Multiple Linear Regression
   fit <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)
@@ -373,8 +373,8 @@ Chla2.RMSE.mlr <- c()
 Chla2.RMSE.glm <- c()
 Chla2.RMSE.gam <- c()
 Chla2.RMSE.tvcm <- c()
-for (i in 1:10) {
-  a <- sample(1:nrow(ex2),round(4*nrow(ex2)/10))
+for (i in 1:1000) {
+  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
   train <- ex2[-a,] ; test <- ex2[a,]
   # Multiple Linear Regression
   fit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)
