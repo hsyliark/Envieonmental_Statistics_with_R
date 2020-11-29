@@ -1193,7 +1193,7 @@ vif(gfit.step)
 par(mfrow=c(2,2))
 plot(gfit.step)
 par(mfrow=c(1,1))
-dwtest(TC~,data=ex2) # 잔차가 양의 자기상관성을 가지고 있음.
+dwtest(TC~BOD+SS+TP+EC+log(FC)+Flow,data=ex2) # 잔차가 양의 자기상관성을 가지고 있음.
 # 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
 ```
 
@@ -1204,7 +1204,7 @@ pred.mlr <- predict(gfit.step,newdata=ex2,type="response")
 data.mlr <- data.frame(response=ex2$TC,fitted_values=pred.mlr,
                        time=ex2$time)
 sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
-       length(data.mlr$response)) # RMSE =   
+       length(data.mlr$response)) # RMSE = 8628.659   
 ggplot(data.mlr, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi TC train data] response vs fitted_values 
@@ -1231,7 +1231,7 @@ pred.mlr1 <- predict(gfit.step,newdata=ex2_1,type="response")
 data.mlr1 <- data.frame(response=ex2_1$TC,fitted_values=pred.mlr1,
                         time=ex2_1$time)
 sqrt(sum((data.mlr1$response-data.mlr1$fitted_values)^2)/
-       length(data.mlr1$response)) # RMSE =    
+       length(data.mlr1$response)) # RMSE = 5388.564    
 ggplot(data.mlr1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi TC test data] response vs fitted_values 
@@ -1252,7 +1252,7 @@ legend(3650,500000,c("fitted_values","response"),lwd=c(1,1),
 
 ```{r}
 m <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)+NH3N+PO4P+log(FC)+Flow+Rain,data=ex2,family=poisson(link="log"))
-summary(m) # Deviance explained : 
+summary(m) # Deviance explained : 0.4710 
 vif(m) 
 par(mfrow=c(2,2))
 plot(m)
@@ -1263,8 +1263,8 @@ par(mfrow=c(1,1))
 
 ```{r}
 m.step <- stepAIC(m, direction="both", trace=TRUE)
-m.step # 선택변수 : 
-summary(m.step) # Deviance explained :  
+m.step # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, log(Chla), NH3N, PO4P, log(FC), Flow, Rain 
+summary(m.step) # Deviance explained : 0.4710  
 vif(m.step) 
 par(mfrow=c(2,2))
 plot(m.step)
@@ -1278,7 +1278,7 @@ pred.glm <- predict(m.step,newdata=ex2,type="response")
 data.glm <- data.frame(response=ex2$TC,fitted_values=pred.glm,
                        time=ex2$time)
 sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
-       length(data.glm$response)) # RMSE =    
+       length(data.glm$response)) # RMSE = 7886.188    
 ggplot(data.glm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi TC train data] response vs fitted_values 
@@ -1305,7 +1305,7 @@ pred.glm1 <- predict(m.step,newdata=ex2_1,type="response")
 data.glm1 <- data.frame(response=ex2_1$TC,fitted_values=pred.glm1,
                         time=ex2_1$time)
 sqrt(sum((data.glm1$response-data.glm1$fitted_values)^2)/
-       length(data.glm1$response)) # RMSE =  
+       length(data.glm1$response)) # RMSE = 6856.565  
 ggplot(data.glm1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi TC test data] response vs fitted_values 
@@ -1328,7 +1328,7 @@ legend(3650,500000,c("fitted_values","response"),lwd=c(1,1),
 mm <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(log(Chla))+s(NH3N)+s(PO4P)+s(log(FC))+s(Flow)+s(Rain),data=ex2,family=quasipoisson(link="log"))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
 ggGam(mm)
-summary(mm) # Deviance explained = 
+summary(mm) # Deviance explained = 75.2% 
 concurvity(mm,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm) # 적합결여 존재 (기저함수 부족)
@@ -1340,8 +1340,8 @@ par(mfrow=c(1,1))
 ```{r}
 mm.shrink <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(log(Chla))+s(NH3N)+s(PO4P)+s(log(FC))+s(Flow)+s(Rain),data=ex2,family=quasipoisson(link="log"),method="GCV.Cp",select=TRUE) 
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
-ggGam(mm.shrink) # 선택변수 :  
-summary(mm.shrink) # Deviance explained =  
+ggGam(mm.shrink) # 선택변수 : pH, BOD, COD, SS, TN, TP, TOC, WT, EC, log(Chla), NH3N, PO4P, log(FC), Flow, Rain  
+summary(mm.shrink) # Deviance explained = 74.1%  
 concurvity(mm.shrink,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
@@ -1355,7 +1355,7 @@ pred.gam <- predict(mm.shrink,newdata=ex2,type="response")
 data.gam <- data.frame(response=ex2$TC,fitted_values=pred.gam,
                        time=ex2$time)
 sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
-       length(data.gam$response)) # RMSE =     
+       length(data.gam$response)) # RMSE = 5355.716     
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi TC train data] response vs fitted_values 
@@ -1382,7 +1382,7 @@ pred.gam1 <- predict(mm.shrink,newdata=ex2_1,type="response")
 data.gam1 <- data.frame(response=ex2_1$TC,fitted_values=pred.gam1,
                         time=ex2_1$time)
 sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/
-       length(data.gam1$response)) # RMSE =   
+       length(data.gam1$response)) # RMSE = 53200.4   
 ggplot(data.gam1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi TC test data] response vs fitted_values 
@@ -1490,25 +1490,25 @@ ggplot(data.mlr1, aes(x=response, y=fitted_values)) +
   ggtitle("[Uchi TC test data] response vs fitted_values 
           (Multiple Linear Regression)") +
   geom_abline(intercept=0,slope=1,color='blue',size=1.5) +
-  coord_cartesian(xlim = c(0,100000), ylim = c(0,100000))
+  coord_cartesian(xlim = c(0,30000), ylim = c(0,30000))
 ggplot(data.glm1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi TC test data] response vs fitted_values 
           (Generalized Linear Model)") +
   geom_abline(intercept=0,slope=1,color='blue',size=1.5) +
-  coord_cartesian(xlim = c(0,100000), ylim = c(0,100000))
+  coord_cartesian(xlim = c(0,30000), ylim = c(0,30000))
 ggplot(data.gam1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi TC test data] response vs fitted_values 
           (Generalized Additive Model)") +
   geom_abline(intercept=0,slope=1,color='blue',size=1.5) +
-  coord_cartesian(xlim = c(0,100000), ylim = c(0,100000))
+  coord_cartesian(xlim = c(0,30000), ylim = c(0,30000))
 ggplot(data.tvcm1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi TC test data] response vs fitted_values 
           (Time Varying Coefficient Model)") +
   geom_abline(intercept=0,slope=1,color='blue',size=1.5) +
-  coord_cartesian(xlim = c(0,100000), ylim = c(0,100000))
+  coord_cartesian(xlim = c(0,30000), ylim = c(0,30000))
 ```
 
 #### 추가로 time vs TC 그래프에 대해서도 y축 범위를 통일시켜 그려보면 다음과 같다.
