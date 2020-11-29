@@ -1,6 +1,37 @@
+ex1 <- read.csv("C:/Users/HSY/Desktop/광산(2010-2019).csv", sep=",", header=T)
+ex1 <- ex1[,-1]
+ex1 <- as.data.frame(ex1)
+
+ex2 <- read.csv("C:/Users/HSY/Desktop/우치(2010-2019).csv", sep=",", header=T)
+ex2 <- ex2[,-1]
+ex2 <- as.data.frame(ex2)
+
+library(tidyverse)
+library(mgcv)
+library(ggplot2)
+library(gridExtra)
+library(moonBook)
+library(ztable)
+library(survival)
+library(ggGam)
+library(corrplot)
+library(ggcorrplot)
+library(car)
+library(lmtest)
+library(fda)
+library(refund)
+library(MASS)
+library(boot)
+library(kohonen)
+library(SOMbrero)
+
+
+
+
+
 ## Out-Of-Bag crossvalidation
 
-## 광산 TC
+# 광산 TC
 
 TC1.RMSE.mlr <- c()
 TC1.RMSE.glm <- c()
@@ -20,7 +51,7 @@ for (i in 1:1000) {
   TC1.RMSE.mlr <- c(TC1.RMSE.mlr,
                 sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
                        length(data.mlr$response)))
-  print(c('MLR',i))
+  print(c('TC1.MLR',i))
   # Generalized Linear Model
   m <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)+
              NH3N+PO4P+log(FC)+Flow+Rain,data=train,
@@ -32,7 +63,7 @@ for (i in 1:1000) {
   TC1.RMSE.glm <- c(TC1.RMSE.glm,
                 sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
                        length(data.glm$response)))
-  print(c('GLM',i))
+  print(c('TC1.GLM',i))
   # Generalized Additive Model
   mm.shrink <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                    +s(TOC)+s(WT)+s(EC)+s(log(Chla))+s(NH3N)+s(PO4P)
@@ -45,7 +76,7 @@ for (i in 1:1000) {
   TC1.RMSE.gam <- c(TC1.RMSE.gam,
                 sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
                        length(data.gam$response)))
-  print(c('GAM',i))
+  print(c('TC1.GAM',i))
   # Time Varying Coefficient Model
   vc.shrink <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+
                      s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
@@ -61,7 +92,7 @@ for (i in 1:1000) {
   TC1.RMSE.tvcm <- c(TC1.RMSE.tvcm,
                  sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
                         length(data.tvcm$response)))
-  print(c('TVCM',i))
+  print(c('TC1.TVCM',i))
 }
 TC1.RMSE <- data.frame(RMSE=c(TC1.RMSE.mlr,TC1.RMSE.glm,
                               TC1.RMSE.gam,TC1.RMSE.tvcm),
@@ -91,7 +122,7 @@ for (i in 1:1000) {
   FC1.RMSE.mlr <- c(FC1.RMSE.mlr,
                 sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
                        length(data.mlr$response)))
-  print(c('MLR',i))
+  print(c('FC1.MLR',i))
   # Generalized Linear Model
   m <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)+
              NH3N+PO4P+log(TC)+Flow+Rain,data=train,
@@ -103,7 +134,7 @@ for (i in 1:1000) {
   FC1.RMSE.glm <- c(FC1.RMSE.glm,
                 sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
                        length(data.glm$response)))
-  print(c('GLM',i))
+  print(c('FC1.GLM',i))
   # Generalized Additive Model
   mm.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                    +s(TOC)+s(WT)+s(EC)+s(log(Chla))+s(NH3N)+s(PO4P)
@@ -116,7 +147,7 @@ for (i in 1:1000) {
   FC1.RMSE.gam <- c(FC1.RMSE.gam,
                 sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
                        length(data.gam$response)))
-  print(c('GAM',i))
+  print(c('FC1.GAM',i))
   # Time Varying Coefficient Model
   vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+
                      s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
@@ -132,7 +163,7 @@ for (i in 1:1000) {
   FC1.RMSE.tvcm <- c(FC1.RMSE.tvcm,
                  sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
                         length(data.tvcm$response)))
-  print(c('TVCM',i))
+  print(c('FC1.TVCM',i))
 }
 FC1.RMSE <- data.frame(RMSE=c(FC1.RMSE.mlr,FC1.RMSE.glm,
                               FC1.RMSE.gam,FC1.RMSE.tvcm),
@@ -162,7 +193,7 @@ for (i in 1:1000) {
   Chla1.RMSE.mlr <- c(Chla1.RMSE.mlr,
                     sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
                            length(data.mlr$response)))
-  print(c('MLR',i))
+  print(c('Chla1.MLR',i))
   # Generalized Linear Model
   m <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)+
              NH3N+PO4P+log(TC)+Flow+Rain,data=train,
@@ -174,7 +205,7 @@ for (i in 1:1000) {
   Chla1.RMSE.glm <- c(Chla1.RMSE.glm,
                     sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
                            length(data.glm$response)))
-  print(c('GLM',i))
+  print(c('Chla1.GLM',i))
   # Generalized Additive Model
   mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                    +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
@@ -187,7 +218,7 @@ for (i in 1:1000) {
   Chla1.RMSE.gam <- c(Chla1.RMSE.gam,
                     sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
                            length(data.gam$response)))
-  print(c('GAM',i))
+  print(c('Chla1.GAM',i))
   # Time Varying Coefficient Model
   vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
                      s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
@@ -203,7 +234,7 @@ for (i in 1:1000) {
   Chla1.RMSE.tvcm <- c(Chla1.RMSE.tvcm,
                      sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
                             length(data.tvcm$response)))
-  print(c('TVCM',i))
+  print(c('Chla1.TVCM',i))
 }
 Chla1.RMSE <- data.frame(RMSE=c(Chla1.RMSE.mlr,Chla1.RMSE.glm,
                                 Chla1.RMSE.gam,Chla1.RMSE.tvcm),
@@ -215,17 +246,7 @@ ggplot(Chla1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
   
 
 
-
-
-
-
-
-
-
-
-
-
-## 우치 TC
+# 우치 TC
 
 TC2.RMSE.mlr <- c()
 TC2.RMSE.glm <- c()
@@ -245,7 +266,7 @@ for (i in 1:1000) {
   TC2.RMSE.mlr <- c(TC2.RMSE.mlr,
                     sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
                            length(data.mlr$response)))
-  print(c('MLR',i))
+  print(c('TC2.MLR',i))
   # Generalized Linear Model
   m <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)+
              NH3N+PO4P+log(FC)+Flow+Rain,data=train,
@@ -257,7 +278,7 @@ for (i in 1:1000) {
   TC2.RMSE.glm <- c(TC2.RMSE.glm,
                     sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
                            length(data.glm$response)))
-  print(c('GLM',i))
+  print(c('TC2.GLM',i))
   # Generalized Additive Model
   mm.shrink <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                    +s(TOC)+s(WT)+s(EC)+s(log(Chla))+s(NH3N)+s(PO4P)
@@ -270,7 +291,7 @@ for (i in 1:1000) {
   TC2.RMSE.gam <- c(TC2.RMSE.gam,
                     sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
                            length(data.gam$response)))
-  print(c('GAM',i))
+  print(c('TC2.GAM',i))
   # Time Varying Coefficient Model
   vc.shrink <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+
                      s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
@@ -286,7 +307,7 @@ for (i in 1:1000) {
   TC2.RMSE.tvcm <- c(TC2.RMSE.tvcm,
                      sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
                             length(data.tvcm$response)))
-  print(c('TVCM',i))
+  print(c('TC2.TVCM',i))
 }
 TC2.RMSE <- data.frame(RMSE=c(TC2.RMSE.mlr,TC2.RMSE.glm,
                               TC2.RMSE.gam,TC2.RMSE.tvcm),
@@ -316,7 +337,7 @@ for (i in 1:1000) {
   FC2.RMSE.mlr <- c(FC2.RMSE.mlr,
                     sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
                            length(data.mlr$response)))
-  print(c('MLR',i))
+  print(c('FC2.MLR',i))
   # Generalized Linear Model
   m <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)+
              NH3N+PO4P+log(TC)+Flow+Rain,data=train,
@@ -328,7 +349,7 @@ for (i in 1:1000) {
   FC2.RMSE.glm <- c(FC2.RMSE.glm,
                     sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
                            length(data.glm$response)))
-  print(c('GLM',i))
+  print(c('FC2.GLM',i))
   # Generalized Additive Model
   mm.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                    +s(TOC)+s(WT)+s(EC)+s(log(Chla))+s(NH3N)+s(PO4P)
@@ -341,7 +362,7 @@ for (i in 1:1000) {
   FC2.RMSE.gam <- c(FC2.RMSE.gam,
                     sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
                            length(data.gam$response)))
-  print(c('GAM',i))
+  print(c('FC2.GAM',i))
   # Time Varying Coefficient Model
   vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+
                      s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
@@ -357,7 +378,7 @@ for (i in 1:1000) {
   FC2.RMSE.tvcm <- c(FC2.RMSE.tvcm,
                      sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
                             length(data.tvcm$response)))
-  print(c('TVCM',i))
+  print(c('FC2.TVCM',i))
 }
 FC2.RMSE <- data.frame(RMSE=c(FC2.RMSE.mlr,FC2.RMSE.glm,
                               FC2.RMSE.gam,FC2.RMSE.tvcm),
@@ -387,7 +408,7 @@ for (i in 1:1000) {
   Chla2.RMSE.mlr <- c(Chla2.RMSE.mlr,
                       sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
                              length(data.mlr$response)))
-  print(c('MLR',i))
+  print(c('Chla2.MLR',i))
   # Generalized Linear Model
   m <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)+
              NH3N+PO4P+log(TC)+Flow+Rain,data=train,
@@ -399,7 +420,7 @@ for (i in 1:1000) {
   Chla2.RMSE.glm <- c(Chla2.RMSE.glm,
                       sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
                              length(data.glm$response)))
-  print(c('GLM',i))
+  print(c('Chla2.GLM',i))
   # Generalized Additive Model
   mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                    +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
@@ -412,7 +433,7 @@ for (i in 1:1000) {
   Chla2.RMSE.gam <- c(Chla2.RMSE.gam,
                       sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
                              length(data.gam$response)))
-  print(c('GAM',i))
+  print(c('Chla2.GAM',i))
   # Time Varying Coefficient Model
   vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
                      s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
@@ -428,7 +449,7 @@ for (i in 1:1000) {
   Chla2.RMSE.tvcm <- c(Chla2.RMSE.tvcm,
                        sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
                               length(data.tvcm$response)))
-  print(c('TVCM',i))
+  print(c('Chla2.TVCM',i))
 }
 Chla2.RMSE <- data.frame(RMSE=c(Chla2.RMSE.mlr,Chla2.RMSE.glm,
                                 Chla2.RMSE.gam,Chla2.RMSE.tvcm),
@@ -436,6 +457,511 @@ Chla2.RMSE <- data.frame(RMSE=c(Chla2.RMSE.mlr,Chla2.RMSE.glm,
                                  rep("3_GAM",10),rep("4_TVCM",10)))
 ggplot(Chla2.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
   ggtitle("Uchi Chla")
+
+
+
+
+
+
+## Out-Of-Bag crossvalidation with Bagging
+
+
+# 광산 TC
+
+TC1.Bag.RMSE.mlr <- c()
+TC1.Bag.RMSE.glm <- c()
+TC1.Bag.RMSE.gam <- c()
+TC1.Bag.RMSE.tvcm <- c()
+for (i in 1:1000) {
+  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
+  train <- ex1[-a,] ; test <- ex1[a,]
+  RMSE.mlr <- c()
+  RMSE.glm <- c()
+  RMSE.gam <- c()
+  RMSE.tvcm <- c()
+  for (j in 1:100) {
+    b <- sample(1:nrow(train),nrow(train),replace=TRUE)
+    train.bag <- train[b,]
+    # Multiple Linear Regression
+    fit <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)
+               +NH3N+PO4P+log(FC)+Flow+Rain,data=train.bag,
+               family=gaussian(link="identity"))
+    fit.step <- stepAIC(fit, direction="both", trace=FALSE)
+    pred.mlr <- predict(fit.step,newdata=test,type="response")
+    data.mlr <- data.frame(response=test$TC,fitted_values=pred.mlr,
+                           time=test$time)
+    RMSE.mlr <- c(RMSE.mlr,
+                      sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
+                             length(data.mlr$response)))
+    print(c('MLR',j))
+    # Generalized Linear Model
+    m <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)+
+               NH3N+PO4P+log(FC)+Flow+Rain,data=train.bag,
+             family=poisson(link="log"))
+    m.step <- stepAIC(m, direction="both", trace=FALSE)
+    pred.glm <- predict(m.step,newdata=test,type="response")
+    data.glm <- data.frame(response=test$TC,fitted_values=pred.glm,
+                           time=test$time)
+    RMSE.glm <- c(RMSE.glm,
+                      sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
+                             length(data.glm$response)))
+    print(c('GLM',j))
+    # Generalized Additive Model
+    mm.shrink <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                     +s(TOC)+s(WT)+s(EC)+s(log(Chla))+s(NH3N)+s(PO4P)
+                     +s(log(FC))+s(Flow)+s(Rain),data=train.bag,
+                     family=quasipoisson(link="log"),method="GCV.Cp",
+                     select=TRUE)
+    pred.gam <- predict(mm.shrink,newdata=test,type="response")
+    data.gam <- data.frame(response=test$TC,fitted_values=pred.gam,
+                           time=test$time)
+    RMSE.gam <- c(RMSE.gam,
+                      sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
+                             length(data.gam$response)))
+    print(c('GAM',j))
+    # Time Varying Coefficient Model
+    vc.shrink <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+
+                       s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+                       s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
+                       s(time,by=WT)+s(time,by=EC)+s(time,by=log(Chla))+
+                       s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(FC))+
+                       s(time,by=Flow)+s(time,by=Rain),data=train.bag,
+                     family=quasipoisson(link="log"),method="GCV.Cp",
+                     select=TRUE)
+    pred.tvcm <- predict(vc.shrink,newdata=test,type="response")
+    data.tvcm <- data.frame(response=test$TC,fitted_values=pred.tvcm,
+                            time=test$time)
+    RMSE.tvcm <- c(RMSE.tvcm,
+                       sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
+                              length(data.tvcm$response)))
+    print(c('TVCM',j))}
+  TC1.Bag.RMSE.mlr <- c(TC1.Bag.RMSE.mlr,mean(RMSE.mlr))
+  TC1.Bag.RMSE.glm <- c(TC1.Bag.RMSE.glm,mean(RMSE.glm))
+  TC1.Bag.RMSE.gam <- c(TC1.Bag.RMSE.gam,mean(RMSE.gam))
+  TC1.Bag.RMSE.tvcm <- c(TC1.Bag.RMSE.tvcm,mean(RMSE.tvcm))
+  print('TC1.bag',i)
+}
+TC1.bag.RMSE <- data.frame(RMSE=c(TC1.bag.RMSE.mlr,TC1.bag.RMSE.glm,
+                              TC1.bag.RMSE.gam,TC1.bag.RMSE.tvcm),
+                       model=c(rep("1_MLR",10),rep("2_GLM",10),
+                               rep("3_GAM",10),rep("4_TVCM",10)))
+ggplot(TC1.bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
+  ggtitle("Gwangsan TC (Bagging)")
+
+
+# 광산 FC
+
+FC1.Bag.RMSE.mlr <- c()
+FC1.Bag.RMSE.glm <- c()
+FC1.Bag.RMSE.gam <- c()
+FC1.Bag.RMSE.tvcm <- c()
+for (i in 1:1000) {
+  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
+  train <- ex1[-a,] ; test <- ex1[a,]
+  RMSE.mlr <- c()
+  RMSE.glm <- c()
+  RMSE.gam <- c()
+  RMSE.tvcm <- c()
+  for (j in 1:100) {
+    b <- sample(1:nrow(train),nrow(train),replace=TRUE)
+    train.bag <- train[b,]
+    # Multiple Linear Regression
+    fit <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)
+               +NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
+               family=gaussian(link="identity"))
+    fit.step <- stepAIC(fit, direction="both", trace=FALSE)
+    pred.mlr <- predict(fit.step,newdata=test,type="response")
+    data.mlr <- data.frame(response=test$FC,fitted_values=pred.mlr,
+                           time=test$time)
+    RMSE.mlr <- c(RMSE.mlr,
+                  sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
+                         length(data.mlr$response)))
+    print(c('MLR',j))
+    # Generalized Linear Model
+    m <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)+
+               NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
+             family=poisson(link="log"))
+    m.step <- stepAIC(m, direction="both", trace=FALSE)
+    pred.glm <- predict(m.step,newdata=test,type="response")
+    data.glm <- data.frame(response=test$FC,fitted_values=pred.glm,
+                           time=test$time)
+    RMSE.glm <- c(RMSE.glm,
+                  sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
+                         length(data.glm$response)))
+    print(c('GLM',j))
+    # Generalized Additive Model
+    mm.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                     +s(TOC)+s(WT)+s(EC)+s(log(Chla))+s(NH3N)+s(PO4P)
+                     +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
+                     family=quasipoisson(link="log"),method="GCV.Cp",
+                     select=TRUE)
+    pred.gam <- predict(mm.shrink,newdata=test,type="response")
+    data.gam <- data.frame(response=test$FC,fitted_values=pred.gam,
+                           time=test$time)
+    RMSE.gam <- c(RMSE.gam,
+                  sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
+                         length(data.gam$response)))
+    print(c('GAM',j))
+    # Time Varying Coefficient Model
+    vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+
+                       s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+                       s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
+                       s(time,by=WT)+s(time,by=EC)+s(time,by=log(Chla))+
+                       s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
+                       s(time,by=Flow)+s(time,by=Rain),data=train.bag,
+                     family=quasipoisson(link="log"),method="GCV.Cp",
+                     select=TRUE)
+    pred.tvcm <- predict(vc.shrink,newdata=test,type="response")
+    data.tvcm <- data.frame(response=test$FC,fitted_values=pred.tvcm,
+                            time=test$time)
+    RMSE.tvcm <- c(RMSE.tvcm,
+                   sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
+                          length(data.tvcm$response)))
+    print(c('TVCM',j))}
+  FC1.Bag.RMSE.mlr <- c(FC1.Bag.RMSE.mlr,mean(RMSE.mlr))
+  FC1.Bag.RMSE.glm <- c(FC1.Bag.RMSE.glm,mean(RMSE.glm))
+  FC1.Bag.RMSE.gam <- c(FC1.Bag.RMSE.gam,mean(RMSE.gam))
+  FC1.Bag.RMSE.tvcm <- c(FC1.Bag.RMSE.tvcm,mean(RMSE.tvcm))
+  print('FC1.bag',i)
+}
+FC1.bag.RMSE <- data.frame(RMSE=c(FC1.bag.RMSE.mlr,FC1.bag.RMSE.glm,
+                                  FC1.bag.RMSE.gam,FC1.bag.RMSE.tvcm),
+                           model=c(rep("1_MLR",10),rep("2_GLM",10),
+                                   rep("3_GAM",10),rep("4_TVCM",10)))
+ggplot(FC1.bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
+  ggtitle("Gwangsan FC (Bagging)")
+
+
+# 광산 Chla
+
+Chla1.Bag.RMSE.mlr <- c()
+Chla1.Bag.RMSE.glm <- c()
+Chla1.Bag.RMSE.gam <- c()
+Chla1.Bag.RMSE.tvcm <- c()
+for (i in 1:1000) {
+  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
+  train <- ex1[-a,] ; test <- ex1[a,]
+  RMSE.mlr <- c()
+  RMSE.glm <- c()
+  RMSE.gam <- c()
+  RMSE.tvcm <- c()
+  for (j in 1:100) {
+    b <- sample(1:nrow(train),nrow(train),replace=TRUE)
+    train.bag <- train[b,]
+    # Multiple Linear Regression
+    fit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)
+               +NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
+               family=gaussian(link="identity"))
+    fit.step <- stepAIC(fit, direction="both", trace=FALSE)
+    pred.mlr <- predict(fit.step,newdata=test,type="response")
+    data.mlr <- data.frame(response=test$Chla,fitted_values=pred.mlr,
+                           time=test$time)
+    RMSE.mlr <- c(RMSE.mlr,
+                  sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
+                         length(data.mlr$response)))
+    print(c('MLR',j))
+    # Generalized Linear Model
+    m <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)+
+               NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
+             family=Gamma(link="log"))
+    m.step <- stepAIC(m, direction="both", trace=FALSE)
+    pred.glm <- predict(m.step,newdata=test,type="response")
+    data.glm <- data.frame(response=test$Chla,fitted_values=pred.glm,
+                           time=test$time)
+    RMSE.glm <- c(RMSE.glm,
+                  sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
+                         length(data.glm$response)))
+    print(c('GLM',j))
+    # Generalized Additive Model
+    mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                     +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
+                     +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
+                     family=quasi(link="log"),method="GCV.Cp",
+                     select=TRUE)
+    pred.gam <- predict(mm.shrink,newdata=test,type="response")
+    data.gam <- data.frame(response=test$Chla,fitted_values=pred.gam,
+                           time=test$time)
+    RMSE.gam <- c(RMSE.gam,
+                  sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
+                         length(data.gam$response)))
+    print(c('GAM',j))
+    # Time Varying Coefficient Model
+    vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
+                       s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+                       s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
+                       s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
+                       s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
+                       s(time,by=Flow)+s(time,by=Rain),data=train.bag,
+                     family=quasi(link="log"),method="GCV.Cp",
+                     select=TRUE)
+    pred.tvcm <- predict(vc.shrink,newdata=test,type="response")
+    data.tvcm <- data.frame(response=test$Chla,fitted_values=pred.tvcm,
+                            time=test$time)
+    RMSE.tvcm <- c(RMSE.tvcm,
+                   sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
+                          length(data.tvcm$response)))
+    print(c('TVCM',j))}
+  Chla1.Bag.RMSE.mlr <- c(Chla1.Bag.RMSE.mlr,mean(RMSE.mlr))
+  Chla1.Bag.RMSE.glm <- c(Chla1.Bag.RMSE.glm,mean(RMSE.glm))
+  Chla1.Bag.RMSE.gam <- c(Chla1.Bag.RMSE.gam,mean(RMSE.gam))
+  Chla1.Bag.RMSE.tvcm <- c(Chla1.Bag.RMSE.tvcm,mean(RMSE.tvcm))
+  print('Chla1.bag',i)
+}
+Chla1.bag.RMSE <- data.frame(RMSE=c(Chla1.bag.RMSE.mlr,Chla1.bag.RMSE.glm,
+                                    Chla1.bag.RMSE.gam,Chla1.bag.RMSE.tvcm),
+                           model=c(rep("1_MLR",10),rep("2_GLM",10),
+                                   rep("3_GAM",10),rep("4_TVCM",10)))
+ggplot(Chla1.bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
+  ggtitle("Gwangsan Chla (Bagging)")
+
+
+# 우치 TC
+
+TC2.Bag.RMSE.mlr <- c()
+TC2.Bag.RMSE.glm <- c()
+TC2.Bag.RMSE.gam <- c()
+TC2.Bag.RMSE.tvcm <- c()
+for (i in 1:1000) {
+  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
+  train <- ex2[-a,] ; test <- ex2[a,]
+  RMSE.mlr <- c()
+  RMSE.glm <- c()
+  RMSE.gam <- c()
+  RMSE.tvcm <- c()
+  for (j in 1:100) {
+    b <- sample(1:nrow(train),nrow(train),replace=TRUE)
+    train.bag <- train[b,]
+    # Multiple Linear Regression
+    fit <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)
+               +NH3N+PO4P+log(FC)+Flow+Rain,data=train.bag,
+               family=gaussian(link="identity"))
+    fit.step <- stepAIC(fit, direction="both", trace=FALSE)
+    pred.mlr <- predict(fit.step,newdata=test,type="response")
+    data.mlr <- data.frame(response=test$TC,fitted_values=pred.mlr,
+                           time=test$time)
+    RMSE.mlr <- c(RMSE.mlr,
+                  sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
+                         length(data.mlr$response)))
+    print(c('MLR',j))
+    # Generalized Linear Model
+    m <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)+
+               NH3N+PO4P+log(FC)+Flow+Rain,data=train.bag,
+             family=poisson(link="log"))
+    m.step <- stepAIC(m, direction="both", trace=FALSE)
+    pred.glm <- predict(m.step,newdata=test,type="response")
+    data.glm <- data.frame(response=test$TC,fitted_values=pred.glm,
+                           time=test$time)
+    RMSE.glm <- c(RMSE.glm,
+                  sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
+                         length(data.glm$response)))
+    print(c('GLM',j))
+    # Generalized Additive Model
+    mm.shrink <- gam(TC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                     +s(TOC)+s(WT)+s(EC)+s(log(Chla))+s(NH3N)+s(PO4P)
+                     +s(log(FC))+s(Flow)+s(Rain),data=train.bag,
+                     family=quasipoisson(link="log"),method="GCV.Cp",
+                     select=TRUE)
+    pred.gam <- predict(mm.shrink,newdata=test,type="response")
+    data.gam <- data.frame(response=test$TC,fitted_values=pred.gam,
+                           time=test$time)
+    RMSE.gam <- c(RMSE.gam,
+                  sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
+                         length(data.gam$response)))
+    print(c('GAM',j))
+    # Time Varying Coefficient Model
+    vc.shrink <- gam(TC~s(time)+s(time,by=pH)+s(time,by=DO)+
+                       s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+                       s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
+                       s(time,by=WT)+s(time,by=EC)+s(time,by=log(Chla))+
+                       s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(FC))+
+                       s(time,by=Flow)+s(time,by=Rain),data=train.bag,
+                     family=quasipoisson(link="log"),method="GCV.Cp",
+                     select=TRUE)
+    pred.tvcm <- predict(vc.shrink,newdata=test,type="response")
+    data.tvcm <- data.frame(response=test$TC,fitted_values=pred.tvcm,
+                            time=test$time)
+    RMSE.tvcm <- c(RMSE.tvcm,
+                   sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
+                          length(data.tvcm$response)))
+    print(c('TVCM',j))}
+  TC2.Bag.RMSE.mlr <- c(TC2.Bag.RMSE.mlr,mean(RMSE.mlr))
+  TC2.Bag.RMSE.glm <- c(TC2.Bag.RMSE.glm,mean(RMSE.glm))
+  TC2.Bag.RMSE.gam <- c(TC2.Bag.RMSE.gam,mean(RMSE.gam))
+  TC2.Bag.RMSE.tvcm <- c(TC2.Bag.RMSE.tvcm,mean(RMSE.tvcm))
+  print('TC1.bag',i)
+}
+TC2.bag.RMSE <- data.frame(RMSE=c(TC2.bag.RMSE.mlr,TC2.bag.RMSE.glm,
+                                  TC2.bag.RMSE.gam,TC2.bag.RMSE.tvcm),
+                           model=c(rep("1_MLR",10),rep("2_GLM",10),
+                                   rep("3_GAM",10),rep("4_TVCM",10)))
+ggplot(TC2.bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
+  ggtitle("Uchi TC (Bagging)")
+
+
+# 우치 FC
+
+FC2.Bag.RMSE.mlr <- c()
+FC2.Bag.RMSE.glm <- c()
+FC2.Bag.RMSE.gam <- c()
+FC2.Bag.RMSE.tvcm <- c()
+for (i in 1:1000) {
+  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
+  train <- ex2[-a,] ; test <- ex2[a,]
+  RMSE.mlr <- c()
+  RMSE.glm <- c()
+  RMSE.gam <- c()
+  RMSE.tvcm <- c()
+  for (j in 1:100) {
+    b <- sample(1:nrow(train),nrow(train),replace=TRUE)
+    train.bag <- train[b,]
+    # Multiple Linear Regression
+    fit <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)
+               +NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
+               family=gaussian(link="identity"))
+    fit.step <- stepAIC(fit, direction="both", trace=FALSE)
+    pred.mlr <- predict(fit.step,newdata=test,type="response")
+    data.mlr <- data.frame(response=test$FC,fitted_values=pred.mlr,
+                           time=test$time)
+    RMSE.mlr <- c(RMSE.mlr,
+                  sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
+                         length(data.mlr$response)))
+    print(c('MLR',j))
+    # Generalized Linear Model
+    m <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)+
+               NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
+             family=poisson(link="log"))
+    m.step <- stepAIC(m, direction="both", trace=FALSE)
+    pred.glm <- predict(m.step,newdata=test,type="response")
+    data.glm <- data.frame(response=test$FC,fitted_values=pred.glm,
+                           time=test$time)
+    RMSE.glm <- c(RMSE.glm,
+                  sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
+                         length(data.glm$response)))
+    print(c('GLM',j))
+    # Generalized Additive Model
+    mm.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                     +s(TOC)+s(WT)+s(EC)+s(log(Chla))+s(NH3N)+s(PO4P)
+                     +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
+                     family=quasipoisson(link="log"),method="GCV.Cp",
+                     select=TRUE)
+    pred.gam <- predict(mm.shrink,newdata=test,type="response")
+    data.gam <- data.frame(response=test$FC,fitted_values=pred.gam,
+                           time=test$time)
+    RMSE.gam <- c(RMSE.gam,
+                  sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
+                         length(data.gam$response)))
+    print(c('GAM',j))
+    # Time Varying Coefficient Model
+    vc.shrink <- gam(FC~s(time)+s(time,by=pH)+s(time,by=DO)+
+                       s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+                       s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
+                       s(time,by=WT)+s(time,by=EC)+s(time,by=log(Chla))+
+                       s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
+                       s(time,by=Flow)+s(time,by=Rain),data=train.bag,
+                     family=quasipoisson(link="log"),method="GCV.Cp",
+                     select=TRUE)
+    pred.tvcm <- predict(vc.shrink,newdata=test,type="response")
+    data.tvcm <- data.frame(response=test$FC,fitted_values=pred.tvcm,
+                            time=test$time)
+    RMSE.tvcm <- c(RMSE.tvcm,
+                   sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
+                          length(data.tvcm$response)))
+    print(c('TVCM',j))}
+  FC2.Bag.RMSE.mlr <- c(FC2.Bag.RMSE.mlr,mean(RMSE.mlr))
+  FC2.Bag.RMSE.glm <- c(FC2.Bag.RMSE.glm,mean(RMSE.glm))
+  FC2.Bag.RMSE.gam <- c(FC2.Bag.RMSE.gam,mean(RMSE.gam))
+  FC2.Bag.RMSE.tvcm <- c(FC2.Bag.RMSE.tvcm,mean(RMSE.tvcm))
+  print('FC2.bag',i)
+}
+FC2.bag.RMSE <- data.frame(RMSE=c(FC2.bag.RMSE.mlr,FC2.bag.RMSE.glm,
+                                  FC2.bag.RMSE.gam,FC2.bag.RMSE.tvcm),
+                           model=c(rep("1_MLR",10),rep("2_GLM",10),
+                                   rep("3_GAM",10),rep("4_TVCM",10)))
+ggplot(FC2.bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
+  ggtitle("Uchi FC (Bagging)")
+
+
+# 우치 Chla
+
+Chla2.Bag.RMSE.mlr <- c()
+Chla2.Bag.RMSE.glm <- c()
+Chla2.Bag.RMSE.gam <- c()
+Chla2.Bag.RMSE.tvcm <- c()
+for (i in 1:1000) {
+  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
+  train <- ex2[-a,] ; test <- ex2[a,]
+  RMSE.mlr <- c()
+  RMSE.glm <- c()
+  RMSE.gam <- c()
+  RMSE.tvcm <- c()
+  for (j in 1:100) {
+    b <- sample(1:nrow(train),nrow(train),replace=TRUE)
+    train.bag <- train[b,]
+    # Multiple Linear Regression
+    fit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)
+               +NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
+               family=gaussian(link="identity"))
+    fit.step <- stepAIC(fit, direction="both", trace=FALSE)
+    pred.mlr <- predict(fit.step,newdata=test,type="response")
+    data.mlr <- data.frame(response=test$Chla,fitted_values=pred.mlr,
+                           time=test$time)
+    RMSE.mlr <- c(RMSE.mlr,
+                  sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
+                         length(data.mlr$response)))
+    print(c('MLR',j))
+    # Generalized Linear Model
+    m <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)+
+               NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
+             family=Gamma(link="log"))
+    m.step <- stepAIC(m, direction="both", trace=FALSE)
+    pred.glm <- predict(m.step,newdata=test,type="response")
+    data.glm <- data.frame(response=test$Chla,fitted_values=pred.glm,
+                           time=test$time)
+    RMSE.glm <- c(RMSE.glm,
+                  sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
+                         length(data.glm$response)))
+    print(c('GLM',j))
+    # Generalized Additive Model
+    mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                     +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
+                     +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
+                     family=quasi(link="log"),method="GCV.Cp",
+                     select=TRUE)
+    pred.gam <- predict(mm.shrink,newdata=test,type="response")
+    data.gam <- data.frame(response=test$Chla,fitted_values=pred.gam,
+                           time=test$time)
+    RMSE.gam <- c(RMSE.gam,
+                  sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
+                         length(data.gam$response)))
+    print(c('GAM',j))
+    # Time Varying Coefficient Model
+    vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
+                       s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+                       s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
+                       s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
+                       s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
+                       s(time,by=Flow)+s(time,by=Rain),data=train.bag,
+                     family=quasi(link="log"),method="GCV.Cp",
+                     select=TRUE)
+    pred.tvcm <- predict(vc.shrink,newdata=test,type="response")
+    data.tvcm <- data.frame(response=test$Chla,fitted_values=pred.tvcm,
+                            time=test$time)
+    RMSE.tvcm <- c(RMSE.tvcm,
+                   sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
+                          length(data.tvcm$response)))
+    print(c('TVCM',j))}
+  Chla2.Bag.RMSE.mlr <- c(Chla2.Bag.RMSE.mlr,mean(RMSE.mlr))
+  Chla2.Bag.RMSE.glm <- c(Chla2.Bag.RMSE.glm,mean(RMSE.glm))
+  Chla2.Bag.RMSE.gam <- c(Chla2.Bag.RMSE.gam,mean(RMSE.gam))
+  Chla2.Bag.RMSE.tvcm <- c(Chla2.Bag.RMSE.tvcm,mean(RMSE.tvcm))
+  print('Chla2.bag',i)
+}
+Chla2.bag.RMSE <- data.frame(RMSE=c(Chla2.bag.RMSE.mlr,Chla2.bag.RMSE.glm,
+                                    Chla2.bag.RMSE.gam,Chla2.bag.RMSE.tvcm),
+                             model=c(rep("1_MLR",10),rep("2_GLM",10),
+                                     rep("3_GAM",10),rep("4_TVCM",10)))
+ggplot(Chla2.bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
+  ggtitle("Uchi Chla (Bagging)")
 
 
 
