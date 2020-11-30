@@ -1736,7 +1736,7 @@ legend(3650,50000,c("fitted_values","response"),lwd=c(1,1),
 mm <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(log(TC))+s(NH3N)+s(PO4P)+s(log(Chla))+s(Flow)+s(Rain),data=ex2,family=quasipoisson(link="log"))
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
 ggGam(mm)
-summary(mm) # Deviance explained =  
+summary(mm) # Deviance explained = 84%  
 concurvity(mm,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm) # 적합결여 존재 (기저함수 부족)
@@ -1748,8 +1748,8 @@ par(mfrow=c(1,1))
 ```{r}
 mm.shrink <- gam(FC~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(log(TC))+s(NH3N)+s(PO4P)+s(log(Chla))+s(Flow)+s(Rain),data=ex2,family=quasipoisson(link="log"),method="GCV.Cp",select=TRUE) 
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
-ggGam(mm.shrink) # 선택변수 : 
-summary(mm.shrink) # Deviance explained =  
+ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, WT, log(TC), NH3N, PO4P, log(Chla), Flow, Rain 
+summary(mm.shrink) # Deviance explained = 83%  
 concurvity(mm.shrink,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
@@ -1763,7 +1763,7 @@ pred.gam <- predict(mm.shrink,newdata=ex2,type="response")
 data.gam <- data.frame(response=ex2$FC,fitted_values=pred.gam,
                        time=ex2$time)
 sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
-       length(data.gam$response)) # RMSE =     
+       length(data.gam$response)) # RMSE = 846.8591     
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi FC train data] response vs fitted_values 
@@ -1790,7 +1790,7 @@ pred.gam1 <- predict(mm.shrink,newdata=ex2_1,type="response")
 data.gam1 <- data.frame(response=ex2_1$FC,fitted_values=pred.gam1,
                         time=ex2_1$time)
 sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/
-       length(data.gam1$response)) # RMSE =   
+       length(data.gam1$response)) # RMSE = 1037.272   
 ggplot(data.gam1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi FC test data] response vs fitted_values 
