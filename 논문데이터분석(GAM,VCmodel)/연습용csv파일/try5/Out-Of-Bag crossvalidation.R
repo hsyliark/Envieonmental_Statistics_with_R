@@ -38,7 +38,7 @@ TC1.RMSE.glm <- c()
 TC1.RMSE.gam <- c()
 TC1.RMSE.tvcm <- c()
 for (i in 1:50) {
-  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
+  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10),replace=FALSE)
   train <- ex1[-a,] ; test <- ex1[a,]
   # Multiple Linear Regression
   fit <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)
@@ -109,7 +109,7 @@ FC1.RMSE.glm <- c()
 FC1.RMSE.gam <- c()
 FC1.RMSE.tvcm <- c()
 for (i in 1:50) {
-  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
+  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10),replace=FALSE)
   train <- ex1[-a,] ; test <- ex1[a,]
   # Multiple Linear Regression
   fit <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)
@@ -180,7 +180,7 @@ Chla1.RMSE.glm <- c()
 Chla1.RMSE.gam <- c()
 Chla1.RMSE.tvcm <- c()
 for (i in 1:50) {
-  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
+  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10),replace=FALSE)
   train <- ex1[-a,] ; test <- ex1[a,]
   # Multiple Linear Regression
   fit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)
@@ -253,7 +253,7 @@ TC2.RMSE.glm <- c()
 TC2.RMSE.gam <- c()
 TC2.RMSE.tvcm <- c()
 for (i in 1:50) {
-  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
+  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10),replace=FALSE)
   train <- ex2[-a,] ; test <- ex2[a,]
   # Multiple Linear Regression
   fit <- glm(TC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)
@@ -324,7 +324,7 @@ FC2.RMSE.glm <- c()
 FC2.RMSE.gam <- c()
 FC2.RMSE.tvcm <- c()
 for (i in 1:50) {
-  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
+  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10),replace=FALSE)
   train <- ex2[-a,] ; test <- ex2[a,]
   # Multiple Linear Regression
   fit <- glm(FC~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(Chla)
@@ -388,14 +388,14 @@ ggplot(FC2.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
   ggtitle("Uchi FC")
 
 
-# 광산 Chla
+# 우치 Chla
 
 Chla2.RMSE.mlr <- c()
 Chla2.RMSE.glm <- c()
 Chla2.RMSE.gam <- c()
 Chla2.RMSE.tvcm <- c()
 for (i in 1:50) {
-  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
+  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10),replace=FALSE)
   train <- ex2[-a,] ; test <- ex2[a,]
   # Multiple Linear Regression
   fit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)
@@ -474,7 +474,7 @@ TC1.Bag.RMSE.glm <- c()
 TC1.Bag.RMSE.gam <- c()
 TC1.Bag.RMSE.tvcm <- c()
 for (i in 1:50) {
-  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
+  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10),replace=FALSE)
   train <- ex1[-a,] ; test <- ex1[a,]
   pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
   pred.bag.glm <- matrix(nrow=nrow(test), ncol=30) 
@@ -561,7 +561,7 @@ FC1.Bag.RMSE.glm <- c()
 FC1.Bag.RMSE.gam <- c()
 FC1.Bag.RMSE.tvcm <- c()
 for (i in 1:50) {
-  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
+  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10),replace=FALSE)
   train <- ex1[-a,] ; test <- ex1[a,]
   pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
   pred.bag.glm <- matrix(nrow=nrow(test), ncol=30) 
@@ -648,7 +648,7 @@ Chla1.Bag.RMSE.glm <- c()
 Chla1.Bag.RMSE.gam <- c()
 Chla1.Bag.RMSE.tvcm <- c()
 for (i in 1:50) {
-  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
+  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10),replace=FALSE)
   train <- ex1[-a,] ; test <- ex1[a,]
   pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
   pred.bag.glm <- matrix(nrow=nrow(test), ncol=30) 
@@ -735,7 +735,7 @@ TC2.Bag.RMSE.glm <- c()
 TC2.Bag.RMSE.gam <- c()
 TC2.Bag.RMSE.tvcm <- c()
 for (i in 1:50) {
-  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
+  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10),replace=FALSE)
   train <- ex2[-a,] ; test <- ex2[a,]
   pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
   pred.bag.glm <- matrix(nrow=nrow(test), ncol=30) 
@@ -822,7 +822,7 @@ FC2.Bag.RMSE.glm <- c()
 FC2.Bag.RMSE.gam <- c()
 FC2.Bag.RMSE.tvcm <- c()
 for (i in 1:50) {
-  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
+  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10),replace=FALSE)
   train <- ex2[-a,] ; test <- ex2[a,]
   pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
   pred.bag.glm <- matrix(nrow=nrow(test), ncol=30) 
@@ -909,7 +909,7 @@ Chla2.Bag.RMSE.glm <- c()
 Chla2.Bag.RMSE.gam <- c()
 Chla2.Bag.RMSE.tvcm <- c()
 for (i in 1:50) {
-  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
+  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10),replace=FALSE)
   train <- ex2[-a,] ; test <- ex2[a,]
   pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
   pred.bag.glm <- matrix(nrow=nrow(test), ncol=30) 
