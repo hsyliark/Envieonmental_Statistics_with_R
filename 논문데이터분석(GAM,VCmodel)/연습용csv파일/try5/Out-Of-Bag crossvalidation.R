@@ -37,7 +37,7 @@ TC1.RMSE.mlr <- c()
 TC1.RMSE.glm <- c()
 TC1.RMSE.gam <- c()
 TC1.RMSE.tvcm <- c()
-for (i in 1:100) {
+for (i in 1:50) {
   a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
   train <- ex1[-a,] ; test <- ex1[a,]
   # Multiple Linear Regression
@@ -108,7 +108,7 @@ FC1.RMSE.mlr <- c()
 FC1.RMSE.glm <- c()
 FC1.RMSE.gam <- c()
 FC1.RMSE.tvcm <- c()
-for (i in 1:100) {
+for (i in 1:50) {
   a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
   train <- ex1[-a,] ; test <- ex1[a,]
   # Multiple Linear Regression
@@ -179,7 +179,7 @@ Chla1.RMSE.mlr <- c()
 Chla1.RMSE.glm <- c()
 Chla1.RMSE.gam <- c()
 Chla1.RMSE.tvcm <- c()
-for (i in 1:100) {
+for (i in 1:50) {
   a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
   train <- ex1[-a,] ; test <- ex1[a,]
   # Multiple Linear Regression
@@ -252,7 +252,7 @@ TC2.RMSE.mlr <- c()
 TC2.RMSE.glm <- c()
 TC2.RMSE.gam <- c()
 TC2.RMSE.tvcm <- c()
-for (i in 1:100) {
+for (i in 1:50) {
   a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
   train <- ex2[-a,] ; test <- ex2[a,]
   # Multiple Linear Regression
@@ -323,7 +323,7 @@ FC2.RMSE.mlr <- c()
 FC2.RMSE.glm <- c()
 FC2.RMSE.gam <- c()
 FC2.RMSE.tvcm <- c()
-for (i in 1:100) {
+for (i in 1:50) {
   a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
   train <- ex2[-a,] ; test <- ex2[a,]
   # Multiple Linear Regression
@@ -394,7 +394,7 @@ Chla2.RMSE.mlr <- c()
 Chla2.RMSE.glm <- c()
 Chla2.RMSE.gam <- c()
 Chla2.RMSE.tvcm <- c()
-for (i in 1:100) {
+for (i in 1:50) {
   a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
   train <- ex2[-a,] ; test <- ex2[a,]
   # Multiple Linear Regression
@@ -473,14 +473,14 @@ TC1.Bag.RMSE.mlr <- c()
 TC1.Bag.RMSE.glm <- c()
 TC1.Bag.RMSE.gam <- c()
 TC1.Bag.RMSE.tvcm <- c()
-for (i in 1:100) {
+for (i in 1:50) {
   a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
   train <- ex1[-a,] ; test <- ex1[a,]
-  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.glm <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.gam <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.tvcm <- matrix(nrow=nrow(test), ncol=50) 
-  for (j in 1:50) {
+  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.glm <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.gam <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.tvcm <- matrix(nrow=nrow(test), ncol=30) 
+  for (j in 1:30) {
     b <- sample(1:nrow(train),nrow(train),replace=TRUE)
     train.bag <- train[b,]
     # Multiple Linear Regression
@@ -560,14 +560,14 @@ FC1.Bag.RMSE.mlr <- c()
 FC1.Bag.RMSE.glm <- c()
 FC1.Bag.RMSE.gam <- c()
 FC1.Bag.RMSE.tvcm <- c()
-for (i in 1:100) {
+for (i in 1:50) {
   a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
   train <- ex1[-a,] ; test <- ex1[a,]
-  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.glm <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.gam <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.tvcm <- matrix(nrow=nrow(test), ncol=50) 
-  for (j in 1:50) {
+  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.glm <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.gam <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.tvcm <- matrix(nrow=nrow(test), ncol=30) 
+  for (j in 1:30) {
     b <- sample(1:nrow(train),nrow(train),replace=TRUE)
     train.bag <- train[b,]
     # Multiple Linear Regression
@@ -647,14 +647,14 @@ Chla1.Bag.RMSE.mlr <- c()
 Chla1.Bag.RMSE.glm <- c()
 Chla1.Bag.RMSE.gam <- c()
 Chla1.Bag.RMSE.tvcm <- c()
-for (i in 1:100) {
+for (i in 1:50) {
   a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10))
   train <- ex1[-a,] ; test <- ex1[a,]
-  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.glm <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.gam <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.tvcm <- matrix(nrow=nrow(test), ncol=50) 
-  for (j in 1:50) {
+  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.glm <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.gam <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.tvcm <- matrix(nrow=nrow(test), ncol=30) 
+  for (j in 1:30) {
     b <- sample(1:nrow(train),nrow(train),replace=TRUE)
     train.bag <- train[b,]
     # Multiple Linear Regression
@@ -734,14 +734,14 @@ TC2.Bag.RMSE.mlr <- c()
 TC2.Bag.RMSE.glm <- c()
 TC2.Bag.RMSE.gam <- c()
 TC2.Bag.RMSE.tvcm <- c()
-for (i in 1:100) {
+for (i in 1:50) {
   a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
   train <- ex2[-a,] ; test <- ex2[a,]
-  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.glm <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.gam <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.tvcm <- matrix(nrow=nrow(test), ncol=50) 
-  for (j in 1:50) {
+  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.glm <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.gam <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.tvcm <- matrix(nrow=nrow(test), ncol=30) 
+  for (j in 1:30) {
     b <- sample(1:nrow(train),nrow(train),replace=TRUE)
     train.bag <- train[b,]
     # Multiple Linear Regression
@@ -821,14 +821,14 @@ FC2.Bag.RMSE.mlr <- c()
 FC2.Bag.RMSE.glm <- c()
 FC2.Bag.RMSE.gam <- c()
 FC2.Bag.RMSE.tvcm <- c()
-for (i in 1:100) {
+for (i in 1:50) {
   a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
   train <- ex2[-a,] ; test <- ex2[a,]
-  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.glm <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.gam <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.tvcm <- matrix(nrow=nrow(test), ncol=50) 
-  for (j in 1:50) {
+  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.glm <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.gam <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.tvcm <- matrix(nrow=nrow(test), ncol=30) 
+  for (j in 1:30) {
     b <- sample(1:nrow(train),nrow(train),replace=TRUE)
     train.bag <- train[b,]
     # Multiple Linear Regression
@@ -908,14 +908,14 @@ Chla2.Bag.RMSE.mlr <- c()
 Chla2.Bag.RMSE.glm <- c()
 Chla2.Bag.RMSE.gam <- c()
 Chla2.Bag.RMSE.tvcm <- c()
-for (i in 1:100) {
+for (i in 1:50) {
   a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10))
   train <- ex2[-a,] ; test <- ex2[a,]
-  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.glm <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.gam <- matrix(nrow=nrow(test), ncol=50) 
-  pred.bag.tvcm <- matrix(nrow=nrow(test), ncol=50) 
-  for (j in 1:50) {
+  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.glm <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.gam <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.tvcm <- matrix(nrow=nrow(test), ncol=30) 
+  for (j in 1:30) {
     b <- sample(1:nrow(train),nrow(train),replace=TRUE)
     train.bag <- train[b,]
     # Multiple Linear Regression
