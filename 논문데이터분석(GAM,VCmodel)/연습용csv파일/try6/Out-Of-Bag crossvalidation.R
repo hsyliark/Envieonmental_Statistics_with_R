@@ -100,12 +100,18 @@ for (i in 1:50) {
 }
 TC1.RMSE <- data.frame(RMSE=c(TC1.RMSE.mlr,TC1.RMSE.glm,
                               TC1.RMSE.gam,TC1.RMSE.tvcm),
-                       model=c(rep("1_MLR",10),rep("2_GLM",10),
-                               rep("3_GAM",10),rep("4_TVCM",10)))
-ggplot(TC1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
-  ggtitle("Gwangsan TC")
+                       model=c(rep("1_MLR",50),rep("2_GLM",50),
+                               rep("3_GAM",50),rep("4_TVCM",50)))
+ggplot(TC1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
+  coord_cartesian(ylim = c(0, 200000)) + ggtitle("Gwangsan TC")
 
-
+# TC1.RMSE <- data.frame(rep=rep(1:50,4),
+#                        RMSE=c(TC1.RMSE.mlr,TC1.RMSE.glm,
+#                               TC1.RMSE.gam,TC1.RMSE.tvcm),
+#                        model=c(rep("1_MLR",50),rep("2_GLM",50),
+#                                rep("3_GAM",50),rep("4_TVCM",50)))
+# ggplot(TC1.RMSE,aes(x=rep, y=RMSE, color=model)) + geom_line()
+                       
 # ±¤»ê FC
 
 FC1.RMSE.mlr <- c()
@@ -175,10 +181,10 @@ for (i in 1:50) {
 }
 FC1.RMSE <- data.frame(RMSE=c(FC1.RMSE.mlr,FC1.RMSE.glm,
                               FC1.RMSE.gam,FC1.RMSE.tvcm),
-                       model=c(rep("1_MLR",10),rep("2_GLM",10),
-                               rep("3_GAM",10),rep("4_TVCM",10)))
-ggplot(FC1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
-  ggtitle("Gwangsan FC")
+                       model=c(rep("1_MLR",50),rep("2_GLM",50),
+                               rep("3_GAM",50),rep("4_TVCM",50)))
+ggplot(FC1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
+  coord_cartesian(ylim = c(0, 150000)) + ggtitle("Gwangsan FC")
 
 
 # ±¤»ê Chla
@@ -250,10 +256,10 @@ for (i in 1:50) {
 }
 Chla1.RMSE <- data.frame(RMSE=c(Chla1.RMSE.mlr,Chla1.RMSE.glm,
                                 Chla1.RMSE.gam,Chla1.RMSE.tvcm),
-                       model=c(rep("1_MLR",10),rep("2_GLM",10),
-                               rep("3_GAM",10),rep("4_TVCM",10)))
-ggplot(Chla1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
-  ggtitle("Gwangsan Chla")
+                       model=c(rep("1_MLR",50),rep("2_GLM",50),
+                               rep("3_GAM",50),rep("4_TVCM",50)))
+ggplot(Chla1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
+  coord_cartesian(ylim = c(0, 500)) + ggtitle("Gwangsan Chla")
   
   
 
@@ -327,10 +333,10 @@ for (i in 1:50) {
 }
 TC2.RMSE <- data.frame(RMSE=c(TC2.RMSE.mlr,TC2.RMSE.glm,
                               TC2.RMSE.gam,TC2.RMSE.tvcm),
-                       model=c(rep("1_MLR",10),rep("2_GLM",10),
-                               rep("3_GAM",10),rep("4_TVCM",10)))
-ggplot(TC2.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
-  ggtitle("Uchi TC")
+                       model=c(rep("1_MLR",50),rep("2_GLM",50),
+                               rep("3_GAM",50),rep("4_TVCM",50)))
+ggplot(TC2.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
+  coord_cartesian(ylim = c(0, 200000)) + ggtitle("Uchi TC")
 
 
 # ¿ìÄ¡ FC
@@ -402,10 +408,10 @@ for (i in 1:50) {
 }
 FC2.RMSE <- data.frame(RMSE=c(FC2.RMSE.mlr,FC2.RMSE.glm,
                               FC2.RMSE.gam,FC2.RMSE.tvcm),
-                       model=c(rep("1_MLR",10),rep("2_GLM",10),
-                               rep("3_GAM",10),rep("4_TVCM",10)))
-ggplot(FC2.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
-  ggtitle("Uchi FC")
+                       model=c(rep("1_MLR",50),rep("2_GLM",50),
+                               rep("3_GAM",50),rep("4_TVCM",50)))
+ggplot(FC2.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
+  coord_cartesian(ylim = c(0, 150000)) + ggtitle("Uchi FC")
 
 
 # ¿ìÄ¡ Chla
@@ -477,10 +483,10 @@ for (i in 1:50) {
 }
 Chla2.RMSE <- data.frame(RMSE=c(Chla2.RMSE.mlr,Chla2.RMSE.glm,
                                 Chla2.RMSE.gam,Chla2.RMSE.tvcm),
-                         model=c(rep("1_MLR",10),rep("2_GLM",10),
-                                 rep("3_GAM",10),rep("4_TVCM",10)))
-ggplot(Chla2.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
-  ggtitle("Uchi Chla")
+                         model=c(rep("1_MLR",50),rep("2_GLM",50),
+                                 rep("3_GAM",50),rep("4_TVCM",50)))
+ggplot(Chla2.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
+  coord_cartesian(ylim = c(0, 500)) +  ggtitle("Uchi Chla")
 
 
 
@@ -580,10 +586,10 @@ for (i in 1:50) {
 }
 TC1.Bag.RMSE <- data.frame(RMSE=c(TC1.Bag.RMSE.mlr,TC1.Bag.RMSE.glm,
                               TC1.Bag.RMSE.gam,TC1.Bag.RMSE.tvcm),
-                       model=c(rep("1_MLR",10),rep("2_GLM",10),
-                               rep("3_GAM",10),rep("4_TVCM",10)))
-ggplot(TC1.Bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
-  ggtitle("Gwangsan TC (Bagging)")
+                       model=c(rep("1_MLR",50),rep("2_GLM",50),
+                               rep("3_GAM",50),rep("4_TVCM",50)))
+ggplot(TC1.Bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
+  coord_cartesian(ylim = c(0, 200000)) +  ggtitle("Gwangsan TC (Bagging)")
 
 
 # ±¤»ê FC
@@ -675,10 +681,10 @@ for (i in 1:50) {
 }
 FC1.Bag.RMSE <- data.frame(RMSE=c(FC1.Bag.RMSE.mlr,FC1.Bag.RMSE.glm,
                                   FC1.Bag.RMSE.gam,FC1.Bag.RMSE.tvcm),
-                           model=c(rep("1_MLR",10),rep("2_GLM",10),
-                                   rep("3_GAM",10),rep("4_TVCM",10)))
-ggplot(FC1.Bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
-  ggtitle("Gwangsan FC (Bagging)")
+                           model=c(rep("1_MLR",50),rep("2_GLM",50),
+                                   rep("3_GAM",50),rep("4_TVCM",50)))
+ggplot(FC1.Bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
+  coord_cartesian(ylim = c(0, 150000)) +  ggtitle("Gwangsan FC (Bagging)")
 
 
 # ±¤»ê Chla
@@ -770,10 +776,10 @@ for (i in 1:50) {
 }
 Chla1.Bag.RMSE <- data.frame(RMSE=c(Chla1.Bag.RMSE.mlr,Chla1.Bag.RMSE.glm,
                                     Chla1.Bag.RMSE.gam,Chla1.Bag.RMSE.tvcm),
-                           model=c(rep("1_MLR",10),rep("2_GLM",10),
-                                   rep("3_GAM",10),rep("4_TVCM",10)))
-ggplot(Chla1.Bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
-  ggtitle("Gwangsan Chla (Bagging)")
+                           model=c(rep("1_MLR",50),rep("2_GLM",50),
+                                   rep("3_GAM",50),rep("4_TVCM",50)))
+ggplot(Chla1.Bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
+  coord_cartesian(ylim = c(0, 500)) +  ggtitle("Gwangsan Chla (Bagging)")
 
 
 # ¿ìÄ¡ TC
@@ -865,10 +871,10 @@ for (i in 1:50) {
 }
 TC2.Bag.RMSE <- data.frame(RMSE=c(TC2.Bag.RMSE.mlr,TC2.Bag.RMSE.glm,
                                   TC2.Bag.RMSE.gam,TC2.Bag.RMSE.tvcm),
-                           model=c(rep("1_MLR",10),rep("2_GLM",10),
-                                   rep("3_GAM",10),rep("4_TVCM",10)))
-ggplot(TC2.Bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
-  ggtitle("Uchi TC (Bagging)")
+                           model=c(rep("1_MLR",50),rep("2_GLM",50),
+                                   rep("3_GAM",50),rep("4_TVCM",50)))
+ggplot(TC2.Bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
+  coord_cartesian(ylim = c(0, 200000)) +  ggtitle("Uchi TC (Bagging)")
 
 
 # ¿ìÄ¡ FC
@@ -960,10 +966,10 @@ for (i in 1:50) {
 }
 FC2.Bag.RMSE <- data.frame(RMSE=c(FC2.Bag.RMSE.mlr,FC2.Bag.RMSE.glm,
                                   FC2.Bag.RMSE.gam,FC2.Bag.RMSE.tvcm),
-                           model=c(rep("1_MLR",10),rep("2_GLM",10),
-                                   rep("3_GAM",10),rep("4_TVCM",10)))
-ggplot(FC2.Bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
-  ggtitle("Uchi FC (Bagging)")
+                           model=c(rep("1_MLR",50),rep("2_GLM",50),
+                                   rep("3_GAM",50),rep("4_TVCM",50)))
+ggplot(FC2.Bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
+  coord_cartesian(ylim = c(0, 150000)) +  ggtitle("Uchi FC (Bagging)")
 
 
 # ¿ìÄ¡ Chla
@@ -1055,10 +1061,10 @@ for (i in 1:50) {
 }
 Chla2.Bag.RMSE <- data.frame(RMSE=c(Chla2.Bag.RMSE.mlr,Chla2.Bag.RMSE.glm,
                                     Chla2.Bag.RMSE.gam,Chla2.Bag.RMSE.tvcm),
-                             model=c(rep("1_MLR",10),rep("2_GLM",10),
-                                     rep("3_GAM",10),rep("4_TVCM",10)))
-ggplot(Chla2.Bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() + 
-  ggtitle("Uchi Chla (Bagging)")
+                             model=c(rep("1_MLR",50),rep("2_GLM",50),
+                                     rep("3_GAM",50),rep("4_TVCM",50)))
+ggplot(Chla2.Bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
+  coord_cartesian(ylim = c(0, 500)) +  ggtitle("Uchi Chla (Bagging)")
 
 
 
