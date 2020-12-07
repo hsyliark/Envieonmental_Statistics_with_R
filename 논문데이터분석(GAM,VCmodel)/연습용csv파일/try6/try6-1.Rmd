@@ -587,7 +587,7 @@ legend(3650,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 
 #### MLR의 경우 적절한 확률분포를 가정하고 있지 않고 있고 Chla의 예측값을 음수로 추정해주는 과오를 범하고 있기 때문에 최적의 모형이라고 할 수는 없다. 그리고 GLM, GAM, TVCM의 경우 예측값을 과대 또는 과소추정하는 경우가 있어서 RMSE의 기준으로 과소평가를 받을 수 있다.
 
-#### 여러가지 사항을 고려했을 때 광산 Chla 예측에 대한 최적의 모형은 GAM이라고 판단됨.
+#### 여러가지 사항을 고려했을 때 광산 Chla 예측에 대한 최적의 모형은 GAM(quasi)이라고 판단됨.
 
 
 
@@ -1002,8 +1002,8 @@ par(mfrow=c(1,1))
 ```{r}
 vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=log(TC))+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(FC))+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=Gamma(link="log"),method="GCV.Cp",select=TRUE)
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
-ggGam(vc.shrink) # 선택변수 : 
-summary(vc.shrink) # Deviance explained =    
+ggGam(vc.shrink) # 선택변수 : DO, BOD, SS, TN, TP, TOC, EC, NH3N, PO4P, Flow, Rain 
+summary(vc.shrink) # Deviance explained = 79.5%    
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
@@ -1016,7 +1016,7 @@ pred.tvcm <- predict(vc.shrink,newdata=ex2,type="response")
 data.tvcm <- data.frame(response=ex2$Chla,fitted_values=pred.tvcm,
                         time=ex2$time)
 sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
-       length(data.tvcm$response)) # RMSE =     
+       length(data.tvcm$response)) # RMSE = 15.69044     
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi Chla train data] response vs fitted_values 
@@ -1043,7 +1043,7 @@ pred.tvcm1 <- predict(vc.shrink,newdata=ex2_1,type="response")
 data.tvcm1 <- data.frame(response=ex2_1$Chla,fitted_values=pred.tvcm1,
                          time=ex2_1$time)
 sqrt(sum((data.tvcm1$response-data.tvcm1$fitted_values)^2)/
-       length(data.tvcm1$response)) # RMSE =   
+       length(data.tvcm1$response)) # RMSE = 40.33535   
 ggplot(data.tvcm1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi Chla test data] response vs fitted_values 
@@ -1069,7 +1069,7 @@ par(oma=c(0.5,0.5,0.5,0.5))
 vc <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=log(TC))+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(FC))+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=quasi(link="log"))
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
 ggGam(vc)
-summary(vc) # Deviance explained =    
+summary(vc) # Deviance explained = 91.9%    
 par(mfrow=c(2,2))
 gam.check(vc) 
 par(mfrow=c(1,1))
@@ -1080,8 +1080,8 @@ par(mfrow=c(1,1))
 ```{r}
 vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=log(TC))+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(FC))+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=quasi(link="log"),method="GCV.Cp",select=TRUE)
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
-ggGam(vc.shrink) # 선택변수 : 
-summary(vc.shrink) # Deviance explained =    
+ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, log(TC), NH3N, PO4P, log(FC), Flow 
+summary(vc.shrink) # Deviance explained = 90%    
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
@@ -1094,7 +1094,7 @@ pred.tvcm <- predict(vc.shrink,newdata=ex2,type="response")
 data.tvcm <- data.frame(response=ex2$Chla,fitted_values=pred.tvcm,
                         time=ex2$time)
 sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
-       length(data.tvcm$response)) # RMSE =     
+       length(data.tvcm$response)) # RMSE = 7.427525     
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi Chla train data] response vs fitted_values 
@@ -1121,7 +1121,7 @@ pred.tvcm1 <- predict(vc.shrink,newdata=ex2_1,type="response")
 data.tvcm1 <- data.frame(response=ex2_1$Chla,fitted_values=pred.tvcm1,
                          time=ex2_1$time)
 sqrt(sum((data.tvcm1$response-data.tvcm1$fitted_values)^2)/
-       length(data.tvcm1$response)) # RMSE =   
+       length(data.tvcm1$response)) # RMSE = 18.35658  
 ggplot(data.tvcm1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi Chla test data] response vs fitted_values 
@@ -1138,14 +1138,14 @@ legend(3650,500,c("fitted_values","response"),lwd=c(1,1),
 ```
 
 
-#### 최종선택된 모형의 설명력(Deviance explained) : %(다중선형회귀모형), %(일반화선형모형(Gamma)), %(일반화가법모형(Gamma)), %(일반화가법모형(quasi)), %(시간에 따른 계수변화모형(Gamma)), %(시간에 따른 계수변화모형(quasi))
+#### 최종선택된 모형의 설명력(Deviance explained) : 71.2%(다중선형회귀모형), 69.0%(일반화선형모형(Gamma)), 79.6%(일반화가법모형(Gamma)), 88.8%(일반화가법모형(quasi)), 79.5%(시간에 따른 계수변화모형(Gamma)), 90.0%(시간에 따른 계수변화모형(quasi))
 
-#### train data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형(Gamma)), (일반화가법모형(Gamma)), (일반화가법모형(quasi)), (시간에 따른 계수변화모형(Gamma)), (시간에 따른 계수변화모형(quasi))
+#### train data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 12.63798(다중선형회귀모형), 22.85586(일반화선형모형(Gamma)), 10.93831(일반화가법모형(Gamma)), 7.873835(일반화가법모형(quasi)), 15.69044(시간에 따른 계수변화모형(Gamma)), 7.427525(시간에 따른 계수변화모형(quasi))
 
-#### test data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : (다중선형회귀모형), (일반화선형모형(Gamma)), (일반화가법모형(Gamma)), (일반화가법모형(quasi)), (시간에 따른 계수변화모형(Gamma)), (시간에 따른 계수변화모형(quasi))
+#### test data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 15.08679(다중선형회귀모형), 15.70857(일반화선형모형(Gamma)), 12.87(일반화가법모형(Gamma)), 22.68404(일반화가법모형(quasi)), 40.33535(시간에 따른 계수변화모형(Gamma)), 18.35658(시간에 따른 계수변화모형(quasi))
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
 #### test RMSE의 경우 MLR이 가장 작게 나왔다. 하지만, MLR의 경우 적절한 확률분포를 가정하고 있지 않고 있고 Chla의 예측값을 음수로 추정해주는 과오를 범하고 있기 때문에 최적의 모형이라고 할 수는 없다. 그리고 GLM, GAM, TVCM의 경우 예측값을 과대 또는 과소추정하는 경우가 있어서 RMSE의 기준으로 과소평가를 받을 수 있다.
 
-#### 여러가지 사항을 고려했을 때 우치 Chla 예측에 대한 최적의 모형은 TVCM이라고 판단됨.
+#### 여러가지 사항을 고려했을 때 우치 Chla 예측에 대한 최적의 모형은 TVCM(quasi)이라고 판단됨.
