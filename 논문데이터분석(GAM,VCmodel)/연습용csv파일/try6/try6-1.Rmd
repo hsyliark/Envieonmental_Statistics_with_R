@@ -37,8 +37,7 @@ par(oma=c(0.5,0.5,0.5,0.5))
 #### 변수 time은 2010년 1월 1일 기준으로 경과된 날짜를 계산하여 반영함.
 
 #### 모형의 설명력은 Deviance explained(다양한 형태의 모형을 비교하기 위해 R-square 통계량을 확장한 형태) 통계량 기준으로(산출된 값이 클수록 좋음.), 모형의 예측력은 RMSE(Root Mean Squared Error) 통계량 기준으로 해석함(산출된 값이 작을수록 좋음.).
-- $RMSE= \sqrt{\frac {1}  {n} \sum _{i=1} ^{n} (y _{i} - {\hat{y _{i}}} ) ^{2}}$
-- $D.E= 1- \frac {residual D.E} {null D.E} $
+- $RMSE= \sqrt{\frac {1}  {n} \sum _{i=1} ^{n} (y _{i} - {\hat{y _{i}}} ) ^{2}}$ , $D.E= 1- \frac {residual D.E} {null D.E} $
 
 #### 환경데이터에서는 분산이 평균보다 큰 과분포(overdispersion) 현상이 자주 발생함. 이에 따라 GAM, TVCM 모형에 대해서는 Quasi Distribution을 추가로 적용함.
 
@@ -58,10 +57,10 @@ par(oma=c(0.5,0.5,0.5,0.5))
 #### 1. Spearman Correlation Analysis
 - 일반적으로 사용되는 Pearson Correlation Analysis는 기본적으로 정규분포(Normal Distribution)을 가정하기 때문에 다양한 분포적 특성과 이상치(Outlier)가 존재하는 환경데이터의 경우에는 각 변수에 대해 오름차순으로 매긴 순위를 사용하는 Spearman Correlation Analysis가 타당하다고 판단됨.
 - https://bioinformaticsandme.tistory.com/58
-- $r _{s} = \frac {{\sum _{j=1} ^{n} (r _{xj} - {\bar{r _{x}}} )(r _{yj} - {\bar{r _{y}}} )}}  {\sqrt {\sum _{j=1} ^{n} (r _{xj} - {\bar{r _{x}}} ) ^{2} \sum _{j=1} ^{n} (r _{yj} - {\bar{r _{y}}} ) ^{2}}} =1- \frac {{6} \sum _{j=1} ^{n} (r _{xj} -r _{yj} ) ^{2}}  {n(n ^{2} -1)} $
-- $Z= \frac {r _{s}} {\sqrt {\frac {1}  {n-1}}} -> N(0,1)$ if  $n>=10$
+- Spearman Correlation Coefficient : $r _{s} = \frac {{\sum _{j=1} ^{n} (r _{xj} - {\bar{r _{x}}} )(r _{yj} - {\bar{r _{y}}} )}}  {\sqrt {\sum _{j=1} ^{n} (r _{xj} - {\bar{r _{x}}} ) ^{2} \sum _{j=1} ^{n} (r _{yj} - {\bar{r _{y}}} ) ^{2}}} =1- \frac {{6} \sum _{j=1} ^{n} (r _{xj} -r _{yj} ) ^{2}}  {n(n ^{2} -1)} $
+- Z test : $Z= \frac {r _{s}} {\sqrt {\frac {1}  {n-1}}} -> N(0,1)$ if  $n>=10$
 - Reject $H_{0}$ if $|Z|>=z_{\frac \alpha {2}}$
-- $T= \frac {r _{s} \sqrt {n-2}} {\sqrt {1-r _{s}^{2}}} -> t _{n-2}$ if $n >= 20$
+- T test : $T= \frac {r _{s} \sqrt {n-2}} {\sqrt {1-r _{s}^{2}}} -> t _{n-2}$ if $n >= 20$
 - Reject $H_{0}$ if $|T|>=t_{\frac \alpha {2}}(n-2)$  
 
 #### 2. SOM(Self Organizing Map)
@@ -81,21 +80,17 @@ par(oma=c(0.5,0.5,0.5,0.5))
 - 반응변수와 설명변수와의 관계를 살펴보고자 할 때 가장 간단하게 사용할 수 있는 통계적 모형
 - $y _{i} = \beta  _{0} + \beta  _{1} x _{1i} + \beta  _{2} x _{2i} +...+ \beta  _{p} x _{pi} + \epsilon  _{i} ,$
 $\epsilon  _{i} ->i.i.d  N(0, \sigma  ^{2} ) , i=1,2,...,n$
-- Normal Distribution
-- $X -> N( \mu , \sigma  ^{2} ) --> f _{X} (x)= \frac{1} {\sqrt {2 \pi } \sigma } exp (  - \frac{1}  {2 \sigma  ^{2}} (x- \mu ) ^{2}) , x \in R $
+- Normal Distribution : $X -> N( \mu , \sigma  ^{2} ) --> f _{X} (x)= \frac{1} {\sqrt {2 \pi } \sigma } exp (  - \frac{1}  {2 \sigma  ^{2}} (x- \mu ) ^{2}) , x \in R $
 
 #### 4. 일반화선형모형(Generalized Linear Model)
 - https://seoncheolpark.github.io/book/_book/14-1-glm-basics.html
 - https://zephyrus1111.tistory.com/26
 - 다중선형회귀분석은 기본적으로 반응변수의 분포가 정규분포(Normal Distribution)임을 가정한다. 그러나 TC, FC 같은 대장균수는 셀 수 있는 변수(counting variable)이고 Chl-a는 양의 실수값이면서 일반적으로 오른쪽으로 꼬리가 긴 분포를 보인다. 이처럼 데이터 내의 반응변수가 항상 정규분포라고 말할 수는 없기 때문에 분포적 특성에 맞는 선형모형을 확장하여 생각한 것이 일반화선형모형이다.
 - $g[E(y )]= \beta  _{0} + \beta  _{1} x _{1} + \beta  _{2} x _{2} +...+ \beta  _{p} x _{p}$
-- Poisson Distribution
-- $X -> Poisson( \lambda )-->P _{X} (X=x)=\frac {e ^{- \lambda } \lambda  ^{x}}  {x!} , x=0,1,2,3,...$
-- Gamma Distribution
-- $X->Gamma ( \alpha , \beta )-->f _{X} (x)= \frac{1}  {\gamma ( \alpha ) \beta  ^{\alpha }} x ^{\alpha -1} e ^{-\frac {1}  {\beta }} , x>0$
+- Poisson Distribution : $X -> Poisson( \lambda )-->P _{X} (X=x)=\frac {e ^{- \lambda } \lambda  ^{x}}  {x!} , x=0,1,2,3,...$
+- Gamma Distribution : $X->Gamma ( \alpha , \beta )-->f _{X} (x)= \frac{1}  {\gamma ( \alpha ) \beta  ^{\alpha }} x ^{\alpha -1} e ^{-\frac {1}  {\beta }} , x>0$
 - $\gamma ( \alpha )= \int _{0} ^{INF } {x ^{\alpha -1} e ^{-x} dx,x>0}$
-- Binomial Distribution
-- $X -> B(p) --> P _{X} (X=x)= _{n} C _{x} p ^{x} (1-p) ^{n-x} , x=0,1,2,...,n$
+- Binomial Distribution : $X -> B(p) --> P _{X} (X=x)= _{n} C _{x} p ^{x} (1-p) ^{n-x} , x=0,1,2,...,n$
 - Log Poisson Model(포아송분포 가정) : $log(y)= \beta  _{0} + \beta  _{1} x _{1} + \beta  _{2} x _{2} +...+ \beta  _{p} x _{p}$
 - Log Gamma Model(감마분포 가정) : $log(y)= \beta  _{0} + \beta  _{1} x _{1} + \beta  _{2} x _{2} +...+ \beta  _{p} x _{p}$
 - Logistic Model(2개의 집단일 경우 이항분포 가정) : $log(\frac {prob }  {1-prob} )= \beta  _{0} + \beta  _{1} x _{1} + \beta  _{2} x _{2} +...+ \beta  _{p} x _{p}$
