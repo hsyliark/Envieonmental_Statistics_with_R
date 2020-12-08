@@ -1,8 +1,8 @@
-ex1 <- read.csv("C:/Users/stat/Desktop/±¤»ê(2010-2019).csv", sep=",", header=T)
+ex1 <- read.csv("C:/Users/HSY/Desktop/ê´‘ì‚°(2010-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
 ex1 <- as.data.frame(ex1)
 
-ex2 <- read.csv("C:/Users/stat/Desktop/¿ìÄ¡(2010-2019).csv", sep=",", header=T)
+ex2 <- read.csv("C:/Users/HSY/Desktop/ìš°ì¹˜(2010-2019).csv", sep=",", header=T)
 ex2 <- ex2[,-1]
 ex2 <- as.data.frame(ex2)
 
@@ -26,7 +26,7 @@ library(kohonen)
 library(SOMbrero)
 
 
-## ±¤»ê Chla
+## ê´‘ì‚° Chla
 
 Chla1.RMSE.mlr <- c()
 Chla1.RMSE.glm.Gamma <- c()
@@ -294,7 +294,7 @@ ggplot(Chla1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
 
 
 
-# ¿ìÄ¡ Chla
+# ìš°ì¹˜ Chla
 
 Chla2.RMSE.mlr <- c()
 Chla2.RMSE.glm.Gamma <- c()
