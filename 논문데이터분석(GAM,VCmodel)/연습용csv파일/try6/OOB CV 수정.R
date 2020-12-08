@@ -26,13 +26,7 @@ library(kohonen)
 library(SOMbrero)
 
 
-
-
-
-## Out-Of-Bag crossvalidation
-
-
-# ±¤»ê Chla
+## ±¤»ê Chla
 
 Chla1.RMSE.mlr <- c()
 Chla1.RMSE.glm.Gamma <- c()
@@ -40,6 +34,13 @@ Chla1.RMSE.gam.Gamma <- c()
 Chla1.RMSE.gam.quasi <- c()
 Chla1.RMSE.tvcm.Gamma <- c()
 Chla1.RMSE.tvcm.quasi <- c()
+# Bagging
+Chla1.Bag.RMSE.mlr <- c()
+Chla1.Bag.RMSE.glm.Gamma <- c()
+Chla1.Bag.RMSE.gam.Gamma <- c()
+Chla1.Bag.RMSE.gam.quasi <- c()
+Chla1.Bag.RMSE.tvcm.Gamma <- c()
+Chla1.Bag.RMSE.tvcm.quasi <- c()
 for (i in 1:50) {
   a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10),replace=FALSE)
   train <- ex1[-a,] ; test <- ex1[a,]
@@ -53,8 +54,8 @@ for (i in 1:50) {
   data.mlr <- data.frame(response=test$Chla,fitted_values=pred.mlr,
                          time=test$time)
   Chla1.RMSE.mlr <- c(Chla1.RMSE.mlr,
-                    sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
-                           length(data.mlr$response)))
+                      sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
+                             length(data.mlr$response)))
   print(c('Chla1.MLR',i,sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
                                length(data.mlr$response))))
   
@@ -67,40 +68,40 @@ for (i in 1:50) {
   data.glm <- data.frame(response=test$Chla,fitted_values=pred.glm,
                          time=test$time)
   Chla1.RMSE.glm.Gamma <- c(Chla1.RMSE.glm.Gamma,
-                    sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
-                           length(data.glm$response)))
+                            sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
+                                   length(data.glm$response)))
   print(c('Chla1.GLM.Gamma',i,sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/
-                               length(data.glm$response))))
+                                     length(data.glm$response))))
   
   # Generalized Additive Model (Gamma)
   mm.shrink1 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
-                   +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
-                   +s(log(TC))+s(Flow)+s(Rain),data=train,
-                   family=Gamma(link="log"),method="GCV.Cp",
-                   select=TRUE)
+                    +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
+                    +s(log(TC))+s(Flow)+s(Rain),data=train,
+                    family=Gamma(link="log"),method="GCV.Cp",
+                    select=TRUE)
   pred.gam1 <- predict(mm.shrink1,newdata=test,type="response")
   data.gam1 <- data.frame(response=test$Chla,fitted_values=pred.gam1,
-                         time=test$time)
+                          time=test$time)
   Chla1.RMSE.gam.Gamma <- c(Chla1.RMSE.gam.Gamma,
-                      sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/
-                             length(data.gam1$response)))
+                            sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/
+                                   length(data.gam1$response)))
   print(c('Chla1.GAM.Gamma',i,sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/
                                      length(data.gam1$response))))
   
   # Generalized Additive Model (quasi)
   mm.shrink2 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
-                   +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
-                   +s(log(TC))+s(Flow)+s(Rain),data=train,
-                   family=quasi(link="log"),method="GCV.Cp",
-                   select=TRUE)
+                    +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
+                    +s(log(TC))+s(Flow)+s(Rain),data=train,
+                    family=quasi(link="log"),method="GCV.Cp",
+                    select=TRUE)
   pred.gam2 <- predict(mm.shrink2,newdata=test,type="response")
   data.gam2 <- data.frame(response=test$Chla,fitted_values=pred.gam2,
-                         time=test$time)
+                          time=test$time)
   Chla1.RMSE.gam.quasi <- c(Chla1.RMSE.gam.quasi,
-                    sqrt(sum((data.gam2$response-data.gam2$fitted_values)^2)/
-                           length(data.gam2$response)))
+                            sqrt(sum((data.gam2$response-data.gam2$fitted_values)^2)/
+                                   length(data.gam2$response)))
   print(c('Chla1.GAM.quasi',i,sqrt(sum((data.gam2$response-data.gam2$fitted_values)^2)/
-                               length(data.gam2$response))))
+                                     length(data.gam2$response))))
   
   # Time Varying Coefficient Model (Gamma)
   vc.shrink1 <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
@@ -122,33 +123,176 @@ for (i in 1:50) {
   
   # Time Varying Coefficient Model (quasi)
   vc.shrink2 <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
-                     s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
-                     s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
-                     s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
-                     s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
-                     s(time,by=Flow)+s(time,by=Rain),data=train,
-                   family=quasi(link="log"),method="GCV.Cp",
-                   select=TRUE)
+                      s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+                      s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
+                      s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
+                      s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
+                      s(time,by=Flow)+s(time,by=Rain),data=train,
+                    family=quasi(link="log"),method="GCV.Cp",
+                    select=TRUE)
   pred.tvcm2 <- predict(vc.shrink2,newdata=test,type="response")
   data.tvcm2 <- data.frame(response=test$Chla,fitted_values=pred.tvcm2,
-                          time=test$time)
+                           time=test$time)
   Chla1.RMSE.tvcm.quasi <- c(Chla1.RMSE.tvcm.quasi,
-                     sqrt(sum((data.tvcm2$response-data.tvcm2$fitted_values)^2)/
-                            length(data.tvcm2$response)))
+                             sqrt(sum((data.tvcm2$response-data.tvcm2$fitted_values)^2)/
+                                    length(data.tvcm2$response)))
   print(c('Chla1.TVCM.quasi',i,sqrt(sum((data.tvcm2$response-data.tvcm2$fitted_values)^2)/
-                                length(data.tvcm2$response))))
+                                      length(data.tvcm2$response))))
+  
+  ## Bagging
+  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.glm.Gamma <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.gam.Gamma <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.gam.quasi <- matrix(nrow=nrow(test), ncol=30)
+  pred.bag.tvcm.Gamma <- matrix(nrow=nrow(test), ncol=30) 
+  pred.bag.tvcm.quasi <- matrix(nrow=nrow(test), ncol=30)
+  
+  for (j in 1:30) {
+    b <- sample(1:nrow(train),nrow(train),replace=TRUE)
+    train.bag <- train[b,]
+    
+    # Multiple Linear Regression
+    fit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)
+               +NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
+               family=gaussian(link="identity"))
+    fit.step <- stepAIC(fit, direction="both", trace=FALSE)
+    pred.mlr <- predict(fit.step,newdata=test,type="response")
+    pred.bag.mlr[,j] <- pred.mlr
+    print(c('MLR',j))
+    
+    # Generalized Linear Model (Gamma)
+    m <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)+
+               NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
+             family=Gamma(link="log"))
+    m.step <- stepAIC(m, direction="both", trace=FALSE)
+    pred.glm.Gamma <- predict(m.step,newdata=test,type="response")
+    pred.bag.glm.Gamma[,j] <- pred.glm.Gamma
+    print(c('GLM.Gamma',j))
+    
+    # Generalized Additive Model (Gamma)
+    mm.shrink1 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                      +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
+                      +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
+                      family=Gamma(link="log"),method="GCV.Cp",
+                      select=TRUE)
+    pred.gam.Gamma <- predict(mm.shrink1,newdata=test,type="response")
+    pred.bag.gam.Gamma[,j] <- pred.gam.Gamma
+    print(c('GAM.Gamma',j))
+    
+    # Generalized Additive Model (quasi)
+    mm.shrink2 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                      +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
+                      +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
+                      family=quasi(link="log"),method="GCV.Cp",
+                      select=TRUE)
+    pred.gam.quasi <- predict(mm.shrink2,newdata=test,type="response")
+    pred.bag.gam.quasi[,j] <- pred.gam.quasi
+    print(c('GAM.quasi',j))
+    
+    # Time Varying Coefficient Model (Gamma)
+    vc.shrink1 <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
+                        s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+                        s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
+                        s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
+                        s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
+                        s(time,by=Flow)+s(time,by=Rain),data=train.bag,
+                      family=Gamma(link="log"),method="GCV.Cp",
+                      select=TRUE)
+    pred.tvcm.Gamma <- predict(vc.shrink1,newdata=test,type="response")
+    pred.bag.tvcm.Gamma[,j] <- pred.tvcm.Gamma
+    print(c('TVCM.Gamma',j))
+    
+    # Time Varying Coefficient Model (quasi)
+    vc.shrink2 <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
+                        s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+                        s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
+                        s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
+                        s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
+                        s(time,by=Flow)+s(time,by=Rain),data=train.bag,
+                      family=quasi(link="log"),method="GCV.Cp",
+                      select=TRUE)
+    pred.tvcm.quasi <- predict(vc.shrink2,newdata=test,type="response")
+    pred.bag.tvcm.quasi[,j] <- pred.tvcm.quasi
+    print(c('TVCM.quasi',j))
+  }
+  
+  pred.bag.mlr.final <- rowMeans(pred.bag.mlr)
+  data.mlr <- data.frame(response=test$Chla,fitted_values=pred.bag.mlr.final,
+                         time=test$time)
+  Chla1.Bag.RMSE.mlr <- c(Chla1.Bag.RMSE.mlr,
+                          sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
+                                 length(data.mlr$response)))
+  print(c('Chla1.Bag.mlr',i,sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
+                                   length(data.mlr$response))))
+  
+  pred.bag.glm.Gamma.final <- rowMeans(pred.bag.glm.Gamma)
+  data.glm.Gamma <- data.frame(response=test$Chla,fitted_values=pred.bag.glm.Gamma.final,
+                               time=test$time)
+  Chla1.Bag.RMSE.glm.Gamma <- c(Chla1.Bag.RMSE.glm.Gamma,
+                                sqrt(sum((data.glm.Gamma$response-data.glm.Gamma$fitted_values)^2)/
+                                       length(data.glm.Gamma$response)))
+  print(c('Chla1.Bag.glm.Gamma',i,sqrt(sum((data.glm.Gamma$response-data.glm.Gamma$fitted_values)^2)/
+                                         length(data.glm.Gamma$response))))
+  
+  pred.bag.gam.Gamma.final <- rowMeans(pred.bag.gam.Gamma)
+  data.gam.Gamma <- data.frame(response=test$Chla,fitted_values=pred.bag.gam.Gamma.final,
+                               time=test$time)
+  Chla1.Bag.RMSE.gam.Gamma <- c(Chla1.Bag.RMSE.gam.Gamma,
+                                sqrt(sum((data.gam.Gamma$response-data.gam.Gamma$fitted_values)^2)/
+                                       length(data.gam.Gamma$response)))
+  print(c('Chla1.Bag.gam.Gamma',i,sqrt(sum((data.gam.Gamma$response-data.gam.Gamma$fitted_values)^2)/
+                                         length(data.gam.Gamma$response))))
+  
+  pred.bag.gam.quasi.final <- rowMeans(pred.bag.gam.quasi)
+  data.gam.quasi <- data.frame(response=test$Chla,fitted_values=pred.bag.gam.quasi.final,
+                               time=test$time)
+  Chla1.Bag.RMSE.gam.quasi <- c(Chla1.Bag.RMSE.gam.quasi,
+                                sqrt(sum((data.gam.quasi$response-data.gam.quasi$fitted_values)^2)/
+                                       length(data.gam.quasi$response)))
+  print(c('Chla1.Bag.gam.quasi',i,sqrt(sum((data.gam.quasi$response-data.gam.quasi$fitted_values)^2)/
+                                         length(data.gam.quasi$response))))
+  
+  pred.bag.tvcm.Gamma.final <- rowMeans(pred.bag.tvcm.Gamma)
+  data.tvcm.Gamma <- data.frame(response=test$Chla,fitted_values=pred.bag.tvcm.Gamma.final,
+                                time=test$time)
+  Chla1.Bag.RMSE.tvcm.Gamma <- c(Chla1.Bag.RMSE.tvcm.Gamma,
+                                 sqrt(sum((data.tvcm.Gamma$response-data.tvcm.Gamma$fitted_values)^2)/
+                                        length(data.tvcm.Gamma$response)))
+  print(c('Chla1.Bag.tvcm.Gamma',i,sqrt(sum((data.tvcm.Gamma$response-data.tvcm.Gamma$fitted_values)^2)/
+                                          length(data.tvcm.Gamma$response))))
+  
+  pred.bag.tvcm.quasi.final <- rowMeans(pred.bag.tvcm.quasi)
+  data.tvcm.quasi <- data.frame(response=test$Chla,fitted_values=pred.bag.tvcm.quasi.final,
+                                time=test$time)
+  Chla1.Bag.RMSE.tvcm.quasi <- c(Chla1.Bag.RMSE.tvcm.quasi,
+                                 sqrt(sum((data.tvcm.quasi$response-data.tvcm.quasi$fitted_values)^2)/
+                                        length(data.tvcm.quasi$response)))
+  print(c('Chla1.Bag.tvcm.quasi',i,sqrt(sum((data.tvcm.quasi$response-data.tvcm.quasi$fitted_values)^2)/
+                                          length(data.tvcm.quasi$response))))
+  
+  print('Chla1.bag',i)
+  
 }
 
 Chla1.RMSE <- data.frame(RMSE=c(Chla1.RMSE.mlr,Chla1.RMSE.glm.Gamma,
                                 Chla1.RMSE.gam.Gamma,Chla1.RMSE.gam.quasi,
-                                Chla1.RMSE.tvcm.Gamma,Chla1.RMSE.tvcm.quasi),
-                       model=c(rep("1_MLR",50),rep("2_GLM.Gamma",50),
-                               rep("3_GAM.Gamma",50),rep("4_GAM.quasi",50),
-                               rep("5_TVCM.Gamma",50),rep("6_TVCM.quasi",50)))
+                                Chla1.RMSE.tvcm.Gamma,Chla1.RMSE.tvcm.quasi,
+                                Chla1.Bag.RMSE.mlr,Chla1.Bag.RMSE.glm.Gamma,
+                                Chla1.Bag.RMSE.gam.Gamma,Chla1.Bag.RMSE.gam.quasi,
+                                Chla1.Bag.RMSE.tvcm.Gamma,Chla1.Bag.RMSE.tvcm.quasi),
+                         model=c(rep("a_MLR",50),rep("b_GLM.Gamma",50),
+                                 rep("c_GAM.Gamma",50),rep("d_GAM.quasi",50),
+                                 rep("e_TVCM.Gamma",50),rep("f_TVCM.quasi",50),
+                                 rep("g_MLR_Bag",50),rep("h_GLM.Gamma_Bag",50),
+                                 rep("i_GAM.Gamma_Bag",50),rep("j_GAM.quasi.Bag",50),
+                                 rep("k_TVCM.Gamma_Bag",50),rep("l_TVCM.quasi_Bag",50)))
 ggplot(Chla1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
-  coord_cartesian(ylim = c(0, 500)) + ggtitle("Gwangsan Chla")
-  
-  
+  coord_cartesian(ylim = c(0, 150)) + ggtitle("Gwangsan Chla")
+
+
+
+
+
 
 # ¿ìÄ¡ Chla
 
@@ -158,6 +302,13 @@ Chla2.RMSE.gam.Gamma <- c()
 Chla2.RMSE.gam.quasi <- c()
 Chla2.RMSE.tvcm.Gamma <- c()
 Chla2.RMSE.tvcm.quasi <- c()
+# Bagging
+Chla2.Bag.RMSE.mlr <- c()
+Chla2.Bag.RMSE.glm.Gamma <- c()
+Chla2.Bag.RMSE.gam.Gamma <- c()
+Chla2.Bag.RMSE.gam.quasi <- c()
+Chla2.Bag.RMSE.tvcm.Gamma <- c()
+Chla2.Bag.RMSE.tvcm.quasi <- c()
 for (i in 1:50) {
   a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10),replace=FALSE)
   train <- ex2[-a,] ; test <- ex2[a,]
@@ -255,194 +406,8 @@ for (i in 1:50) {
                                     length(data.tvcm2$response)))
   print(c('Chla2.TVCM.quasi',i,sqrt(sum((data.tvcm2$response-data.tvcm2$fitted_values)^2)/
                                       length(data.tvcm2$response))))
-}
-
-Chla2.RMSE <- data.frame(RMSE=c(Chla2.RMSE.mlr,Chla2.RMSE.glm.Gamma,
-                                Chla2.RMSE.gam.Gamma,Chla2.RMSE.gam.quasi,
-                                Chla2.RMSE.tvcm.Gamma,Chla2.RMSE.tvcm.quasi),
-                         model=c(rep("1_MLR",50),rep("2_GLM.Gamma",50),
-                                 rep("3_GAM.Gamma",50),rep("4_GAM.quasi",50),
-                                 rep("5_TVCM.Gamma",50),rep("6_TVCM.quasi",50)))
-ggplot(Chla2.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
-  coord_cartesian(ylim = c(0, 500)) + ggtitle("Uchi Chla")
-
-
-
-
-
-
-## Out-Of-Bag crossvalidation with Bagging
-
-
-
-# ±¤»ê Chla
-
-Chla1.Bag.RMSE.mlr <- c()
-Chla1.Bag.RMSE.glm.Gamma <- c()
-Chla1.Bag.RMSE.gam.Gamma <- c()
-Chla1.Bag.RMSE.gam.quasi <- c()
-Chla1.Bag.RMSE.tvcm.Gamma <- c()
-Chla1.Bag.RMSE.tvcm.quasi <- c()
-for (i in 1:50) {
-  a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10),replace=FALSE)
-  train <- ex1[-a,] ; test <- ex1[a,]
   
-  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
-  pred.bag.glm.Gamma <- matrix(nrow=nrow(test), ncol=30) 
-  pred.bag.gam.Gamma <- matrix(nrow=nrow(test), ncol=30) 
-  pred.bag.gam.quasi <- matrix(nrow=nrow(test), ncol=30)
-  pred.bag.tvcm.Gamma <- matrix(nrow=nrow(test), ncol=30) 
-  pred.bag.tvcm.quasi <- matrix(nrow=nrow(test), ncol=30)
-  
-  for (j in 1:30) {
-    b <- sample(1:nrow(train),nrow(train),replace=TRUE)
-    train.bag <- train[b,]
-    
-    # Multiple Linear Regression
-    fit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)
-               +NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
-               family=gaussian(link="identity"))
-    fit.step <- stepAIC(fit, direction="both", trace=FALSE)
-    pred.mlr <- predict(fit.step,newdata=test,type="response")
-    pred.bag.mlr[,j] <- pred.mlr
-    print(c('MLR',j))
-    
-    # Generalized Linear Model (Gamma)
-    m <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)+
-               NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
-             family=Gamma(link="log"))
-    m.step <- stepAIC(m, direction="both", trace=FALSE)
-    pred.glm.Gamma <- predict(m.step,newdata=test,type="response")
-    pred.bag.glm.Gamma[,j] <- pred.glm.Gamma
-    print(c('GLM.Gamma',j))
-    
-    # Generalized Additive Model (Gamma)
-    mm.shrink1 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
-                      +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
-                      +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
-                      family=Gamma(link="log"),method="GCV.Cp",
-                      select=TRUE)
-    pred.gam.Gamma <- predict(mm.shrink1,newdata=test,type="response")
-    pred.bag.gam.Gamma[,j] <- pred.gam.Gamma
-    print(c('GAM.Gamma',j))
-    
-    # Generalized Additive Model (quasi)
-    mm.shrink2 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
-                     +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
-                     +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
-                     family=quasi(link="log"),method="GCV.Cp",
-                     select=TRUE)
-    pred.gam.quasi <- predict(mm.shrink2,newdata=test,type="response")
-    pred.bag.gam.quasi[,j] <- pred.gam.quasi
-    print(c('GAM.quasi',j))
-    
-    # Time Varying Coefficient Model (Gamma)
-    vc.shrink1 <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
-                        s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
-                        s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
-                        s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
-                        s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
-                        s(time,by=Flow)+s(time,by=Rain),data=train.bag,
-                      family=Gamma(link="log"),method="GCV.Cp",
-                      select=TRUE)
-    pred.tvcm.Gamma <- predict(vc.shrink1,newdata=test,type="response")
-    pred.bag.tvcm.Gamma[,j] <- pred.tvcm.Gamma
-    print(c('TVCM.Gamma',j))
-    
-    # Time Varying Coefficient Model (quasi)
-    vc.shrink2 <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
-                       s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
-                       s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
-                       s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
-                       s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
-                       s(time,by=Flow)+s(time,by=Rain),data=train.bag,
-                     family=quasi(link="log"),method="GCV.Cp",
-                     select=TRUE)
-    pred.tvcm.quasi <- predict(vc.shrink2,newdata=test,type="response")
-    pred.bag.tvcm.quasi[,j] <- pred.tvcm.quasi
-    print(c('TVCM.quasi',j))
-    }
-  
-  pred.bag.mlr.final <- rowMeans(pred.bag.mlr)
-  data.mlr <- data.frame(response=test$Chla,fitted_values=pred.bag.mlr.final,
-                         time=test$time)
-  Chla1.Bag.RMSE.mlr <- c(Chla1.Bag.RMSE.mlr,
-                        sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
-                               length(data.mlr$response)))
-  print(c('Chla1.Bag.mlr',i,sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/
-                                 length(data.mlr$response))))
-  
-  pred.bag.glm.Gamma.final <- rowMeans(pred.bag.glm.Gamma)
-  data.glm.Gamma <- data.frame(response=test$Chla,fitted_values=pred.bag.glm.Gamma.final,
-                         time=test$time)
-  Chla1.Bag.RMSE.glm.Gamma <- c(Chla1.Bag.RMSE.glm.Gamma,
-                        sqrt(sum((data.glm.Gamma$response-data.glm.Gamma$fitted_values)^2)/
-                               length(data.glm.Gamma$response)))
-  print(c('Chla1.Bag.glm.Gamma',i,sqrt(sum((data.glm.Gamma$response-data.glm.Gamma$fitted_values)^2)/
-                                   length(data.glm.Gamma$response))))
-  
-  pred.bag.gam.Gamma.final <- rowMeans(pred.bag.gam.Gamma)
-  data.gam.Gamma <- data.frame(response=test$Chla,fitted_values=pred.bag.gam.Gamma.final,
-                         time=test$time)
-  Chla1.Bag.RMSE.gam.Gamma <- c(Chla1.Bag.RMSE.gam.Gamma,
-                        sqrt(sum((data.gam.Gamma$response-data.gam.Gamma$fitted_values)^2)/
-                               length(data.gam.Gamma$response)))
-  print(c('Chla1.Bag.gam.Gamma',i,sqrt(sum((data.gam.Gamma$response-data.gam.Gamma$fitted_values)^2)/
-                                   length(data.gam.Gamma$response))))
-  
-  pred.bag.gam.quasi.final <- rowMeans(pred.bag.gam.quasi)
-  data.gam.quasi <- data.frame(response=test$Chla,fitted_values=pred.bag.gam.quasi.final,
-                               time=test$time)
-  Chla1.Bag.RMSE.gam.quasi <- c(Chla1.Bag.RMSE.gam.quasi,
-                                sqrt(sum((data.gam.quasi$response-data.gam.quasi$fitted_values)^2)/
-                                       length(data.gam.quasi$response)))
-  print(c('Chla1.Bag.gam.quasi',i,sqrt(sum((data.gam.quasi$response-data.gam.quasi$fitted_values)^2)/
-                                         length(data.gam.quasi$response))))
-  
-  pred.bag.tvcm.Gamma.final <- rowMeans(pred.bag.tvcm.Gamma)
-  data.tvcm.Gamma <- data.frame(response=test$Chla,fitted_values=pred.bag.tvcm.Gamma.final,
-                          time=test$time)
-  Chla1.Bag.RMSE.tvcm.Gamma <- c(Chla1.Bag.RMSE.tvcm.Gamma,
-                         sqrt(sum((data.tvcm.Gamma$response-data.tvcm.Gamma$fitted_values)^2)/
-                                length(data.tvcm.Gamma$response)))
-  print(c('Chla1.Bag.tvcm.Gamma',i,sqrt(sum((data.tvcm.Gamma$response-data.tvcm.Gamma$fitted_values)^2)/
-                                   length(data.tvcm.Gamma$response))))
-  
-  pred.bag.tvcm.quasi.final <- rowMeans(pred.bag.tvcm.quasi)
-  data.tvcm.quasi <- data.frame(response=test$Chla,fitted_values=pred.bag.tvcm.quasi.final,
-                                time=test$time)
-  Chla1.Bag.RMSE.tvcm.quasi <- c(Chla1.Bag.RMSE.tvcm.quasi,
-                                 sqrt(sum((data.tvcm.quasi$response-data.tvcm.quasi$fitted_values)^2)/
-                                        length(data.tvcm.quasi$response)))
-  print(c('Chla1.Bag.tvcm.quasi',i,sqrt(sum((data.tvcm.quasi$response-data.tvcm.quasi$fitted_values)^2)/
-                                          length(data.tvcm.quasi$response))))
-  
-  print('Chla1.bag',i)
-}
-
-Chla1.Bag.RMSE <- data.frame(RMSE=c(Chla1.Bag.RMSE.mlr,Chla1.Bag.RMSE.glm.Gamma,
-                                    Chla1.Bag.RMSE.gam.Gamma,Chla1.Bag.RMSE.gam.quasi,
-                                    Chla1.Bag.RMSE.tvcm.Gamma,Chla1.Bag.RMSE.tvcm.quasi),
-                           model=c(rep("1_MLR",50),rep("2_GLM.Gamma",50),
-                                   rep("3_GAM.Gamma",50),rep("4_GAM.quasi",50),
-                                   rep("5_TVCM.Gamma",50),rep("6_TVCM.quasi",50)))
-ggplot(Chla1.Bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
-  coord_cartesian(ylim = c(0, 500)) +  ggtitle("Gwangsan Chla (Bagging)")
-
-
-
-# ¿ìÄ¡ chla
-
-Chla2.Bag.RMSE.mlr <- c()
-Chla2.Bag.RMSE.glm.Gamma <- c()
-Chla2.Bag.RMSE.gam.Gamma <- c()
-Chla2.Bag.RMSE.gam.quasi <- c()
-Chla2.Bag.RMSE.tvcm.Gamma <- c()
-Chla2.Bag.RMSE.tvcm.quasi <- c()
-for (i in 1:50) {
-  a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10),replace=FALSE)
-  train <- ex2[-a,] ; test <- ex2[a,]
-  
+  ## Bagging
   pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
   pred.bag.glm.Gamma <- matrix(nrow=nrow(test), ncol=30) 
   pred.bag.gam.Gamma <- matrix(nrow=nrow(test), ncol=30) 
@@ -576,110 +541,17 @@ for (i in 1:50) {
   print('Chla2.bag',i)
 }
 
-Chla2.Bag.RMSE <- data.frame(RMSE=c(Chla2.Bag.RMSE.mlr,Chla2.Bag.RMSE.glm.Gamma,
-                                    Chla2.Bag.RMSE.gam.Gamma,Chla2.Bag.RMSE.gam.quasi,
-                                    Chla2.Bag.RMSE.tvcm.Gamma,Chla2.Bag.RMSE.tvcm.quasi),
-                             model=c(rep("1_MLR",50),rep("2_GLM.Gamma",50),
-                                     rep("3_GAM.Gamma",50),rep("4_GAM.quasi",50),
-                                     rep("5_TVCM.Gamma",50),rep("6_TVCM.quasi",50)))
-ggplot(Chla2.Bag.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
-  coord_cartesian(ylim = c(0, 500)) +  ggtitle("Uchi Chla (Bagging)")
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Compute NSE
-## reference1 : https://www.rdocumentation.org/packages/hydroGOF/versions/0.4-0/topics/NSE
-## reference2 : https://cran.r-project.org/web/packages/hydroGOF/hydroGOF.pdf
-
-install.packages("hydroGOF")
-library(hydroGOF)
-
-# NOT RUN {
-obs <- 1:10
-sim <- 1:10
-NSE(sim, obs)
-
-obs <- 1:10
-sim <- 2:11
-NSE(sim, obs)
-
-#################
-# Computing NSE on the (natural) logarithm of simulated and observed values
-obs <- 1:10/10
-sim <- 2:11/10
-NSE(sim=sim, obs=obs, FUN=log)
-
-##################
-# Loading daily streamflows of the Ega River (Spain), from 1961 to 1970
-data(EgaEnEstellaQts)
-obs <- EgaEnEstellaQts
-
-# Generating a simulated daily time series, initially equal to the observed series
-sim <- obs 
-
-# Computing the 'NSE' for the "best" (unattainable) case
-NSE(sim=sim, obs=obs)
-
-# Randomly changing the first 2000 elements of 'sim', by using a normal distribution 
-# with mean 10 and standard deviation equal to 1 (default of 'rnorm').
-sim[1:2000] <- obs[1:2000] + rnorm(2000, mean=10)
-
-# Computing the new 'NSE'
-NSE(sim=sim, obs=obs)
-# }
-
-
-
-
-### Compute Bias
-## reference : https://www.rdocumentation.org/packages/SimDesign/versions/1.14/topics/bias
-
-my_bias <- function(sim, obs) {
-  bias = sum(sim-obs)/length(sim)
-  return(bias)
-}
-
-
-
-
-
-
-
-
-
-### Compute MAE
-## reference1 : https://www.rdocumentation.org/packages/Metrics/versions/0.1.4/topics/mae
-## reference2 : https://cran.r-project.org/web/packages/hydroGOF/hydroGOF.pdf
-
-install.packages("hydroGOF")
-library(hydroGOF)
-
-obs <- 1:10
-sim <- 1:10
-mae(sim, obs)
-obs <- 1:10
-sim <- 2:11
-mae(sim, obs)
-##################
-# Loading daily streamflows of the Ega River (Spain), from 1961 to 1970
-data(EgaEnEstellaQts)
-obs <- EgaEnEstellaQts
-# Generating a simulated daily time series, initially equal to the observed series
-sim <- obs
-# Computing the mean absolute error for the "best" case
-mae(sim=sim, obs=obs)
-# Randomly changing the first 2000 elements of 'sim', by using a normal distribution
-# with mean 10 and standard deviation equal to 1 (default of 'rnorm').
-sim[1:2000] <- obs[1:2000] + rnorm(2000, mean=10)
-# Computing the new mean absolute error
-mae(sim=sim, obs=obs)
+Chla2.RMSE <- data.frame(RMSE=c(Chla2.RMSE.mlr,Chla2.RMSE.glm.Gamma,
+                                Chla2.RMSE.gam.Gamma,Chla2.RMSE.gam.quasi,
+                                Chla2.RMSE.tvcm.Gamma,Chla2.RMSE.tvcm.quasi,
+                                Chla2.Bag.RMSE.mlr,Chla2.Bag.RMSE.glm.Gamma,
+                                Chla2.Bag.RMSE.gam.Gamma,Chla2.Bag.RMSE.gam.quasi,
+                                Chla2.Bag.RMSE.tvcm.Gamma,Chla2.Bag.RMSE.tvcm.quasi),
+                         model=c(rep("a_MLR",50),rep("b_GLM.Gamma",50),
+                                 rep("c_GAM.Gamma",50),rep("d_GAM.quasi",50),
+                                 rep("e_TVCM.Gamma",50),rep("f_TVCM.quasi",50),
+                                 rep("g_MLR_Bag",50),rep("h_GLM.Gamma_Bag",50),
+                                 rep("i_GAM.Gamma_Bag",50),rep("j_GAM.quasi.Bag",50),
+                                 rep("k_TVCM.Gamma_Bag",50),rep("l_TVCM.quasi_Bag",50)))
+ggplot(Chla2.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
+  coord_cartesian(ylim = c(0, 150)) + ggtitle("Uchi Chla")
