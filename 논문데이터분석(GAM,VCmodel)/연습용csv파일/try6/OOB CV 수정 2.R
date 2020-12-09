@@ -1,3 +1,6 @@
+# 반응변수 : Chla
+# 설명변수 : BOD, COD, SS, TN, TP, TOC, log(TC), Flow, Rain
+
 ex1 <- read.csv("C:/Users/stat/Desktop/광산(2010-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
 ex1 <- as.data.frame(ex1)
@@ -46,8 +49,7 @@ for (i in 1:50) {
   train <- ex1[-a,] ; test <- ex1[a,]
   
   # Multiple Linear Regression
-  fit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)
-             +NH3N+PO4P+log(TC)+Flow+Rain,data=train,
+  fit <- glm(Chla~BOD+COD+SS+TN+TP+TOC+log(TC)+Flow+Rain,data=train,
              family=gaussian(link="identity"))
   fit.step <- stepAIC(fit, direction="both", trace=FALSE)
   pred.mlr <- predict(fit.step,newdata=test,type="response")
@@ -60,8 +62,7 @@ for (i in 1:50) {
                                length(data.mlr$response))))
   
   # Generalized Linear Model (Gamma)
-  m <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)+
-             NH3N+PO4P+log(TC)+Flow+Rain,data=train,
+  m <- glm(Chla~BOD+COD+SS+TN+TP+TOC+log(TC)+Flow+Rain,data=train,
            family=Gamma(link="log"))
   m.step <- stepAIC(m, direction="both", trace=FALSE)
   pred.glm <- predict(m.step,newdata=test,type="response")
@@ -74,9 +75,8 @@ for (i in 1:50) {
                                      length(data.glm$response))))
   
   # Generalized Additive Model (Gamma)
-  mm.shrink1 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
-                    +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
-                    +s(log(TC))+s(Flow)+s(Rain),data=train,
+  mm.shrink1 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                    +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train,
                     family=Gamma(link="log"),method="GCV.Cp",
                     select=TRUE)
   pred.gam1 <- predict(mm.shrink1,newdata=test,type="response")
@@ -89,9 +89,8 @@ for (i in 1:50) {
                                      length(data.gam1$response))))
   
   # Generalized Additive Model (quasi)
-  mm.shrink2 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
-                    +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
-                    +s(log(TC))+s(Flow)+s(Rain),data=train,
+  mm.shrink2 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                    +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train,
                     family=quasi(link="log"),method="GCV.Cp",
                     select=TRUE)
   pred.gam2 <- predict(mm.shrink2,newdata=test,type="response")
@@ -104,12 +103,9 @@ for (i in 1:50) {
                                      length(data.gam2$response))))
   
   # Time Varying Coefficient Model (Gamma)
-  vc.shrink1 <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
-                      s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+  vc.shrink1 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
                       s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
-                      s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
-                      s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
-                      s(time,by=Flow)+s(time,by=Rain),data=train,
+                      s(time,by=log(TC))+s(time,by=Flow)+s(time,by=Rain),data=train,
                     family=Gamma(link="log"),method="GCV.Cp",
                     select=TRUE)
   pred.tvcm1 <- predict(vc.shrink1,newdata=test,type="response")
@@ -122,12 +118,9 @@ for (i in 1:50) {
                                       length(data.tvcm1$response))))
   
   # Time Varying Coefficient Model (quasi)
-  vc.shrink2 <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
-                      s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+  vc.shrink2 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
                       s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
-                      s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
-                      s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
-                      s(time,by=Flow)+s(time,by=Rain),data=train,
+                      s(time,by=log(TC))+s(time,by=Flow)+s(time,by=Rain),data=train,
                     family=quasi(link="log"),method="GCV.Cp",
                     select=TRUE)
   pred.tvcm2 <- predict(vc.shrink2,newdata=test,type="response")
@@ -152,8 +145,7 @@ for (i in 1:50) {
     train.bag <- train[b,]
     
     # Multiple Linear Regression
-    fit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)
-               +NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
+    fit <- glm(Chla~BOD+COD+SS+TN+TP+TOC+log(TC)+Flow+Rain,data=train.bag,
                family=gaussian(link="identity"))
     fit.step <- stepAIC(fit, direction="both", trace=FALSE)
     pred.mlr <- predict(fit.step,newdata=test,type="response")
@@ -161,8 +153,7 @@ for (i in 1:50) {
     print(c('MLR',j))
     
     # Generalized Linear Model (Gamma)
-    m <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)+
-               NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
+    m <- glm(Chla~BOD+COD+SS+TN+TP+TOC+log(TC)+Flow+Rain,data=train.bag,
              family=Gamma(link="log"))
     m.step <- stepAIC(m, direction="both", trace=FALSE)
     pred.glm.Gamma <- predict(m.step,newdata=test,type="response")
@@ -170,9 +161,8 @@ for (i in 1:50) {
     print(c('GLM.Gamma',j))
     
     # Generalized Additive Model (Gamma)
-    mm.shrink1 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
-                      +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
-                      +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
+    mm.shrink1 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                      +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train.bag,
                       family=Gamma(link="log"),method="GCV.Cp",
                       select=TRUE)
     pred.gam.Gamma <- predict(mm.shrink1,newdata=test,type="response")
@@ -180,9 +170,8 @@ for (i in 1:50) {
     print(c('GAM.Gamma',j))
     
     # Generalized Additive Model (quasi)
-    mm.shrink2 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
-                      +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
-                      +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
+    mm.shrink2 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                      +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train.bag,
                       family=quasi(link="log"),method="GCV.Cp",
                       select=TRUE)
     pred.gam.quasi <- predict(mm.shrink2,newdata=test,type="response")
@@ -190,12 +179,9 @@ for (i in 1:50) {
     print(c('GAM.quasi',j))
     
     # Time Varying Coefficient Model (Gamma)
-    vc.shrink1 <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
-                        s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+    vc.shrink1 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
                         s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
-                        s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
-                        s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
-                        s(time,by=Flow)+s(time,by=Rain),data=train.bag,
+                        s(time,by=log(TC))+s(time,by=Flow)+s(time,by=Rain),data=train.bag,
                       family=Gamma(link="log"),method="GCV.Cp",
                       select=TRUE)
     pred.tvcm.Gamma <- predict(vc.shrink1,newdata=test,type="response")
@@ -203,12 +189,9 @@ for (i in 1:50) {
     print(c('TVCM.Gamma',j))
     
     # Time Varying Coefficient Model (quasi)
-    vc.shrink2 <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
-                        s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+    vc.shrink2 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
                         s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
-                        s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
-                        s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
-                        s(time,by=Flow)+s(time,by=Rain),data=train.bag,
+                        s(time,by=log(TC))+s(time,by=Flow)+s(time,by=Rain),data=train.bag,
                       family=quasi(link="log"),method="GCV.Cp",
                       select=TRUE)
     pred.tvcm.quasi <- predict(vc.shrink2,newdata=test,type="response")
@@ -287,7 +270,7 @@ Chla1.RMSE <- data.frame(RMSE=c(Chla1.RMSE.mlr,Chla1.RMSE.glm.Gamma,
                                  rep("i_GAM.Gamma_Bag",50),rep("j_GAM.quasi.Bag",50),
                                  rep("k_TVCM.Gamma_Bag",50),rep("l_TVCM.quasi_Bag",50)))
 ggplot(Chla1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
-  coord_cartesian(ylim = c(0, 150)) + ggtitle("Gwangsan Chla")
+  coord_cartesian(ylim = c(0, 150)) + ggtitle("Gwangsan Chla (correct)")
 
 
 
@@ -314,8 +297,7 @@ for (i in 1:50) {
   train <- ex2[-a,] ; test <- ex2[a,]
   
   # Multiple Linear Regression
-  fit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)
-             +NH3N+PO4P+log(TC)+Flow+Rain,data=train,
+  fit <- glm(Chla~BOD+COD+SS+TN+TP+TOC+log(TC)+Flow+Rain,data=train,
              family=gaussian(link="identity"))
   fit.step <- stepAIC(fit, direction="both", trace=FALSE)
   pred.mlr <- predict(fit.step,newdata=test,type="response")
@@ -328,8 +310,7 @@ for (i in 1:50) {
                                length(data.mlr$response))))
   
   # Generalized Linear Model (Gamma)
-  m <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)+
-             NH3N+PO4P+log(TC)+Flow+Rain,data=train,
+  m <- glm(Chla~BOD+COD+SS+TN+TP+TOC+log(TC)+Flow+Rain,data=train,
            family=Gamma(link="log"))
   m.step <- stepAIC(m, direction="both", trace=FALSE)
   pred.glm <- predict(m.step,newdata=test,type="response")
@@ -342,9 +323,8 @@ for (i in 1:50) {
                                      length(data.glm$response))))
   
   # Generalized Additive Model (Gamma)
-  mm.shrink1 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
-                    +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
-                    +s(log(TC))+s(Flow)+s(Rain),data=train,
+  mm.shrink1 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                    +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train,
                     family=Gamma(link="log"),method="GCV.Cp",
                     select=TRUE)
   pred.gam1 <- predict(mm.shrink1,newdata=test,type="response")
@@ -357,9 +337,8 @@ for (i in 1:50) {
                                      length(data.gam1$response))))
   
   # Generalized Additive Model (quasi)
-  mm.shrink2 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
-                    +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
-                    +s(log(TC))+s(Flow)+s(Rain),data=train,
+  mm.shrink2 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                    +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train,
                     family=quasi(link="log"),method="GCV.Cp",
                     select=TRUE)
   pred.gam2 <- predict(mm.shrink2,newdata=test,type="response")
@@ -372,11 +351,8 @@ for (i in 1:50) {
                                      length(data.gam2$response))))
   
   # Time Varying Coefficient Model (Gamma)
-  vc.shrink1 <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
-                      s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
-                      s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
-                      s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
-                      s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
+  vc.shrink1 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+                      s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=log(TC))+
                       s(time,by=Flow)+s(time,by=Rain),data=train,
                     family=Gamma(link="log"),method="GCV.Cp",
                     select=TRUE)
@@ -390,11 +366,8 @@ for (i in 1:50) {
                                       length(data.tvcm1$response))))
   
   # Time Varying Coefficient Model (quasi)
-  vc.shrink2 <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
-                      s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
-                      s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
-                      s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
-                      s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
+  vc.shrink2 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+                      s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=log(TC))+
                       s(time,by=Flow)+s(time,by=Rain),data=train,
                     family=quasi(link="log"),method="GCV.Cp",
                     select=TRUE)
@@ -420,8 +393,7 @@ for (i in 1:50) {
     train.bag <- train[b,]
     
     # Multiple Linear Regression
-    fit <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)
-               +NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
+    fit <- glm(Chla~BOD+COD+SS+TN+TP+TOC+log(TC)+Flow+Rain,data=train.bag,
                family=gaussian(link="identity"))
     fit.step <- stepAIC(fit, direction="both", trace=FALSE)
     pred.mlr <- predict(fit.step,newdata=test,type="response")
@@ -429,8 +401,7 @@ for (i in 1:50) {
     print(c('MLR',j))
     
     # Generalized Linear Model (Gamma)
-    m <- glm(Chla~pH+DO+BOD+COD+SS+TN+TP+TOC+WT+EC+log(FC)+
-               NH3N+PO4P+log(TC)+Flow+Rain,data=train.bag,
+    m <- glm(Chla~BOD+COD+SS+TN+TP+TOC+log(TC)+Flow+Rain,data=train.bag,
              family=Gamma(link="log"))
     m.step <- stepAIC(m, direction="both", trace=FALSE)
     pred.glm.Gamma <- predict(m.step,newdata=test,type="response")
@@ -438,9 +409,8 @@ for (i in 1:50) {
     print(c('GLM.Gamma',j))
     
     # Generalized Additive Model (Gamma)
-    mm.shrink1 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
-                      +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
-                      +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
+    mm.shrink1 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                      +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train.bag,
                       family=Gamma(link="log"),method="GCV.Cp",
                       select=TRUE)
     pred.gam.Gamma <- predict(mm.shrink1,newdata=test,type="response")
@@ -448,9 +418,8 @@ for (i in 1:50) {
     print(c('GAM.Gamma',j))
     
     # Generalized Additive Model (quasi)
-    mm.shrink2 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
-                      +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
-                      +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
+    mm.shrink2 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
+                      +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train.bag,
                       family=quasi(link="log"),method="GCV.Cp",
                       select=TRUE)
     pred.gam.quasi <- predict(mm.shrink2,newdata=test,type="response")
@@ -458,11 +427,8 @@ for (i in 1:50) {
     print(c('GAM.quasi',j))
     
     # Time Varying Coefficient Model (Gamma)
-    vc.shrink1 <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
-                        s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
-                        s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
-                        s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
-                        s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
+    vc.shrink1 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+                        s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=log(TC))+
                         s(time,by=Flow)+s(time,by=Rain),data=train.bag,
                       family=Gamma(link="log"),method="GCV.Cp",
                       select=TRUE)
@@ -471,11 +437,8 @@ for (i in 1:50) {
     print(c('TVCM.Gamma',j))
     
     # Time Varying Coefficient Model (quasi)
-    vc.shrink2 <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+
-                        s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
-                        s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
-                        s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
-                        s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
+    vc.shrink2 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
+                        s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=log(TC))+
                         s(time,by=Flow)+s(time,by=Rain),data=train.bag,
                       family=quasi(link="log"),method="GCV.Cp",
                       select=TRUE)
@@ -554,4 +517,4 @@ Chla2.RMSE <- data.frame(RMSE=c(Chla2.RMSE.mlr,Chla2.RMSE.glm.Gamma,
                                  rep("i_GAM.Gamma_Bag",50),rep("j_GAM.quasi.Bag",50),
                                  rep("k_TVCM.Gamma_Bag",50),rep("l_TVCM.quasi_Bag",50)))
 ggplot(Chla2.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
-  coord_cartesian(ylim = c(0, 150)) + ggtitle("Uchi Chla")
+  coord_cartesian(ylim = c(0, 150)) + ggtitle("Uchi Chla (correct)")
