@@ -129,6 +129,20 @@ $\epsilon  _{i} ->i.i.d  N(0, \sigma  ^{2} ) , i=1,2,...,n$
 - 만약 실제 데이터를 모두 수집하여도 모든 데이터를 학습시키기 위한 시간이 측정 불가능한 수준으로 증가할 수 있다.
 - 학습 데이터만 가지고 실제 데이터의 오차가 증가하는 지점을 예측하는 것은 매우 어렵거나 불가능하다.
 
+#### 8. 배깅(Bagging), 랜덤포레스트(Random Forest)
+- https://ko.wikipedia.org/wiki/%EB%B0%B0%EA%B9%85
+- https://bkshin.tistory.com/entry/%EB%A8%B8%EC%8B%A0%EB%9F%AC%EB%8B%9D-11-%EC%95%99%EC%83%81%EB%B8%94-%ED%95%99%EC%8A%B5-Ensemble-Learning-%EB%B0%B0%EA%B9%85Bagging%EA%B3%BC-%EB%B6%80%EC%8A%A4%ED%8C%85Boosting
+- https://bkshin.tistory.com/entry/%EB%A8%B8%EC%8B%A0%EB%9F%AC%EB%8B%9D-5-%EB%9E%9C%EB%8D%A4-%ED%8F%AC%EB%A0%88%EC%8A%A4%ED%8A%B8Random-Forest%EC%99%80-%EC%95%99%EC%83%81%EB%B8%94Ensemble
+- 제안된 모형에 대한 추정모수의 분산을 큰 폭으로 줄여서 성능을 더욱 향상시키고 과적합 효과를 완화시키는 대표적인 기계학습(Machine Learning) 방법이다.
+- 샘플을 여러 번 뽑아(Bootstrap) 각 모델을 학습시켜 결과물을 집계(Aggregration)하는 방법
+- 본 연구에서 사용하고자 하는 평가방법은 다음과 같이 진행해볼 예정임.
+- 1) 난수(random number)를 추출하여 주어진 데이터를 7:3의 비율로 training data와 test data로 나눈다.
+- 2) training data를 이용하여 총 12가지 방법(MLR, GLM_Gamma, GAM_Gamma, GAM_Quasi, TVCM_Gamma, TVCM_Quasi, MLR_Bagging, GLM_Gamma_Bagging, GAM_Gamma_Bagging, GAM_Quasi_Bagging, TVCM_Gamma_Bagging, TVCM_Quasi_Bagging)을 통해서 test data에 대한 예측값을 구하고 RMSE값을 계산한다.
+- 3) 1)~2) 과정을 50번 반복하여 계산된 RMSE값을 boxplot으로 그려본다.
+- 4) RMSE의 평균과 표준편차가 작을수록 예측을 잘하는 모형으로 평가한다.
+- p.s) 다중선형회귀분석(MLR)의 경우는 Chl-a의 예측값을 음수로 추정하는 과오를 범하기 때문에 서두에서 이러한 한계만 언급하고 모형평가 시에는 제외시키는 것을 고려중임.
+
+
 
 
 
