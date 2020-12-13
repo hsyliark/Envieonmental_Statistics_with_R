@@ -26,8 +26,9 @@ library(MASS)
 library(boot)
 library(kohonen)
 library(SOMbrero)
-par(mar=c(4,4,4,4))
-par(oma=c(0.5,0.5,0.5,0.5))
+library(e1071)
+# par(mar=c(4,4,4,4))
+# par(oma=c(0.5,0.5,0.5,0.5))
 ```
 
 #### 다중선형회귀모형 적용 시 Chla의 예측값이 음수가 나오는 경우가 발생할 수 있음. 이에 따라 변수의 특성에 맞는 분포를 가정해서 모형을 적합할 필요가 있음.
@@ -353,7 +354,7 @@ legend(3650,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 mm <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(log(TC))+s(NH3N)+s(PO4P)+s(log(FC))+s(Flow)+s(Rain),data=ex1,family=Gamma(link="log"),method="REML")
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
 ggGam(mm)
-summary(mm) # Deviance explained = 72.3%    
+summary(mm) # Deviance explained = 70.9%    
 concurvity(mm,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm) # 적합결여 존재 (기저함수 부족)
@@ -365,8 +366,8 @@ par(mfrow=c(1,1))
 ```{r}
 mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(log(TC))+s(NH3N)+s(PO4P)+s(log(FC))+s(Flow)+s(Rain),data=ex1,family=Gamma(link="log"),method="REML",select=TRUE) 
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
-ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, log(TC), NH3N, PO4P, log(FC), Flow, Rain 
-summary(mm.shrink) # Deviance explained = 72.3%   
+ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, log(TC), NH3N, PO4P, Flow, Rain 
+summary(mm.shrink) # Deviance explained = 69.3%   
 concurvity(mm.shrink,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
@@ -378,7 +379,7 @@ par(mfrow=c(1,1))
 ```{r}
 pred.gam <- predict(mm.shrink,newdata=ex1,type="response")
 data.gam <- data.frame(response=ex1$Chla,fitted_values=pred.gam,time=ex1$time)
-sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 19.23435      
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 20.33466      
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan Chla train data] response vs fitted_values (Generalized Additive Model (Gamma Distribution))") +
@@ -397,7 +398,7 @@ ex1_1 <- ex1_1[,-1]
 ex1_1 <- as.data.frame(ex1_1)
 pred.gam1 <- predict(mm.shrink,newdata=ex1_1,type="response")
 data.gam1 <- data.frame(response=ex1_1$Chla,fitted_values=pred.gam1,time=ex1_1$time)
-sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/length(data.gam1$response)) # RMSE = 38.33993    
+sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/length(data.gam1$response)) # RMSE = 39.9079    
 ggplot(data.gam1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan Chla test data] response vs fitted_values (Generalized Additive Model, (Gamma Distribution))") +
@@ -417,7 +418,7 @@ legend(3650,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 mm <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(log(TC))+s(NH3N)+s(PO4P)+s(log(FC))+s(Flow)+s(Rain),data=ex1,family=quasi(link="log"),method="REML")
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
 ggGam(mm)
-summary(mm) # Deviance explained = 77.3%   
+summary(mm) # Deviance explained = 76.3%   
 concurvity(mm,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm) # 적합결여 존재 (기저함수 부족)
@@ -430,7 +431,7 @@ par(mfrow=c(1,1))
 mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(log(TC))+s(NH3N)+s(PO4P)+s(log(FC))+s(Flow)+s(Rain),data=ex1,family=quasi(link="log"),method="REML",select=TRUE) 
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
 ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, EC, log(TC), NH3N, PO4P, Rain 
-summary(mm.shrink) # Deviance explained = 76.9%  
+summary(mm.shrink) # Deviance explained = 75.7%   
 concurvity(mm.shrink,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
@@ -442,7 +443,7 @@ par(mfrow=c(1,1))
 ```{r}
 pred.gam <- predict(mm.shrink,newdata=ex1,type="response")
 data.gam <- data.frame(response=ex1$Chla,fitted_values=pred.gam,time=ex1$time)
-sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 16.08552     
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 16.48926     
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan Chla train data] response vs fitted_values (Generalized Additive Model (Quasi Distribution))") +
@@ -461,7 +462,7 @@ ex1_1 <- ex1_1[,-1]
 ex1_1 <- as.data.frame(ex1_1)
 pred.gam1 <- predict(mm.shrink,newdata=ex1_1,type="response")
 data.gam1 <- data.frame(response=ex1_1$Chla,fitted_values=pred.gam1,time=ex1_1$time)
-sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/length(data.gam1$response)) # RMSE = 37.13758   
+sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/length(data.gam1$response)) # RMSE = 37.7436   
 ggplot(data.gam1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan Chla test data] response vs fitted_values (Generalized Additive Model, (Quasi Distribution))") +
@@ -476,12 +477,10 @@ legend(3650,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 ### Time Varying Coefficient Model (Gamma)
 
 ```{r}
-par(mar=c(4,4,4,4))
-par(oma=c(0.5,0.5,0.5,0.5))
 vc <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=log(TC))+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(FC))+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=Gamma(link="log"),method="REML")
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
 ggGam(vc)
-summary(vc) # Deviance explained = 75.5%    
+summary(vc) # Deviance explained = 72.3%     
 par(mfrow=c(2,2))
 gam.check(vc) 
 par(mfrow=c(1,1))
@@ -492,8 +491,8 @@ par(mfrow=c(1,1))
 ```{r}
 vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=log(TC))+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(FC))+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=Gamma(link="log"),method="REML",select=TRUE)
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
-ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, EC, PO4P, log(FC), Flow, Rain 
-summary(vc.shrink) # Deviance explained = 71.5%   
+ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, EC, log(TC), PO4P, Flow, Rain 
+summary(vc.shrink) # Deviance explained = 69.9%    
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
@@ -504,7 +503,7 @@ par(mfrow=c(1,1))
 ```{r}
 pred.tvcm <- predict(vc.shrink,newdata=ex1,type="response")
 data.tvcm <- data.frame(response=ex1$Chla,fitted_values=pred.tvcm,time=ex1$time)
-sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 25.17242     
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 27.81185     
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan Chla train data] response vs fitted_values (Time Varying Coefficient Model, (Gamma Distribution))") +
@@ -523,7 +522,7 @@ ex1_1 <- ex1_1[,-1]
 ex1_1 <- as.data.frame(ex1_1)
 pred.tvcm1 <- predict(vc.shrink,newdata=ex1_1,type="response")
 data.tvcm1 <- data.frame(response=ex1_1$Chla,fitted_values=pred.tvcm1,time=ex1_1$time)
-sqrt(sum((data.tvcm1$response-data.tvcm1$fitted_values)^2)/length(data.tvcm1$response)) # RMSE = 45.5266    
+sqrt(sum((data.tvcm1$response-data.tvcm1$fitted_values)^2)/length(data.tvcm1$response)) # RMSE = 46.76845    
 ggplot(data.tvcm1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan Chla test data] response vs fitted_values (Time Varying Coefficient Model, (Gamma Distribution))") +
@@ -539,12 +538,10 @@ legend(3650,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 ### Time Varying Coefficient Model (quasi)
 
 ```{r}
-par(mar=c(4,4,4,4))
-par(oma=c(0.5,0.5,0.5,0.5))
 vc <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=log(TC))+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(FC))+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=quasi(link="log"),method="REML")
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
 ggGam(vc)
-summary(vc) # Deviance explained = 79.6%   
+summary(vc) # Deviance explained = 77.3%    
 par(mfrow=c(2,2))
 gam.check(vc) 
 par(mfrow=c(1,1))
@@ -555,8 +552,8 @@ par(mfrow=c(1,1))
 ```{r}
 vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=log(TC))+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(FC))+s(time,by=Flow)+s(time,by=Rain),data=ex1,family=quasi(link="log"),method="REML",select=TRUE)
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
-ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, EC, log(TC), NH3N, PO4P, log(FC), Flow, Rain 
-summary(vc.shrink) # Deviance explained = 80.3%   
+ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TP, TOC, WT, log(TC), NH3N, PO4P, log(FC), Flow, Rain 
+summary(vc.shrink) # Deviance explained = 74.6%    
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
@@ -567,7 +564,7 @@ par(mfrow=c(1,1))
 ```{r}
 pred.tvcm <- predict(vc.shrink,newdata=ex1,type="response")
 data.tvcm <- data.frame(response=ex1$Chla,fitted_values=pred.tvcm,time=ex1$time)
-sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 14.85056     
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 16.86484     
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan Chla train data] response vs fitted_values (Time Varying Coefficient Model, (Quasi Distribution))") +
@@ -586,7 +583,7 @@ ex1_1 <- ex1_1[,-1]
 ex1_1 <- as.data.frame(ex1_1)
 pred.tvcm1 <- predict(vc.shrink,newdata=ex1_1,type="response")
 data.tvcm1 <- data.frame(response=ex1_1$Chla,fitted_values=pred.tvcm1,time=ex1_1$time)
-sqrt(sum((data.tvcm1$response-data.tvcm1$fitted_values)^2)/length(data.tvcm1$response)) # RMSE = 48.43549    
+sqrt(sum((data.tvcm1$response-data.tvcm1$fitted_values)^2)/length(data.tvcm1$response)) # RMSE = 42.18933    
 ggplot(data.tvcm1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Gwangsan Chla test data] response vs fitted_values (Time Varying Coefficient Model, (Quasi Distribution))") +
@@ -598,11 +595,11 @@ legend(3650,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 ```
 
 
-#### 최종선택된 모형의 설명력(Deviance explained) : 64.8%(다중선형회귀모형), 59.7%(일반화선형모형(Gamma)), 72.3%(일반화가법모형(Gamma)), 76.9%(일반화가법모형(quasi)), 71.5%(시간에 따른 계수변화모형(Gamma)), 80.3%(시간에 따른 계수변화모형(quasi)) 
+#### 최종선택된 모형의 설명력(Deviance explained) : 64.8%(다중선형회귀모형), 59.7%(일반화선형모형(Gamma)), 69.3%(일반화가법모형(Gamma)), 75.7%(일반화가법모형(quasi)), 69.9%(시간에 따른 계수변화모형(Gamma)), 74.6%(시간에 따른 계수변화모형(quasi)) 
 
-#### train data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 19.85979(다중선형회귀모형), 31.34176(일반화선형모형(Gamma)), 19.23435(일반화가법모형(Gamma)), 16.08552(일반화가법모형(quasi)), 25.17242(일반화가법모형(Gamma)), 14.85056(시간에 따른 계수변화모형(quasi))
+#### train data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 19.85979(다중선형회귀모형), 31.34176(일반화선형모형(Gamma)), 20.33466(일반화가법모형(Gamma)), 16.48926(일반화가법모형(quasi)), 27.81185(시간에 따른 계수변화모형(Gamma)), 16.86484(시간에 따른 계수변화모형(quasi))
 
-#### test data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 39.45355(다중선형회귀모형), 46.81785(일반화선형모형(Gamma)), 38.33993(일반화가법모형(Gamma)), 37.13758(일반화가법모형(quasi)), 45.5266(시간에 따른 계수변화모형(Gamma)), 48.43549(시간에 따른 계수변화모형(quasi))
+#### test data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 39.45355(다중선형회귀모형), 46.81785(일반화선형모형(Gamma)), 39.9079(일반화가법모형(Gamma)), 37.7436(일반화가법모형(quasi)), 46.76845(시간에 따른 계수변화모형(Gamma)), 42.18933(시간에 따른 계수변화모형(quasi))
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
@@ -852,7 +849,7 @@ legend(3650,500,c("fitted_values","response"),lwd=c(1,1),
 mm <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(log(TC))+s(NH3N)+s(PO4P)+s(log(FC))+s(Flow)+s(Rain),data=ex2,family=Gamma(link="log"),method="REML")
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
 ggGam(mm)
-summary(mm) # Deviance explained = 79.8%  
+summary(mm) # Deviance explained = 78.9%  
 concurvity(mm,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm) # 적합결여 존재 (기저함수 부족)
@@ -864,8 +861,8 @@ par(mfrow=c(1,1))
 ```{r}
 mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(log(TC))+s(NH3N)+s(PO4P)+s(log(FC))+s(Flow)+s(Rain),data=ex2,family=Gamma(link="log"),method="REML",select=TRUE) 
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
-ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, log(TC), NH3N, PO4P, log(FC), Flow, Rain  
-summary(mm.shrink) # Deviance explained = 79.6%   
+ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, NH3N, PO4P, log(FC), Flow, Rain   
+summary(mm.shrink) # Deviance explained = 78%    
 concurvity(mm.shrink,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
@@ -879,7 +876,7 @@ pred.gam <- predict(mm.shrink,newdata=ex2,type="response")
 data.gam <- data.frame(response=ex2$Chla,fitted_values=pred.gam,
                        time=ex2$time)
 sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
-       length(data.gam$response)) # RMSE = 10.93831     
+       length(data.gam$response)) # RMSE = 11.38836     
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi Chla train data] response vs fitted_values 
@@ -906,7 +903,7 @@ pred.gam1 <- predict(mm.shrink,newdata=ex2_1,type="response")
 data.gam1 <- data.frame(response=ex2_1$Chla,fitted_values=pred.gam1,
                         time=ex2_1$time)
 sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/
-       length(data.gam1$response)) # RMSE = 12.87   
+       length(data.gam1$response)) # RMSE = 13.8368   
 ggplot(data.gam1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi Chla test data] response vs fitted_values 
@@ -932,7 +929,7 @@ legend(3650,500,c("fitted_values","response"),lwd=c(1,1),
 mm <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(log(TC))+s(NH3N)+s(PO4P)+s(log(FC))+s(Flow)+s(Rain),data=ex2,family=quasi(link="log"),method="REML")
 plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
 ggGam(mm)
-summary(mm) # Deviance explained = 89.9%  
+summary(mm) # Deviance explained = 86.3%  
 concurvity(mm,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm) # 적합결여 존재 (기저함수 부족)
@@ -944,8 +941,8 @@ par(mfrow=c(1,1))
 ```{r}
 mm.shrink <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)+s(TOC)+s(WT)+s(EC)+s(log(TC))+s(NH3N)+s(PO4P)+s(log(FC))+s(Flow)+s(Rain),data=ex2,family=quasi(link="log"),method="REML",select=TRUE) 
 plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
-ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, log(TC), NH3N, PO4P, log(FC), Rain  
-summary(mm.shrink) # Deviance explained = 88.8%   
+ggGam(mm.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, NH3N, PO4P, log(FC), Flow   
+summary(mm.shrink) # Deviance explained = 85.7%    
 concurvity(mm.shrink,full=TRUE) # 공선성 존재
 par(mfrow=c(2,2))
 gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
@@ -959,7 +956,7 @@ pred.gam <- predict(mm.shrink,newdata=ex2,type="response")
 data.gam <- data.frame(response=ex2$Chla,fitted_values=pred.gam,
                        time=ex2$time)
 sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/
-       length(data.gam$response)) # RMSE = 7.873835     
+       length(data.gam$response)) # RMSE = 8.900784     
 ggplot(data.gam, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi Chla train data] response vs fitted_values 
@@ -986,7 +983,7 @@ pred.gam1 <- predict(mm.shrink,newdata=ex2_1,type="response")
 data.gam1 <- data.frame(response=ex2_1$Chla,fitted_values=pred.gam1,
                         time=ex2_1$time)
 sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/
-       length(data.gam1$response)) # RMSE = 22.68404   
+       length(data.gam1$response)) # RMSE = 21.57132   
 ggplot(data.gam1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi Chla test data] response vs fitted_values 
@@ -1007,12 +1004,10 @@ legend(3650,500,c("fitted_values","response"),lwd=c(1,1),
 ### Time Varying Coefficient Model (Gamma)
 
 ```{r}
-par(mar=c(4,4,4,4))
-par(oma=c(0.5,0.5,0.5,0.5))
 vc <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=log(TC))+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(FC))+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=Gamma(link="log"),method="REML")
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
 ggGam(vc)
-summary(vc) # Deviance explained = 80.8%    
+summary(vc) # Deviance explained = 77.3%     
 par(mfrow=c(2,2))
 gam.check(vc) 
 par(mfrow=c(1,1))
@@ -1023,8 +1018,8 @@ par(mfrow=c(1,1))
 ```{r}
 vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=log(TC))+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(FC))+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=Gamma(link="log"),method="REML",select=TRUE)
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
-ggGam(vc.shrink) # 선택변수 : DO, BOD, SS, TN, TP, TOC, EC, NH3N, PO4P, Flow, Rain 
-summary(vc.shrink) # Deviance explained = 79.5%    
+ggGam(vc.shrink) # 선택변수 : DO, BOD, COD, SS, TN, TP, TOC, EC, NH3N, PO4P, log(FC), Flow, Rain 
+summary(vc.shrink) # Deviance explained = 76%    
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
@@ -1037,7 +1032,7 @@ pred.tvcm <- predict(vc.shrink,newdata=ex2,type="response")
 data.tvcm <- data.frame(response=ex2$Chla,fitted_values=pred.tvcm,
                         time=ex2$time)
 sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
-       length(data.tvcm$response)) # RMSE = 15.69044     
+       length(data.tvcm$response)) # RMSE = 18.6995     
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi Chla train data] response vs fitted_values 
@@ -1064,7 +1059,7 @@ pred.tvcm1 <- predict(vc.shrink,newdata=ex2_1,type="response")
 data.tvcm1 <- data.frame(response=ex2_1$Chla,fitted_values=pred.tvcm1,
                          time=ex2_1$time)
 sqrt(sum((data.tvcm1$response-data.tvcm1$fitted_values)^2)/
-       length(data.tvcm1$response)) # RMSE = 40.33535   
+       length(data.tvcm1$response)) # RMSE = 39.34194   
 ggplot(data.tvcm1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi Chla test data] response vs fitted_values 
@@ -1085,12 +1080,10 @@ legend(3650,500,c("fitted_values","response"),lwd=c(1,1),
 ### Time Varying Coefficient Model (quasi)
 
 ```{r}
-par(mar=c(4,4,4,4))
-par(oma=c(0.5,0.5,0.5,0.5))
 vc <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=log(TC))+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(FC))+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=quasi(link="log"),method="REML")
 plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
 ggGam(vc)
-summary(vc) # Deviance explained = 91.9%    
+summary(vc) # Deviance explained = 87%     
 par(mfrow=c(2,2))
 gam.check(vc) 
 par(mfrow=c(1,1))
@@ -1101,8 +1094,8 @@ par(mfrow=c(1,1))
 ```{r}
 vc.shrink <- gam(Chla~s(time)+s(time,by=pH)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=WT)+s(time,by=EC)+s(time,by=log(TC))+s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(FC))+s(time,by=Flow)+s(time,by=Rain),data=ex2,family=quasi(link="log"),method="REML",select=TRUE)
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
-ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, WT, EC, log(TC), NH3N, PO4P, log(FC), Flow 
-summary(vc.shrink) # Deviance explained = 90%    
+ggGam(vc.shrink) # 선택변수 : pH, DO, BOD, COD, SS, TN, TP, TOC, EC, log(TC), NH3N, PO4P, Flow 
+summary(vc.shrink) # Deviance explained = 83.7%     
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
 par(mfrow=c(1,1))
@@ -1115,7 +1108,7 @@ pred.tvcm <- predict(vc.shrink,newdata=ex2,type="response")
 data.tvcm <- data.frame(response=ex2$Chla,fitted_values=pred.tvcm,
                         time=ex2$time)
 sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/
-       length(data.tvcm$response)) # RMSE = 7.427525     
+       length(data.tvcm$response)) # RMSE = 9.500878     
 ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi Chla train data] response vs fitted_values 
@@ -1142,7 +1135,7 @@ pred.tvcm1 <- predict(vc.shrink,newdata=ex2_1,type="response")
 data.tvcm1 <- data.frame(response=ex2_1$Chla,fitted_values=pred.tvcm1,
                          time=ex2_1$time)
 sqrt(sum((data.tvcm1$response-data.tvcm1$fitted_values)^2)/
-       length(data.tvcm1$response)) # RMSE = 18.35658  
+       length(data.tvcm1$response)) # RMSE = 17.87177  
 ggplot(data.tvcm1, aes(x=response, y=fitted_values)) +
   geom_point() + geom_rug() +
   ggtitle("[Uchi Chla test data] response vs fitted_values 
@@ -1159,11 +1152,11 @@ legend(3650,500,c("fitted_values","response"),lwd=c(1,1),
 ```
 
 
-#### 최종선택된 모형의 설명력(Deviance explained) : 71.2%(다중선형회귀모형), 69.0%(일반화선형모형(Gamma)), 79.6%(일반화가법모형(Gamma)), 88.8%(일반화가법모형(quasi)), 79.5%(시간에 따른 계수변화모형(Gamma)), 90.0%(시간에 따른 계수변화모형(quasi))
+#### 최종선택된 모형의 설명력(Deviance explained) : 71.2%(다중선형회귀모형), 69.0%(일반화선형모형(Gamma)), 78.0%(일반화가법모형(Gamma)), 85.7%(일반화가법모형(quasi)), 76.0%(시간에 따른 계수변화모형(Gamma)), 83.7%(시간에 따른 계수변화모형(quasi))
 
-#### train data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 12.63798(다중선형회귀모형), 22.85586(일반화선형모형(Gamma)), 10.93831(일반화가법모형(Gamma)), 7.873835(일반화가법모형(quasi)), 15.69044(시간에 따른 계수변화모형(Gamma)), 7.427525(시간에 따른 계수변화모형(quasi))
+#### train data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 12.63798(다중선형회귀모형), 22.85586(일반화선형모형(Gamma)), 11.38836(일반화가법모형(Gamma)), 8.900784(일반화가법모형(quasi)), 18.6995(시간에 따른 계수변화모형(Gamma)), 9.500878(시간에 따른 계수변화모형(quasi))
 
-#### test data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 15.08679(다중선형회귀모형), 15.70857(일반화선형모형(Gamma)), 12.87(일반화가법모형(Gamma)), 22.68404(일반화가법모형(quasi)), 40.33535(시간에 따른 계수변화모형(Gamma)), 18.35658(시간에 따른 계수변화모형(quasi))
+#### test data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 15.08679(다중선형회귀모형), 15.70857(일반화선형모형(Gamma)), 13.8368(일반화가법모형(Gamma)), 21.57132(일반화가법모형(quasi)), 39.34194(시간에 따른 계수변화모형(Gamma)), 17.87177(시간에 따른 계수변화모형(quasi))
 
 #### 일반화가법모형이나 시간에 따른 계수변화모형이 다중선형회귀모형보다 설명력이 우수하다는 것을 확실하게 보여주기 위해서는 설명변수들과 확실한 비선형관계가 있다고 여겨지는 변수를 반응변수로 선택하는 것이 좋다고 판단됨.
 
