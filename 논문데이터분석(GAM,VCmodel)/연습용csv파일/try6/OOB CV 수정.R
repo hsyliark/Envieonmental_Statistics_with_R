@@ -1,8 +1,8 @@
-ex1 <- read.csv("C:/Users/stat/Desktop/±¤»ê(2010-2019).csv", sep=",", header=T)
+ex1 <- read.csv("C:/Users/stat/Desktop/ê´‘ì‚°(2010-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
 ex1 <- as.data.frame(ex1)
 
-ex2 <- read.csv("C:/Users/stat/Desktop/¿ìÄ¡(2010-2019).csv", sep=",", header=T)
+ex2 <- read.csv("C:/Users/stat/Desktop/ìš°ì¹˜(2010-2019).csv", sep=",", header=T)
 ex2 <- ex2[,-1]
 ex2 <- as.data.frame(ex2)
 
@@ -26,7 +26,7 @@ library(kohonen)
 library(SOMbrero)
 
 
-## ±¤»ê Chla
+## ê´‘ì‚° Chla
 
 Chla1.RMSE.mlr <- c()
 Chla1.RMSE.glm.Gamma <- c()
@@ -77,7 +77,7 @@ for (i in 1:50) {
   mm.shrink1 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                     +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
                     +s(log(TC))+s(Flow)+s(Rain),data=train,
-                    family=Gamma(link="log"),method="GCV.Cp",
+                    family=Gamma(link="log"),method="REML",
                     select=TRUE)
   pred.gam1 <- predict(mm.shrink1,newdata=test,type="response")
   data.gam1 <- data.frame(response=test$Chla,fitted_values=pred.gam1,
@@ -92,7 +92,7 @@ for (i in 1:50) {
   mm.shrink2 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                     +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
                     +s(log(TC))+s(Flow)+s(Rain),data=train,
-                    family=quasi(link="log"),method="GCV.Cp",
+                    family=quasi(link="log"),method="REML",
                     select=TRUE)
   pred.gam2 <- predict(mm.shrink2,newdata=test,type="response")
   data.gam2 <- data.frame(response=test$Chla,fitted_values=pred.gam2,
@@ -110,7 +110,7 @@ for (i in 1:50) {
                       s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
                       s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
                       s(time,by=Flow)+s(time,by=Rain),data=train,
-                    family=Gamma(link="log"),method="GCV.Cp",
+                    family=Gamma(link="log"),method="REML",
                     select=TRUE)
   pred.tvcm1 <- predict(vc.shrink1,newdata=test,type="response")
   data.tvcm1 <- data.frame(response=test$Chla,fitted_values=pred.tvcm1,
@@ -128,7 +128,7 @@ for (i in 1:50) {
                       s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
                       s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
                       s(time,by=Flow)+s(time,by=Rain),data=train,
-                    family=quasi(link="log"),method="GCV.Cp",
+                    family=quasi(link="log"),method="REML",
                     select=TRUE)
   pred.tvcm2 <- predict(vc.shrink2,newdata=test,type="response")
   data.tvcm2 <- data.frame(response=test$Chla,fitted_values=pred.tvcm2,
@@ -173,7 +173,7 @@ for (i in 1:50) {
     mm.shrink1 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                       +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
                       +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
-                      family=Gamma(link="log"),method="GCV.Cp",
+                      family=Gamma(link="log"),method="REML",
                       select=TRUE)
     pred.gam.Gamma <- predict(mm.shrink1,newdata=test,type="response")
     pred.bag.gam.Gamma[,j] <- pred.gam.Gamma
@@ -183,7 +183,7 @@ for (i in 1:50) {
     mm.shrink2 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                       +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
                       +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
-                      family=quasi(link="log"),method="GCV.Cp",
+                      family=quasi(link="log"),method="REML",
                       select=TRUE)
     pred.gam.quasi <- predict(mm.shrink2,newdata=test,type="response")
     pred.bag.gam.quasi[,j] <- pred.gam.quasi
@@ -196,7 +196,7 @@ for (i in 1:50) {
                         s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
                         s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
                         s(time,by=Flow)+s(time,by=Rain),data=train.bag,
-                      family=Gamma(link="log"),method="GCV.Cp",
+                      family=Gamma(link="log"),method="REML",
                       select=TRUE)
     pred.tvcm.Gamma <- predict(vc.shrink1,newdata=test,type="response")
     pred.bag.tvcm.Gamma[,j] <- pred.tvcm.Gamma
@@ -209,7 +209,7 @@ for (i in 1:50) {
                         s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
                         s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
                         s(time,by=Flow)+s(time,by=Rain),data=train.bag,
-                      family=quasi(link="log"),method="GCV.Cp",
+                      family=quasi(link="log"),method="REML",
                       select=TRUE)
     pred.tvcm.quasi <- predict(vc.shrink2,newdata=test,type="response")
     pred.bag.tvcm.quasi[,j] <- pred.tvcm.quasi
@@ -294,7 +294,7 @@ ggplot(Chla1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
 
 
 
-# ¿ìÄ¡ Chla
+# ìš°ì¹˜ Chla
 
 Chla2.RMSE.mlr <- c()
 Chla2.RMSE.glm.Gamma <- c()
@@ -345,7 +345,7 @@ for (i in 1:50) {
   mm.shrink1 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                     +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
                     +s(log(TC))+s(Flow)+s(Rain),data=train,
-                    family=Gamma(link="log"),method="GCV.Cp",
+                    family=Gamma(link="log"),method="REML",
                     select=TRUE)
   pred.gam1 <- predict(mm.shrink1,newdata=test,type="response")
   data.gam1 <- data.frame(response=test$Chla,fitted_values=pred.gam1,
@@ -360,7 +360,7 @@ for (i in 1:50) {
   mm.shrink2 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                     +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
                     +s(log(TC))+s(Flow)+s(Rain),data=train,
-                    family=quasi(link="log"),method="GCV.Cp",
+                    family=quasi(link="log"),method="REML",
                     select=TRUE)
   pred.gam2 <- predict(mm.shrink2,newdata=test,type="response")
   data.gam2 <- data.frame(response=test$Chla,fitted_values=pred.gam2,
@@ -378,7 +378,7 @@ for (i in 1:50) {
                       s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
                       s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
                       s(time,by=Flow)+s(time,by=Rain),data=train,
-                    family=Gamma(link="log"),method="GCV.Cp",
+                    family=Gamma(link="log"),method="REML",
                     select=TRUE)
   pred.tvcm1 <- predict(vc.shrink1,newdata=test,type="response")
   data.tvcm1 <- data.frame(response=test$Chla,fitted_values=pred.tvcm1,
@@ -396,7 +396,7 @@ for (i in 1:50) {
                       s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
                       s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
                       s(time,by=Flow)+s(time,by=Rain),data=train,
-                    family=quasi(link="log"),method="GCV.Cp",
+                    family=quasi(link="log"),method="REML",
                     select=TRUE)
   pred.tvcm2 <- predict(vc.shrink2,newdata=test,type="response")
   data.tvcm2 <- data.frame(response=test$Chla,fitted_values=pred.tvcm2,
@@ -441,7 +441,7 @@ for (i in 1:50) {
     mm.shrink1 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                       +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
                       +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
-                      family=Gamma(link="log"),method="GCV.Cp",
+                      family=Gamma(link="log"),method="REML",
                       select=TRUE)
     pred.gam.Gamma <- predict(mm.shrink1,newdata=test,type="response")
     pred.bag.gam.Gamma[,j] <- pred.gam.Gamma
@@ -451,7 +451,7 @@ for (i in 1:50) {
     mm.shrink2 <- gam(Chla~s(pH)+s(DO)+s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                       +s(TOC)+s(WT)+s(EC)+s(log(FC))+s(NH3N)+s(PO4P)
                       +s(log(TC))+s(Flow)+s(Rain),data=train.bag,
-                      family=quasi(link="log"),method="GCV.Cp",
+                      family=quasi(link="log"),method="REML",
                       select=TRUE)
     pred.gam.quasi <- predict(mm.shrink2,newdata=test,type="response")
     pred.bag.gam.quasi[,j] <- pred.gam.quasi
@@ -464,7 +464,7 @@ for (i in 1:50) {
                         s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
                         s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
                         s(time,by=Flow)+s(time,by=Rain),data=train.bag,
-                      family=Gamma(link="log"),method="GCV.Cp",
+                      family=Gamma(link="log"),method="REML",
                       select=TRUE)
     pred.tvcm.Gamma <- predict(vc.shrink1,newdata=test,type="response")
     pred.bag.tvcm.Gamma[,j] <- pred.tvcm.Gamma
@@ -477,7 +477,7 @@ for (i in 1:50) {
                         s(time,by=WT)+s(time,by=EC)+s(time,by=log(FC))+
                         s(time,by=NH3N)+s(time,by=PO4P)+s(time,by=log(TC))+
                         s(time,by=Flow)+s(time,by=Rain),data=train.bag,
-                      family=quasi(link="log"),method="GCV.Cp",
+                      family=quasi(link="log"),method="REML",
                       select=TRUE)
     pred.tvcm.quasi <- predict(vc.shrink2,newdata=test,type="response")
     pred.bag.tvcm.quasi[,j] <- pred.tvcm.quasi

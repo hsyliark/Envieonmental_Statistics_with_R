@@ -1,10 +1,12 @@
-# 반응변수 la
-# ???�설명변수D, SS, TN, TP, TOC, log(TC), Flow, Rain
-# ???߼???ȸ다중선형회귀분석은 모형평가 시 제외csv("C:/Users/stat/Desktop/????(2010-2019).csv", sep=",", header=T)
+# 반응변수 : Chla
+# 설명변수 : BOD, COD, SS, TN, TP, TOC, log(TC), Flow, Rain
+# 다중선형회귀분석은 모형평가 시 제외
+
+ex1 <- csv("C:/Users/stat/Desktop/광산(2010-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
 ex1 <- as.data.frame(ex1)
 
-ex2 <- read.csv("C:/Users/stat/Desktop/??ġ(2010-2019).csv", sep=",", header=T)
+ex2 <- read.csv("C:/Users/stat/Desktop/우치(2010-2019).csv", sep=",", header=T)
 ex2 <- ex2[,-1]
 ex2 <- as.data.frame(ex2)
 
@@ -28,9 +30,9 @@ library(kohonen)
 library(SOMbrero)
 
 
-## ???? Chla
+## 광산 Chla
 
-Chl광산MSE.glm.Gamma <- c()
+Chla1.MSE.glm.Gamma <- c()
 Chla1.RMSE.gam.Gamma <- c()
 Chla1.RMSE.gam.quasi <- c()
 Chla1.RMSE.tvcm.Gamma <- c()
@@ -61,7 +63,7 @@ for (i in 1:100) {
   # Generalized Additive Model (Gamma)
   mm.shrink1 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                     +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train,
-                    family=Gamma(link="log"),method="GCV.Cp",
+                    family=Gamma(link="log"),method="REML",
                     select=TRUE)
   pred.gam1 <- predict(mm.shrink1,newdata=test,type="response")
   data.gam1 <- data.frame(response=test$Chla,fitted_values=pred.gam1,
@@ -75,7 +77,7 @@ for (i in 1:100) {
   # Generalized Additive Model (quasi)
   mm.shrink2 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                     +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train,
-                    family=quasi(link="log"),method="GCV.Cp",
+                    family=quasi(link="log"),method="REML",
                     select=TRUE)
   pred.gam2 <- predict(mm.shrink2,newdata=test,type="response")
   data.gam2 <- data.frame(response=test$Chla,fitted_values=pred.gam2,
@@ -90,7 +92,7 @@ for (i in 1:100) {
   vc.shrink1 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
                       s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
                       s(time,by=log(TC))+s(time,by=Flow)+s(time,by=Rain),data=train,
-                    family=Gamma(link="log"),method="GCV.Cp",
+                    family=Gamma(link="log"),method="REML",
                     select=TRUE)
   pred.tvcm1 <- predict(vc.shrink1,newdata=test,type="response")
   data.tvcm1 <- data.frame(response=test$Chla,fitted_values=pred.tvcm1,
@@ -105,7 +107,7 @@ for (i in 1:100) {
   vc.shrink2 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
                       s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
                       s(time,by=log(TC))+s(time,by=Flow)+s(time,by=Rain),data=train,
-                    family=quasi(link="log"),method="GCV.Cp",
+                    family=quasi(link="log"),method="REML",
                     select=TRUE)
   pred.tvcm2 <- predict(vc.shrink2,newdata=test,type="response")
   data.tvcm2 <- data.frame(response=test$Chla,fitted_values=pred.tvcm2,
@@ -138,7 +140,7 @@ for (i in 1:100) {
     # Generalized Additive Model (Gamma)
     mm.shrink1 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                       +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train.bag,
-                      family=Gamma(link="log"),method="GCV.Cp",
+                      family=Gamma(link="log"),method="REML",
                       select=TRUE)
     pred.gam.Gamma <- predict(mm.shrink1,newdata=test,type="response")
     pred.bag.gam.Gamma[,j] <- pred.gam.Gamma
@@ -147,7 +149,7 @@ for (i in 1:100) {
     # Generalized Additive Model (quasi)
     mm.shrink2 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                       +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train.bag,
-                      family=quasi(link="log"),method="GCV.Cp",
+                      family=quasi(link="log"),method="REML",
                       select=TRUE)
     pred.gam.quasi <- predict(mm.shrink2,newdata=test,type="response")
     pred.bag.gam.quasi[,j] <- pred.gam.quasi
@@ -157,7 +159,7 @@ for (i in 1:100) {
     vc.shrink1 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
                         s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
                         s(time,by=log(TC))+s(time,by=Flow)+s(time,by=Rain),data=train.bag,
-                      family=Gamma(link="log"),method="GCV.Cp",
+                      family=Gamma(link="log"),method="REML",
                       select=TRUE)
     pred.tvcm.Gamma <- predict(vc.shrink1,newdata=test,type="response")
     pred.bag.tvcm.Gamma[,j] <- pred.tvcm.Gamma
@@ -167,7 +169,7 @@ for (i in 1:100) {
     vc.shrink2 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
                         s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+
                         s(time,by=log(TC))+s(time,by=Flow)+s(time,by=Rain),data=train.bag,
-                      family=quasi(link="log"),method="GCV.Cp",
+                      family=quasi(link="log"),method="REML",
                       select=TRUE)
     pred.tvcm.quasi <- predict(vc.shrink2,newdata=test,type="response")
     pred.bag.tvcm.quasi[,j] <- pred.tvcm.quasi
@@ -243,9 +245,9 @@ ggplot(Chla1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
 
 
 
-# ??ġ Chla
+# 우치 Chla
 
-Chl우치MSE.glm.Gamma <- c()
+Chla2.MSE.glm.Gamma <- c()
 Chla2.RMSE.gam.Gamma <- c()
 Chla2.RMSE.gam.quasi <- c()
 Chla2.RMSE.tvcm.Gamma <- c()
@@ -276,7 +278,7 @@ for (i in 1:100) {
   # Generalized Additive Model (Gamma)
   mm.shrink1 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                     +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train,
-                    family=Gamma(link="log"),method="GCV.Cp",
+                    family=Gamma(link="log"),method="REML",
                     select=TRUE)
   pred.gam1 <- predict(mm.shrink1,newdata=test,type="response")
   data.gam1 <- data.frame(response=test$Chla,fitted_values=pred.gam1,
@@ -290,7 +292,7 @@ for (i in 1:100) {
   # Generalized Additive Model (quasi)
   mm.shrink2 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                     +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train,
-                    family=quasi(link="log"),method="GCV.Cp",
+                    family=quasi(link="log"),method="REML",
                     select=TRUE)
   pred.gam2 <- predict(mm.shrink2,newdata=test,type="response")
   data.gam2 <- data.frame(response=test$Chla,fitted_values=pred.gam2,
@@ -305,7 +307,7 @@ for (i in 1:100) {
   vc.shrink1 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
                       s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=log(TC))+
                       s(time,by=Flow)+s(time,by=Rain),data=train,
-                    family=Gamma(link="log"),method="GCV.Cp",
+                    family=Gamma(link="log"),method="REML",
                     select=TRUE)
   pred.tvcm1 <- predict(vc.shrink1,newdata=test,type="response")
   data.tvcm1 <- data.frame(response=test$Chla,fitted_values=pred.tvcm1,
@@ -320,7 +322,7 @@ for (i in 1:100) {
   vc.shrink2 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
                       s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=log(TC))+
                       s(time,by=Flow)+s(time,by=Rain),data=train,
-                    family=quasi(link="log"),method="GCV.Cp",
+                    family=quasi(link="log"),method="REML",
                     select=TRUE)
   pred.tvcm2 <- predict(vc.shrink2,newdata=test,type="response")
   data.tvcm2 <- data.frame(response=test$Chla,fitted_values=pred.tvcm2,
@@ -353,7 +355,7 @@ for (i in 1:100) {
     # Generalized Additive Model (Gamma)
     mm.shrink1 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                       +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train.bag,
-                      family=Gamma(link="log"),method="GCV.Cp",
+                      family=Gamma(link="log"),method="REML",
                       select=TRUE)
     pred.gam.Gamma <- predict(mm.shrink1,newdata=test,type="response")
     pred.bag.gam.Gamma[,j] <- pred.gam.Gamma
@@ -362,7 +364,7 @@ for (i in 1:100) {
     # Generalized Additive Model (quasi)
     mm.shrink2 <- gam(Chla~s(BOD)+s(COD)+s(SS)+s(TN)+s(TP)
                       +s(TOC)+s(log(TC))+s(Flow)+s(Rain),data=train.bag,
-                      family=quasi(link="log"),method="GCV.Cp",
+                      family=quasi(link="log"),method="REML",
                       select=TRUE)
     pred.gam.quasi <- predict(mm.shrink2,newdata=test,type="response")
     pred.bag.gam.quasi[,j] <- pred.gam.quasi
@@ -372,7 +374,7 @@ for (i in 1:100) {
     vc.shrink1 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
                         s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=log(TC))+
                         s(time,by=Flow)+s(time,by=Rain),data=train.bag,
-                      family=Gamma(link="log"),method="GCV.Cp",
+                      family=Gamma(link="log"),method="REML",
                       select=TRUE)
     pred.tvcm.Gamma <- predict(vc.shrink1,newdata=test,type="response")
     pred.bag.tvcm.Gamma[,j] <- pred.tvcm.Gamma
@@ -382,7 +384,7 @@ for (i in 1:100) {
     vc.shrink2 <- gam(Chla~s(time)+s(time,by=BOD)+s(time,by=COD)+s(time,by=SS)+
                         s(time,by=TN)+s(time,by=TP)+s(time,by=TOC)+s(time,by=log(TC))+
                         s(time,by=Flow)+s(time,by=Rain),data=train.bag,
-                      family=quasi(link="log"),method="GCV.Cp",
+                      family=quasi(link="log"),method="REML",
                       select=TRUE)
     pred.tvcm.quasi <- predict(vc.shrink2,newdata=test,type="response")
     pred.bag.tvcm.quasi[,j] <- pred.tvcm.quasi
