@@ -27,6 +27,7 @@ library(boot)
 library(kohonen)
 library(SOMbrero)
 library(e1071)
+library(fitdistrplus)
 # par(mar=c(4,4,4,4))
 # par(oma=c(0.5,0.5,0.5,0.5))
 ```
@@ -218,6 +219,22 @@ par(mfrow=c(1,1))
 
 
 ### Dependent(Response) variable : Chla
+
+### Distribution of Chla
+
+```{r}
+plotdist(ex1$Chla)
+descdist(ex1$Chla)  
+```
+
+#### Cullen and Frey graph에서 Observation에 해당하는 파란색 표시가 베타분포(Beta distribution) 영역에 있고 감마분포(Gamma distribution)와 관련한 선에 접근하고 있다. 여기에서 Chla의 범위는 0보다 큰 양의 실수이기 때문에 0에서 1 사이의 분포범위를 가지는 베타분포와는 거리가 있다. 이에 따라 광산지점의 Chla는 감마분포를 따른다고 가정하는 것이 타당하다.
+
+```{r}
+f1 <- fitdist(ex1$Chla, "gamma")
+summary(f1)
+plot(f1)
+```
+
 
 ### Multiple Linear Regression
 
@@ -696,6 +713,22 @@ par(mfrow=c(1,1))
 
 
 ### Dependent(Response) variable : Chla
+
+### Distribution of Chla
+
+```{r}
+plotdist(ex2$Chla)
+descdist(ex2$Chla)  
+```
+
+#### Cullen and Frey graph에서 Observation에 해당하는 파란색 표시가 베타분포(Beta distribution) 영역에 있고 감마분포(Gamma distribution)와 관련한 선에 접근하고 있다. 여기에서 Chla의 범위는 0보다 큰 양의 실수이기 때문에 0에서 1 사이의 분포범위를 가지는 베타분포와는 거리가 있다. 이에 따라 우치지점의 Chla는 감마분포를 따른다고 가정하는 것이 타당하다.
+
+```{r}
+f2 <- fitdist(ex2$Chla, "gamma")
+summary(f2)
+plot(f2)
+```
+
 
 ### Multiple Linear Regression
 
