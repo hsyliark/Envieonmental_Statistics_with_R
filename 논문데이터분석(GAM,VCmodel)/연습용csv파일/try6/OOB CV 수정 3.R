@@ -1,12 +1,12 @@
-# ë°˜ì‘ë³€ìˆ˜ : Chla
-# ì„¤ëª…ë³€ìˆ˜ : BOD, COD, SS, TN, TP, TOC, log(TC), Flow, Rain
-# ë‹¤ì¤‘ì„ í˜•íšŒê·€ë¶„ì„ì€ ëª¨í˜•í‰ê°€ ì‹œ ì œì™¸
+# ¹ÝÀÀº¯¼ö : Chla
+# ¼³¸íº¯¼ö : BOD, COD, SS, TN, TP, TOC, log(TC), Flow, Rain
+# ´ÙÁß¼±ÇüÈ¸±Í¸ðÇüÀº ¸ðÇü Æò°¡ ½Ã Á¦¿Ü
 
-ex1 <- csv("C:/Users/stat/Desktop/ê´‘ì‚°(2010-2019).csv", sep=",", header=T)
+ex1 <- read.csv("C:/Users/stat/Desktop/±¤»ê(2010-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
 ex1 <- as.data.frame(ex1)
 
-ex2 <- read.csv("C:/Users/stat/Desktop/ìš°ì¹˜(2010-2019).csv", sep=",", header=T)
+ex2 <- read.csv("C:/Users/stat/Desktop/¿ìÄ¡(2010-2019).csv", sep=",", header=T)
 ex2 <- ex2[,-1]
 ex2 <- as.data.frame(ex2)
 
@@ -30,7 +30,7 @@ library(kohonen)
 library(SOMbrero)
 
 
-## ê´‘ì‚° Chla
+## ±¤»ê Chla
 
 Chla1.MSE.glm.Gamma <- c()
 Chla1.RMSE.gam.Gamma <- c()
@@ -245,7 +245,7 @@ ggplot(Chla1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
 
 
 
-# ìš°ì¹˜ Chla
+# ¿ìÄ¡ Chla
 
 Chla2.MSE.glm.Gamma <- c()
 Chla2.RMSE.gam.Gamma <- c()

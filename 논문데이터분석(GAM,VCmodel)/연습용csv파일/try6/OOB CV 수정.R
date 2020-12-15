@@ -1,8 +1,8 @@
-ex1 <- read.csv("C:/Users/stat/Desktop/ê´‘ì‚°(2010-2019).csv", sep=",", header=T)
+ex1 <- read.csv("C:/Users/stat/Desktop/±¤»ê(2010-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
 ex1 <- as.data.frame(ex1)
 
-ex2 <- read.csv("C:/Users/stat/Desktop/ìš°ì¹˜(2010-2019).csv", sep=",", header=T)
+ex2 <- read.csv("C:/Users/stat/Desktop/¿ìÄ¡(2010-2019).csv", sep=",", header=T)
 ex2 <- ex2[,-1]
 ex2 <- as.data.frame(ex2)
 
@@ -26,7 +26,7 @@ library(kohonen)
 library(SOMbrero)
 
 
-## ê´‘ì‚° Chla
+## ±¤»ê Chla
 
 Chla1.RMSE.mlr <- c()
 Chla1.RMSE.glm.Gamma <- c()
@@ -41,7 +41,7 @@ Chla1.Bag.RMSE.gam.Gamma <- c()
 Chla1.Bag.RMSE.gam.quasi <- c()
 Chla1.Bag.RMSE.tvcm.Gamma <- c()
 Chla1.Bag.RMSE.tvcm.quasi <- c()
-for (i in 1:50) {
+for (i in 1:100) {
   a <- sample(1:nrow(ex1),round(3*nrow(ex1)/10),replace=FALSE)
   train <- ex1[-a,] ; test <- ex1[a,]
   
@@ -140,14 +140,14 @@ for (i in 1:50) {
                                       length(data.tvcm2$response))))
   
   ## Bagging
-  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
-  pred.bag.glm.Gamma <- matrix(nrow=nrow(test), ncol=30) 
-  pred.bag.gam.Gamma <- matrix(nrow=nrow(test), ncol=30) 
-  pred.bag.gam.quasi <- matrix(nrow=nrow(test), ncol=30)
-  pred.bag.tvcm.Gamma <- matrix(nrow=nrow(test), ncol=30) 
-  pred.bag.tvcm.quasi <- matrix(nrow=nrow(test), ncol=30)
+  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=100) 
+  pred.bag.glm.Gamma <- matrix(nrow=nrow(test), ncol=100) 
+  pred.bag.gam.Gamma <- matrix(nrow=nrow(test), ncol=100) 
+  pred.bag.gam.quasi <- matrix(nrow=nrow(test), ncol=100)
+  pred.bag.tvcm.Gamma <- matrix(nrow=nrow(test), ncol=100) 
+  pred.bag.tvcm.quasi <- matrix(nrow=nrow(test), ncol=100)
   
-  for (j in 1:30) {
+  for (j in 1:100) {
     b <- sample(1:nrow(train),nrow(train),replace=TRUE)
     train.bag <- train[b,]
     
@@ -280,13 +280,28 @@ Chla1.RMSE <- data.frame(RMSE=c(Chla1.RMSE.mlr,Chla1.RMSE.glm.Gamma,
                                 Chla1.Bag.RMSE.mlr,Chla1.Bag.RMSE.glm.Gamma,
                                 Chla1.Bag.RMSE.gam.Gamma,Chla1.Bag.RMSE.gam.quasi,
                                 Chla1.Bag.RMSE.tvcm.Gamma,Chla1.Bag.RMSE.tvcm.quasi),
-                         model=c(rep("a_MLR",50),rep("b_GLM.Gamma",50),
-                                 rep("c_GAM.Gamma",50),rep("d_GAM.quasi",50),
-                                 rep("e_TVCM.Gamma",50),rep("f_TVCM.quasi",50),
-                                 rep("g_MLR_Bag",50),rep("h_GLM.Gamma_Bag",50),
-                                 rep("i_GAM.Gamma_Bag",50),rep("j_GAM.quasi.Bag",50),
-                                 rep("k_TVCM.Gamma_Bag",50),rep("l_TVCM.quasi_Bag",50)))
+                         model=c(rep("a_MLR",100),rep("b_GLM.Gamma",100),
+                                 rep("c_GAM.Gamma",100),rep("d_GAM.quasi",100),
+                                 rep("e_TVCM.Gamma",100),rep("f_TVCM.quasi",100),
+                                 rep("g_MLR_Bag",100),rep("h_GLM.Gamma_Bag",100),
+                                 rep("i_GAM.Gamma_Bag",100),rep("j_GAM.quasi.Bag",100),
+                                 rep("k_TVCM.Gamma_Bag",100),rep("l_TVCM.quasi_Bag",100)))
 ggplot(Chla1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
+  coord_cartesian(ylim = c(0, 150)) + ggtitle("Gwangsan Chla")
+
+Chla1_1.RMSE <- data.frame(RMSE=c(Chla1.RMSE.glm.Gamma,
+                                Chla1.RMSE.gam.Gamma,Chla1.RMSE.gam.quasi,
+                                Chla1.RMSE.tvcm.Gamma,Chla1.RMSE.tvcm.quasi,
+                                Chla1.Bag.RMSE.glm.Gamma,
+                                Chla1.Bag.RMSE.gam.Gamma,Chla1.Bag.RMSE.gam.quasi,
+                                Chla1.Bag.RMSE.tvcm.Gamma,Chla1.Bag.RMSE.tvcm.quasi),
+                         model=c(rep("a_GLM.Gamma",100),
+                                 rep("b_GAM.Gamma",100),rep("c_GAM.quasi",100),
+                                 rep("d_TVCM.Gamma",100),rep("e_TVCM.quasi",100),
+                                 rep("f_GLM.Gamma_Bag",100),
+                                 rep("g_GAM.Gamma_Bag",100),rep("h_GAM.quasi.Bag",100),
+                                 rep("i_TVCM.Gamma_Bag",100),rep("j_TVCM.quasi_Bag",100)))
+ggplot(Chla1_1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
   coord_cartesian(ylim = c(0, 150)) + ggtitle("Gwangsan Chla")
 
 
@@ -294,7 +309,7 @@ ggplot(Chla1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
 
 
 
-# ìš°ì¹˜ Chla
+# ¿ìÄ¡ Chla
 
 Chla2.RMSE.mlr <- c()
 Chla2.RMSE.glm.Gamma <- c()
@@ -309,7 +324,7 @@ Chla2.Bag.RMSE.gam.Gamma <- c()
 Chla2.Bag.RMSE.gam.quasi <- c()
 Chla2.Bag.RMSE.tvcm.Gamma <- c()
 Chla2.Bag.RMSE.tvcm.quasi <- c()
-for (i in 1:50) {
+for (i in 1:100) {
   a <- sample(1:nrow(ex2),round(3*nrow(ex2)/10),replace=FALSE)
   train <- ex2[-a,] ; test <- ex2[a,]
   
@@ -408,14 +423,14 @@ for (i in 1:50) {
                                       length(data.tvcm2$response))))
   
   ## Bagging
-  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=30) 
-  pred.bag.glm.Gamma <- matrix(nrow=nrow(test), ncol=30) 
-  pred.bag.gam.Gamma <- matrix(nrow=nrow(test), ncol=30) 
-  pred.bag.gam.quasi <- matrix(nrow=nrow(test), ncol=30)
-  pred.bag.tvcm.Gamma <- matrix(nrow=nrow(test), ncol=30) 
-  pred.bag.tvcm.quasi <- matrix(nrow=nrow(test), ncol=30)
+  pred.bag.mlr <- matrix(nrow=nrow(test), ncol=100) 
+  pred.bag.glm.Gamma <- matrix(nrow=nrow(test), ncol=100) 
+  pred.bag.gam.Gamma <- matrix(nrow=nrow(test), ncol=100) 
+  pred.bag.gam.quasi <- matrix(nrow=nrow(test), ncol=100)
+  pred.bag.tvcm.Gamma <- matrix(nrow=nrow(test), ncol=100) 
+  pred.bag.tvcm.quasi <- matrix(nrow=nrow(test), ncol=100)
   
-  for (j in 1:30) {
+  for (j in 1:100) {
     b <- sample(1:nrow(train),nrow(train),replace=TRUE)
     train.bag <- train[b,]
     
@@ -547,11 +562,26 @@ Chla2.RMSE <- data.frame(RMSE=c(Chla2.RMSE.mlr,Chla2.RMSE.glm.Gamma,
                                 Chla2.Bag.RMSE.mlr,Chla2.Bag.RMSE.glm.Gamma,
                                 Chla2.Bag.RMSE.gam.Gamma,Chla2.Bag.RMSE.gam.quasi,
                                 Chla2.Bag.RMSE.tvcm.Gamma,Chla2.Bag.RMSE.tvcm.quasi),
-                         model=c(rep("a_MLR",50),rep("b_GLM.Gamma",50),
-                                 rep("c_GAM.Gamma",50),rep("d_GAM.quasi",50),
-                                 rep("e_TVCM.Gamma",50),rep("f_TVCM.quasi",50),
-                                 rep("g_MLR_Bag",50),rep("h_GLM.Gamma_Bag",50),
-                                 rep("i_GAM.Gamma_Bag",50),rep("j_GAM.quasi.Bag",50),
-                                 rep("k_TVCM.Gamma_Bag",50),rep("l_TVCM.quasi_Bag",50)))
+                         model=c(rep("a_MLR",100),rep("b_GLM.Gamma",100),
+                                 rep("c_GAM.Gamma",100),rep("d_GAM.quasi",100),
+                                 rep("e_TVCM.Gamma",100),rep("f_TVCM.quasi",100),
+                                 rep("g_MLR_Bag",100),rep("h_GLM.Gamma_Bag",100),
+                                 rep("i_GAM.Gamma_Bag",100),rep("j_GAM.quasi.Bag",100),
+                                 rep("k_TVCM.Gamma_Bag",100),rep("l_TVCM.quasi_Bag",100)))
 ggplot(Chla2.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
+  coord_cartesian(ylim = c(0, 150)) + ggtitle("Uchi Chla")
+
+Chla2_1.RMSE <- data.frame(RMSE=c(Chla2.RMSE.glm.Gamma,
+                                Chla2.RMSE.gam.Gamma,Chla2.RMSE.gam.quasi,
+                                Chla2.RMSE.tvcm.Gamma,Chla2.RMSE.tvcm.quasi,
+                                Chla2.Bag.RMSE.glm.Gamma,
+                                Chla2.Bag.RMSE.gam.Gamma,Chla2.Bag.RMSE.gam.quasi,
+                                Chla2.Bag.RMSE.tvcm.Gamma,Chla2.Bag.RMSE.tvcm.quasi),
+                         model=c(rep("a_GLM.Gamma",100),
+                                 rep("b_GAM.Gamma",100),rep("c_GAM.quasi",100),
+                                 rep("d_TVCM.Gamma",100),rep("e_TVCM.quasi",100),
+                                 rep("f_GLM.Gamma_Bag",100),
+                                 rep("g_GAM.Gamma_Bag",100),rep("h_GAM.quasi.Bag",100),
+                                 rep("i_TVCM.Gamma_Bag",100),rep("j_TVCM.quasi_Bag",100)))
+ggplot(Chla2_1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
   coord_cartesian(ylim = c(0, 150)) + ggtitle("Uchi Chla")
