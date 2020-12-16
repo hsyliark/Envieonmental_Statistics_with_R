@@ -1,0 +1,5 @@
+1. 지점 : 우치, 광산
+2. TC및 FC에 대해서
+1) Spearman Correlation Analysis
+2) Self Organizing Map Pattern Analysis
+3) Heatmap

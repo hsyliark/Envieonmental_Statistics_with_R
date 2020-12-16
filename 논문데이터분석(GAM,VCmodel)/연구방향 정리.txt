@@ -1,0 +1,4 @@
+1. 지점선정 : 광산, 죽산
+2. 모니터링 기간 : 2013~2020년 주간 일별자료
+3. 반응변수 : Chlorophyll-a
+4. 모형에 들어갈 설명변수는 Chl-a과의 Spearman Correlation Analysis를 통해 유의미한 변수를 지점별로 선정
