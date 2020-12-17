@@ -2,3 +2,4 @@
 2. 모니터링 기간 : 2013~2020년 주간 일별자료
 3. 반응변수 : Chlorophyll-a
 4. 모형에 들어갈 설명변수는 Chl-a과의 Spearman Correlation Analysis를 통해 유의미한 변수를 지점별로 선정 (현장항목은 제외)
+5. 모형평가는 다중선형회귀모형을 제외한 나머지 방법들을 training data와 test data를 이용한 CrossValidation을 이용함.
