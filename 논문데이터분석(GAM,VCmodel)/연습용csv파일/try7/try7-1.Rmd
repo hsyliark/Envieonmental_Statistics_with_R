@@ -28,8 +28,8 @@ library(kohonen)
 library(SOMbrero)
 library(e1071)
 library(fitdistrplus)
-# par(mar=c(4,4,4,4))
-# par(oma=c(0.5,0.5,0.5,0.5))
+par(mar=c(4,4,4,4))
+par(oma=c(0.5,0.5,0.5,0.5))
 ```
 
 #### 다중선형회귀모형 적용 시 Chla의 예측값이 음수가 나오는 경우가 발생할 수 있음. 이에 따라 변수의 특성에 맞는 분포를 가정해서 모형을 적합할 필요가 있음.
@@ -39,7 +39,7 @@ library(fitdistrplus)
 #### 변수 time은 2013년 1월 1일 기준으로 경과된 날짜를 계산하여 반영함.
 
 #### 모형의 설명력은 Deviance explained(다양한 형태의 모형을 비교하기 위해 R-square 통계량을 확장한 형태) 통계량 기준으로(산출된 값이 클수록 좋음.), 모형의 예측력은 RMSE(Root Mean Squared Error) 통계량 기준으로 해석함(산출된 값이 작을수록 좋음.).
-- $RMSE= \sqrt{\frac {1}  {n} \sum _{i=1} ^{n} (y _{i} - {\hat{y _{i}}} ) ^{2}}$ , $D.E= 1- \frac {residual D.E} {null D.E} $
+- $RMSE= \sqrt{\frac {1}  {n} \sum _{i=1} ^{n} (y _{i} - {\hat{y _{i}}} ) ^{2}}$ 
 
 #### 환경데이터에서는 분산이 평균보다 큰 과분포(overdispersion) 현상이 자주 발생함. 이에 따라 GAM, TVCM 모형에 대해서는 Quasi Distribution을 추가로 적용함.
 
@@ -59,7 +59,7 @@ library(fitdistrplus)
 #### 1. Spearman Correlation Analysis
 - 일반적으로 사용되는 Pearson Correlation Analysis는 기본적으로 정규분포(Normal Distribution)을 가정하기 때문에 다양한 분포적 특성과 이상치(Outlier)가 존재하는 환경데이터의 경우에는 각 변수에 대해 오름차순으로 매긴 순위를 사용하는 Spearman Correlation Analysis가 타당하다고 판단됨.
 - https://bioinformaticsandme.tistory.com/58
-- Spearman Correlation Coefficient : $r _{s} = \frac {{\sum _{j=1} ^{n} (r _{xj} - {\bar{r _{x}}} )(r _{yj} - {\bar{r _{y}}} )}}  {\sqrt {\sum _{j=1} ^{n} (r _{xj} - {\bar{r _{x}}} ) ^{2} \sum _{j=1} ^{n} (r _{yj} - {\bar{r _{y}}} ) ^{2}}} =1- \frac {{6} \sum _{j=1} ^{n} (r _{xj} -r _{yj} ) ^{2}}  {n(n ^{2} -1)} $
+- Spearman Correlation Coefficient : $r _{s} = \frac {{\sum _{j=1} ^{n} (r _{xj} - {\bar{r _{x}}} )(r _{yj} - {\bar{r _{y}}} )}}  {\sqrt {\sum _{j=1} ^{n} (r _{xj} - {\bar{r _{x}}} ) ^{2} \sum _{j=1} ^{n} (r _{yj} - {\bar{r _{y}}} ) ^{2}}}$
 - Z test : $Z= \frac {r _{s}} {\sqrt {\frac {1}  {n-1}}} -> N(0,1)$ if  $n>=10$
 - Reject $H_{0}$ if $|Z|>=z_{\frac \alpha {2}}$
 - T test : $T= \frac {r _{s} \sqrt {n-2}} {\sqrt {1-r _{s}^{2}}} -> t _{n-2}$ if $n >= 20$
@@ -82,17 +82,20 @@ library(fitdistrplus)
 - 반응변수와 설명변수와의 관계를 살펴보고자 할 때 가장 간단하게 사용할 수 있는 통계적 모형
 - $y _{i} = \beta  _{0} + \beta  _{1} x _{1i} + \beta  _{2} x _{2i} +...+ \beta  _{p} x _{pi} + \epsilon  _{i} ,$
 $\epsilon  _{i} ->i.i.d  N(0, \sigma  ^{2} ) , i=1,2,...,n$
-- Normal Distribution : $X -> N( \mu , \sigma  ^{2} ) --> f _{X} (x)= \frac{1} {\sqrt {2 \pi } \sigma } exp (  - \frac{1}  {2 \sigma  ^{2}} (x- \mu ) ^{2}) , x \in R $
 
 #### 4. 일반화선형모형(Generalized Linear Model)
 - https://seoncheolpark.github.io/book/_book/14-1-glm-basics.html
 - https://zephyrus1111.tistory.com/26
 - 다중선형회귀분석은 기본적으로 반응변수의 분포가 정규분포(Normal Distribution)임을 가정한다. 그러나 TC, FC 같은 대장균수는 셀 수 있는 변수(counting variable)이고 Chl-a는 양의 실수값이면서 일반적으로 오른쪽으로 꼬리가 긴 분포를 보인다. 이처럼 데이터 내의 반응변수가 항상 정규분포라고 말할 수는 없기 때문에 분포적 특성에 맞는 선형모형을 확장하여 생각한 것이 일반화선형모형이다.
 - $g[E(y )]= \beta  _{0} + \beta  _{1} x _{1} + \beta  _{2} x _{2} +...+ \beta  _{p} x _{p}$
-- Poisson Distribution : $X -> Poisson( \lambda )-->P _{X} (X=x)=\frac {e ^{- \lambda } \lambda  ^{x}}  {x!} , x=0,1,2,3,...$
-- Gamma Distribution : $X->Gamma ( \alpha , \beta )-->f _{X} (x)= \frac{1}  {\gamma ( \alpha ) \beta  ^{\alpha }} x ^{\alpha -1} e ^{-\frac {1}  {\beta }} , x>0$
-- $\gamma ( \alpha )= \int _{0} ^{INF } {x ^{\alpha -1} e ^{-x} dx,x>0}$
-- Binomial Distribution : $X -> B(p) --> P _{X} (X=x)= _{n} C _{x} p ^{x} (1-p) ^{n-x} , x=0,1,2,...,n$
+- Poisson Distribution : $X -> Poisson( \lambda )$
+- pmf of Poisson Distribution : $P _{X} (X=x)=\frac {e ^{- \lambda } \lambda  ^{x}}  {x!} , x=0,1,2,3,...$
+- Gamma Distribution : $X->Gamma ( \alpha , \beta )$
+- pdf of Gamma Distribution : $f _{X} (x)= \frac{1}  {\gamma ( \alpha ) \beta  ^{\alpha }} x ^{\alpha -1} e ^{-\frac {1}  {\beta }} , x>0$
+- Gamma function : $\gamma ( \alpha )= \int _{0} ^{INF } {x ^{\alpha -1} e ^{-x} dx,x>0}$
+- Binomial Distribution : $X -> Binomial(p)$
+- pmf of Binomial Distribution : $P _{X} (X=x)= _{n} C _{x} p ^{x} (1-p) ^{n-x} , x=0,1,2,...,n$
+
 - Log Poisson Model(포아송분포 가정) : $log(y)= \beta  _{0} + \beta  _{1} x _{1} + \beta  _{2} x _{2} +...+ \beta  _{p} x _{p}$
 - Log Gamma Model(감마분포 가정) : $log(y)= \beta  _{0} + \beta  _{1} x _{1} + \beta  _{2} x _{2} +...+ \beta  _{p} x _{p}$
 - Logistic Model(2개의 집단일 경우 이항분포 가정) : $log(\frac {prob }  {1-prob} )= \beta  _{0} + \beta  _{1} x _{1} + \beta  _{2} x _{2} +...+ \beta  _{p} x _{p}$
@@ -102,7 +105,6 @@ $\epsilon  _{i} ->i.i.d  N(0, \sigma  ^{2} ) , i=1,2,...,n$
 - 일반화가법모형 : 일반화선형모형의 확장으로 반응변수와 설명변수간의 비선형(Non-linear relationship)관계를 고려한 모형.
 - 선형회귀와 같은 단순한 모형은 사용하기 쉽고 해석하기 쉬우며 인수의 뜻도 해석하기 쉽다. 하지만 선형관계로 설명할 수 없는 현상을 설명하려면 보다 복잡한 모형이 필요하다. 신경망과 같은 기계학습 모형은 복잡한 관계를 예측하는 능력은 뛰어나지만 많은 데이터를 필요로 하고 해석하기 어렵고 모형의 결과로부터 추론하는 것이 매우 어렵다. GAM은 선형모형과 기계학습의 중간에 위치하고 있다. 복잡한 비선형관계를 적합시킬 수 있으며 매우 좋은 예측을 할 수 있는 반면 통계적 추론이 가능할 뿐만 아니라 모형의 구조를 이해하고 설명할 수 있으며 예측에 대한 설명도 가능하다.
 - 비선형모형을 이용하여 모형적합을 할 때 두 가지를 염두에 두어야 한다. 적합한 모형은 데이터에 가까워야 하고(과소적합 방지) 또한 소음(noise)에 적합되는 것을 피해야 한다(과적합 방지). GAM이 데이터의 변동양상을 잘 찾는 정도를 가능도(likelihood)라고 할 수 있고 곡선이 모양을 잘 바꾸는 정도를 잔떨림정도(wiggliness)라고 표현한다면 이 둘은 서로 상충하는 trade-off가 일어나며 평활 파라미터(smoothing parameter) 람다(λ)가 균형을 조절하고 있다. GAM을 이용하여 데이터를 적합시킬 때 평활 파라미터는 자동으로 최적화된다.
-- $ Fit = Likelihood - \lambda * Wiggliness $
 - 평활 파라미터 람다가 너무 큰 경우 적합선은 곡선모양의 데이터를 가로지르는 직선이 되고 너무 적은 경우 트렌드(trend)가 아닌 소음(noise)에 반응하여 과적합된다. 가장 적절한 람다의 값은 과적합과 과소적합 사이의 균형을 잡아준다.
 - 평활 파리미터를 선택하는 방법은 REML이외에도 여러가지가 있으며 각 방법에 따라 각각의 잇점이 있으나 REML 방법이 가장 신뢰할만 하고 안정적인 결과를 보여주기 때문에 대부분의 GAM 전문가들은 REML 방법을 추천한다. 이에 따라 본 연구에서는 REML 방법을 적용한다.
 - https://bookdown.org/cardiomoon/gam/-.html#tab-1
