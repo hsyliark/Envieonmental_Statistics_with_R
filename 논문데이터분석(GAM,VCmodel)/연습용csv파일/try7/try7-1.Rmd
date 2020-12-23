@@ -28,8 +28,8 @@ library(kohonen)
 library(SOMbrero)
 library(e1071)
 library(fitdistrplus)
-par(mar=c(4,4,4,4))
-par(oma=c(0.5,0.5,0.5,0.5))
+# par(mar=c(4,4,4,4))
+# par(oma=c(0.5,0.5,0.5,0.5))
 ```
 
 #### 다중선형회귀모형 적용 시 Chla의 예측값이 음수가 나오는 경우가 발생할 수 있음. 이에 따라 변수의 특성에 맞는 분포를 가정해서 모형을 적합할 필요가 있음.
