@@ -1,11 +1,11 @@
-# ë°˜ì‘ë³€ìˆ˜ : Chla
-# ì„¤ëª…ë³€ìˆ˜ : BOD, COD, SS, TN, TP, TOC, NH3N, PO4P, Flow, Rain, log(TC), log(FC)
+# ¹ÝÀÀº¯¼ö : Chla
+# ¼³¸íº¯¼ö : BOD, COD, SS, TN, TP, TOC, NH3N, PO4P, Flow, Rain, log(TC), log(FC)
 
-ex1 <- read.csv("C:/Users/stat/Desktop/ê´‘ì‚°(2013-2019).csv", sep=",", header=T)
+ex1 <- read.csv("C:/Users/stat/Desktop/±¤»ê(2013-2019).csv", sep=",", header=T)
 ex1 <- ex1[,-1]
 ex1 <- as.data.frame(ex1)
 
-ex2 <- read.csv("C:/Users/stat/Desktop/ìš°ì¹˜(2013-2019).csv", sep=",", header=T)
+ex2 <- read.csv("C:/Users/stat/Desktop/¿ìÄ¡(2013-2019).csv", sep=",", header=T)
 ex2 <- ex2[,-1]
 ex2 <- as.data.frame(ex2)
 
@@ -29,7 +29,7 @@ library(kohonen)
 library(SOMbrero)
 
 
-## ê´‘ì‚° Chla
+## ±¤»ê Chla
 Chla1.RMSE.mlr <- c()
 Chla1.RMSE.glm.Gamma <- c()
 Chla1.RMSE.gam.Gamma <- c()
@@ -273,7 +273,7 @@ Chla1.RMSE <- data.frame(RMSE=c(Chla1.RMSE.mlr,Chla1.RMSE.glm.Gamma,
                                  rep("i_GAM.Gamma_Bag",50),rep("j_GAM.quasi.Bag",50),
                                  rep("k_TVCM.Gamma_Bag",50),rep("l_TVCM.quasi_Bag",50)))
 ggplot(Chla1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
-  coord_cartesian(ylim = c(0, 150)) + ggtitle("Gwangsan Chla (correct)")
+  coord_cartesian(ylim = c(0, 70)) + ggtitle("Gwangsan Chla (correct)")
 
 Chla1_0.RMSE <- data.frame(RMSE=c(Chla1.RMSE.mlr,Chla1.RMSE.glm.Gamma,
                                 Chla1.RMSE.gam.Gamma,Chla1.RMSE.gam.quasi,
@@ -282,7 +282,7 @@ Chla1_0.RMSE <- data.frame(RMSE=c(Chla1.RMSE.mlr,Chla1.RMSE.glm.Gamma,
                                  rep("c_GAM.Gamma",50),rep("d_GAM.quasi",50),
                                  rep("e_TVCM.Gamma",50),rep("f_TVCM.quasi",50)))
 ggplot(Chla1_0.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
-  coord_cartesian(ylim = c(0, 150)) + ggtitle("Gwangsan Chla (correct)")
+  coord_cartesian(ylim = c(0, 70)) + ggtitle("Gwangsan Chla (correct)")
 
 Chla1_1.RMSE <- data.frame(RMSE=c(Chla1.RMSE.glm.Gamma,
                                 Chla1.RMSE.gam.Gamma,Chla1.RMSE.gam.quasi,
@@ -297,7 +297,7 @@ Chla1_1.RMSE <- data.frame(RMSE=c(Chla1.RMSE.glm.Gamma,
                                  rep("g_GAM.Gamma_Bag",50),rep("h_GAM.quasi.Bag",50),
                                  rep("i_TVCM.Gamma_Bag",50),rep("j_TVCM.quasi_Bag",50)))
 ggplot(Chla1_1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
-  coord_cartesian(ylim = c(0, 150)) + ggtitle("Gwangsan Chla (correct)")
+  coord_cartesian(ylim = c(0, 70)) + ggtitle("Gwangsan Chla (correct)")
 
 Chla1_2.RMSE <- data.frame(RMSE=c(Chla1.RMSE.glm.Gamma,
                                   Chla1.RMSE.gam.Gamma,Chla1.RMSE.gam.quasi,
@@ -306,14 +306,14 @@ Chla1_2.RMSE <- data.frame(RMSE=c(Chla1.RMSE.glm.Gamma,
                                    rep("b_GAM.Gamma",50),rep("c_GAM.quasi",50),
                                    rep("d_TVCM.Gamma",50),rep("e_TVCM.quasi",50)))
 ggplot(Chla1_2.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
-  coord_cartesian(ylim = c(0, 150)) + ggtitle("Gwangsan Chla (correct)")
+  coord_cartesian(ylim = c(0, 70)) + ggtitle("Gwangsan Chla (correct)")
 
 
 
 
 
 
-# ìš°ì¹˜ Chla
+# ¿ìÄ¡ Chla
 Chla2.RMSE.mlr <- c()
 Chla2.RMSE.glm.Gamma <- c()
 Chla2.RMSE.gam.Gamma <- c()
@@ -556,7 +556,7 @@ Chla2.RMSE <- data.frame(RMSE=c(Chla2.RMSE.mlr,Chla2.RMSE.glm.Gamma,
                                  rep("i_GAM.Gamma_Bag",50),rep("j_GAM.quasi.Bag",50),
                                  rep("k_TVCM.Gamma_Bag",50),rep("l_TVCM.quasi_Bag",50)))
 ggplot(Chla2.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
-  coord_cartesian(ylim = c(0, 150)) + ggtitle("Uchi Chla (correct)")
+  coord_cartesian(ylim = c(0, 70)) + ggtitle("Uchi Chla (correct)")
 
 Chla2_0.RMSE <- data.frame(RMSE=c(Chla2.RMSE.mlr,Chla2.RMSE.glm.Gamma,
                                 Chla2.RMSE.gam.Gamma,Chla2.RMSE.gam.quasi,
@@ -565,7 +565,7 @@ Chla2_0.RMSE <- data.frame(RMSE=c(Chla2.RMSE.mlr,Chla2.RMSE.glm.Gamma,
                                  rep("c_GAM.Gamma",50),rep("d_GAM.quasi",50),
                                  rep("e_TVCM.Gamma",50),rep("f_TVCM.quasi",50)))
 ggplot(Chla2_0.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
-  coord_cartesian(ylim = c(0, 150)) + ggtitle("Uchi Chla (correct)")
+  coord_cartesian(ylim = c(0, 70)) + ggtitle("Uchi Chla (correct)")
 
 Chla2_1.RMSE <- data.frame(RMSE=c(Chla2.RMSE.glm.Gamma,
                                 Chla2.RMSE.gam.Gamma,Chla2.RMSE.gam.quasi,
@@ -580,7 +580,7 @@ Chla2_1.RMSE <- data.frame(RMSE=c(Chla2.RMSE.glm.Gamma,
                                  rep("g_GAM.Gamma_Bag",50),rep("h_GAM.quasi.Bag",50),
                                  rep("i_TVCM.Gamma_Bag",50),rep("j_TVCM.quasi_Bag",50)))
 ggplot(Chla2_1.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
-  coord_cartesian(ylim = c(0, 150)) + ggtitle("Uchi Chla (correct)")
+  coord_cartesian(ylim = c(0, 70)) + ggtitle("Uchi Chla (correct)")
 
 Chla2_2.RMSE <- data.frame(RMSE=c(Chla2.RMSE.glm.Gamma,
                                   Chla2.RMSE.gam.Gamma,Chla2.RMSE.gam.quasi,
@@ -589,4 +589,4 @@ Chla2_2.RMSE <- data.frame(RMSE=c(Chla2.RMSE.glm.Gamma,
                                    rep("b_GAM.Gamma",50),rep("c_GAM.quasi",50),
                                    rep("d_TVCM.Gamma",50),rep("e_TVCM.quasi",50)))
 ggplot(Chla2_2.RMSE, aes(x=model, y=RMSE, fill=model)) + geom_boxplot() +
-  coord_cartesian(ylim = c(0, 150)) + ggtitle("Uchi Chla (correct)")
+  coord_cartesian(ylim = c(0, 70)) + ggtitle("Uchi Chla (correct)")
