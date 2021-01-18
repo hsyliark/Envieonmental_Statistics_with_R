@@ -6,10 +6,8 @@ output: html_document
 ---
 
 ## 분석개요
-### 분석지점 : 2016~2019년 광산 및 우치 지점에 대한 월별자료
-### 분석방법 
-#### 광산 : Spearman Correlation Analysis, Self Organizing Map (TC, FC, Discharge, WT, pH, DO, BOD, SS, EC, TP, TOC, Precipitation) / heatmap (TC, FC, Discharge, Precipitation, TP, SS)
-#### 우치 : Spearman Correlation Analysis, Self Organizing Map (TC, FC, Discharge, pH, DO, BOD, SS, EC, NH3N, TP, PO4P, TOC, Precipitation) / heatmap (TC, FC, Discharge, Precipitation, PO4P)
+
+### 분석지점 : 2016~2019년 광산 및 우치 지점에 대한 월별 및 주단위 측정 자료
 
 
 
@@ -58,6 +56,54 @@ library(kohonen)
 Gwangsan_SOM_matrix <- as.matrix(Gwangsan_SOM)
 som_grid <- somgrid(xdim=6, ydim=8, topo="hexagonal")
 som_model <- som(Gwangsan_SOM_matrix, grid=som_grid)
+coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
+par(mfrow=c(1,1))
+for (i in 1:12) {
+  plot(som_model, type="property", property=getCodes(som_model)[,i], 
+       main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}
+par(mfrow=c(1,1))
+```
+
+
+### Spearman Correlation Analysis (주단위)
+
+```{r}
+## Reading data
+Gwangsan_SOM_week <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(TC,FC)/자료분석/주단위/Gwangsan_SOM_week.csv",sep=",",header=T)
+## Spearman Correlation Analysis
+library(corrplot)
+library(ggplot2)
+library(ggcorrplot)
+X <- round(cor(Gwangsan_SOM_week, method='spearman'),4)
+corrplot(X) 
+# Compute a matrix of correlation p-values
+p.mat <- cor_pmat(Gwangsan_SOM_week, method='spearman')
+# Using ggplot2, ggcorrplot
+# Add correlation coefficients
+# argument lab = TRUE
+ggcorrplot(X, hc.order=T, type="lower", lab=T) +
+  ggtitle("Correlation plot(Spearman) for water quality data(week), Gwangsan") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+# Add correlation significance level
+# Argument p.mat
+# Barring the no significant coefficient
+ggcorrplot(X, hc.order=T, type="lower", p.mat=p.mat) +
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level(week), Gwangsan") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+```
+
+
+### Self Organizing Map (주단위)
+
+```{r}
+library(kohonen)
+Gwangsan_SOM_week_matrix <- as.matrix(Gwangsan_SOM_week)
+som_grid <- somgrid(xdim=10, ydim=20, topo="hexagonal")
+som_model <- som(Gwangsan_SOM_week_matrix, grid=som_grid)
 coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
 par(mfrow=c(1,1))
 for (i in 1:12) {
@@ -230,6 +276,54 @@ library(kohonen)
 Uchi_SOM_matrix <- as.matrix(Uchi_SOM)
 som_grid <- somgrid(xdim=6, ydim=8, topo="hexagonal")
 som_model <- som(Uchi_SOM_matrix, grid=som_grid)
+coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
+par(mfrow=c(1,1))
+for (i in 1:13) {
+  plot(som_model, type="property", property=getCodes(som_model)[,i], 
+       main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}
+par(mfrow=c(1,1))
+```
+
+
+### Spearman Correlation Analysis (주단위)
+
+```{r}
+## Reading data
+Uchi_SOM_week <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(TC,FC)/자료분석/주단위/Uchi_SOM_week.csv",sep=",",header=T)
+## Spearman Correlation Analysis
+library(corrplot)
+library(ggplot2)
+library(ggcorrplot)
+X <- round(cor(Uchi_SOM_week, method='spearman'),4)
+corrplot(X) 
+# Compute a matrix of correlation p-values
+p.mat <- cor_pmat(Uchi_SOM_week, method='spearman')
+# Using ggplot2, ggcorrplot
+# Add correlation coefficients
+# argument lab = TRUE
+ggcorrplot(X, hc.order=T, type="lower", lab=T) +
+  ggtitle("Correlation plot(Spearman) for water quality data(week), Uchi") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+# Add correlation significance level
+# Argument p.mat
+# Barring the no significant coefficient
+ggcorrplot(X, hc.order=T, type="lower", p.mat=p.mat) +
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level(week), Uchi") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+```
+
+
+### Self Organizing Map (주단위)
+
+```{r}
+library(kohonen)
+Uchi_SOM_week_matrix <- as.matrix(Uchi_SOM_week)
+som_grid <- somgrid(xdim=10, ydim=20, topo="hexagonal")
+som_model <- som(Uchi_SOM_week_matrix, grid=som_grid)
 coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
 par(mfrow=c(1,1))
 for (i in 1:13) {
