@@ -1,0 +1,338 @@
+---
+title: "TC, FC"
+author: "Hwang Seong-Yun"
+date: '2021 1 18 '
+output: html_document
+---
+
+## 분석개요
+### 분석지점 : 2016~2019년 광산 및 우치 지점에 대한 월별자료
+### 분석방법 
+#### 광산 : Spearman Correlation Analysis, Self Organizing Map (TC, FC, Discharge, WT, pH, DO, BOD, SS, EC, TP, TOC, Precipitation) / heatmap (TC, FC, Discharge, Precipitation, TP, SS)
+#### 우치 : Spearman Correlation Analysis, Self Organizing Map (TC, FC, Discharge, pH, DO, BOD, SS, EC, NH3N, TP, PO4P, TOC, Precipitation) / heatmap (TC, FC, Discharge, Precipitation, PO4P)
+
+
+
+## 광산
+
+
+### Spearman Correlation Analysis
+
+```{r}
+## Reading data
+Gwangsan_SOM <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(TC,FC)/자료분석/광산/SOM/Gwangsan_SOM.csv",sep=",",header=T)
+Gwangsan_SOM_name <- Gwangsan_SOM[,1]
+rownames(Gwangsan_SOM) <- Gwangsan_SOM_name
+Gwangsan_SOM <- Gwangsan_SOM[,-1]
+## Spearman Correlation Analysis
+library(corrplot)
+library(ggplot2)
+library(ggcorrplot)
+X <- round(cor(Gwangsan_SOM, method='spearman'),4)
+corrplot(X) 
+# Compute a matrix of correlation p-values
+p.mat <- cor_pmat(Gwangsan_SOM, method='spearman')
+# Using ggplot2, ggcorrplot
+# Add correlation coefficients
+# argument lab = TRUE
+ggcorrplot(X, hc.order=T, type="lower", lab=T) +
+  ggtitle("Correlation plot(Spearman) for water quality data, Gwangsan") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+# Add correlation significance level
+# Argument p.mat
+# Barring the no significant coefficient
+ggcorrplot(X, hc.order=T, type="lower", p.mat=p.mat) +
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level, Gwangsan") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+```
+
+
+### Self Organizing Map
+
+```{r}
+library(kohonen)
+Gwangsan_SOM_matrix <- as.matrix(Gwangsan_SOM)
+som_grid <- somgrid(xdim=6, ydim=8, topo="hexagonal")
+som_model <- som(Gwangsan_SOM_matrix, grid=som_grid)
+coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
+par(mfrow=c(1,1))
+for (i in 1:12) {
+  plot(som_model, type="property", property=getCodes(som_model)[,i], 
+       main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}
+par(mfrow=c(1,1))
+```
+
+
+### heatmap
+
+#### TC
+
+```{r}
+# Reading data
+Gwangsan_heatmap_TC <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(TC,FC)/자료분석/광산/heatmap/TC/Gwangsan_heatmap_TC.csv",sep=",",header=T)
+Gwangsan_heatmap_TC_name <- Gwangsan_heatmap_TC[,1]
+rownames(Gwangsan_heatmap_TC) <- Gwangsan_heatmap_TC_name
+Gwangsan_heatmap_TC <- Gwangsan_heatmap_TC[,-1]
+Gwangsan_heatmap_TC_rev <- Gwangsan_heatmap_TC[nrow(Gwangsan_heatmap_TC):1,]
+# heatmap
+library(superheat)
+library(RColorBrewer)
+colors <- brewer.pal(5, "Blues")
+superheat(Gwangsan_heatmap_TC_rev, scale = FALSE, left.label.text.size=3,
+          bottom.label.text.size=3, bottom.label.size = .05,
+          row.dendrogram = FALSE, heat.pal = colors,
+          title = "Water Quality Heatmap, Gwangsan TC")
+```
+
+#### FC
+
+```{r}
+# Reading data
+Gwangsan_heatmap_FC <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(TC,FC)/자료분석/광산/heatmap/FC/Gwangsan_heatmap_FC.csv",sep=",",header=T)
+Gwangsan_heatmap_FC_name <- Gwangsan_heatmap_FC[,1]
+rownames(Gwangsan_heatmap_FC) <- Gwangsan_heatmap_FC_name
+Gwangsan_heatmap_FC <- Gwangsan_heatmap_FC[,-1]
+Gwangsan_heatmap_FC_rev <- Gwangsan_heatmap_FC[nrow(Gwangsan_heatmap_FC):1,]
+# heatmap
+library(superheat)
+library(RColorBrewer)
+colors <- brewer.pal(5, "Blues")
+superheat(Gwangsan_heatmap_FC_rev, scale = FALSE, left.label.text.size=3,
+          bottom.label.text.size=3, bottom.label.size = .05,
+          row.dendrogram = FALSE, heat.pal = colors,
+          title = "Water Quality Heatmap, Gwangsan FC")
+```
+
+#### Discharge
+
+```{r}
+# Reading data
+Gwangsan_heatmap_Discharge <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(TC,FC)/자료분석/광산/heatmap/Discharge/Gwangsan_heatmap_Discharge.csv",sep=",",header=T)
+Gwangsan_heatmap_Discharge_name <- Gwangsan_heatmap_Discharge[,1]
+rownames(Gwangsan_heatmap_Discharge) <- Gwangsan_heatmap_Discharge_name
+Gwangsan_heatmap_Discharge <- Gwangsan_heatmap_Discharge[,-1]
+Gwangsan_heatmap_Discharge_rev <- Gwangsan_heatmap_Discharge[nrow(Gwangsan_heatmap_Discharge):1,]
+# heatmap
+library(superheat)
+library(RColorBrewer)
+colors <- brewer.pal(5, "Blues")
+superheat(Gwangsan_heatmap_Discharge_rev, scale = FALSE, left.label.text.size=3,
+          bottom.label.text.size=3, bottom.label.size = .05,
+          row.dendrogram = FALSE, heat.pal = colors,
+          title = "Water Quality Heatmap, Gwangsan Discharge")
+```
+
+#### Precipitation
+
+```{r}
+# Reading data
+Gwangsan_heatmap_Precipitation <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(TC,FC)/자료분석/광산/heatmap/Precipitation/Gwangsan_heatmap_Precipitation.csv",sep=",",header=T)
+Gwangsan_heatmap_Precipitation_name <- Gwangsan_heatmap_Precipitation[,1]
+rownames(Gwangsan_heatmap_Precipitation) <- Gwangsan_heatmap_Precipitation_name
+Gwangsan_heatmap_Precipitation <- Gwangsan_heatmap_Precipitation[,-1]
+Gwangsan_heatmap_Precipitation_rev <- Gwangsan_heatmap_Precipitation[nrow(Gwangsan_heatmap_Precipitation):1,]
+# heatmap
+library(superheat)
+library(RColorBrewer)
+colors <- brewer.pal(5, "Blues")
+superheat(Gwangsan_heatmap_Precipitation_rev, scale = FALSE, left.label.text.size=3,
+          bottom.label.text.size=3, bottom.label.size = .05,
+          row.dendrogram = FALSE, heat.pal = colors,
+          title = "Water Quality Heatmap, Gwangsan Precipitation")
+```
+
+#### TP
+
+```{r}
+# Reading data
+Gwangsan_heatmap_TP <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(TC,FC)/자료분석/광산/heatmap/TP/Gwangsan_heatmap_TP.csv",sep=",",header=T)
+Gwangsan_heatmap_TP_name <- Gwangsan_heatmap_TP[,1]
+rownames(Gwangsan_heatmap_TP) <- Gwangsan_heatmap_TP_name
+Gwangsan_heatmap_TP <- Gwangsan_heatmap_TP[,-1]
+Gwangsan_heatmap_TP_rev <- Gwangsan_heatmap_TP[nrow(Gwangsan_heatmap_TP):1,]
+# heatmap
+library(superheat)
+library(RColorBrewer)
+colors <- brewer.pal(5, "Blues")
+superheat(Gwangsan_heatmap_TP_rev, scale = FALSE, left.label.text.size=3,
+          bottom.label.text.size=3, bottom.label.size = .05,
+          row.dendrogram = FALSE, heat.pal = colors,
+          title = "Water Quality Heatmap, Gwangsan TP")
+```
+
+#### SS
+
+```{r}
+# Reading data
+Gwangsan_heatmap_SS <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(TC,FC)/자료분석/광산/heatmap/SS/Gwangsan_heatmap_SS.csv",sep=",",header=T)
+Gwangsan_heatmap_SS_name <- Gwangsan_heatmap_SS[,1]
+rownames(Gwangsan_heatmap_SS) <- Gwangsan_heatmap_SS_name
+Gwangsan_heatmap_SS <- Gwangsan_heatmap_SS[,-1]
+Gwangsan_heatmap_SS_rev <- Gwangsan_heatmap_SS[nrow(Gwangsan_heatmap_SS):1,]
+# heatmap
+library(superheat)
+library(RColorBrewer)
+colors <- brewer.pal(5, "Blues")
+superheat(Gwangsan_heatmap_SS_rev, scale = FALSE, left.label.text.size=3,
+          bottom.label.text.size=3, bottom.label.size = .05,
+          row.dendrogram = FALSE, heat.pal = colors,
+          title = "Water Quality Heatmap, Gwangsan SS")
+```
+
+
+
+## 우치
+
+
+### Spearman Correlation Analysis
+
+```{r}
+## Reading data
+Uchi_SOM <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(TC,FC)/자료분석/우치/SOM/Uchi_SOM.csv",sep=",",header=T)
+Uchi_SOM_name <- Uchi_SOM[,1]
+rownames(Uchi_SOM) <- Uchi_SOM_name
+Uchi_SOM <- Uchi_SOM[,-1]
+## Spearman Correlation Analysis
+library(corrplot)
+library(ggplot2)
+library(ggcorrplot)
+X <- round(cor(Uchi_SOM, method='spearman'),4)
+corrplot(X) 
+# Compute a matrix of correlation p-values
+p.mat <- cor_pmat(Uchi_SOM, method='spearman')
+# Using ggplot2, ggcorrplot
+# Add correlation coefficients
+# argument lab = TRUE
+ggcorrplot(X, hc.order=T, type="lower", lab=T) +
+  ggtitle("Correlation plot(Spearman) for water quality data, Uchi") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+# Add correlation significance level
+# Argument p.mat
+# Barring the no significant coefficient
+ggcorrplot(X, hc.order=T, type="lower", p.mat=p.mat) +
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level, Uchi") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+```
+
+
+### Self Organizing Map
+
+```{r}
+library(kohonen)
+Uchi_SOM_matrix <- as.matrix(Uchi_SOM)
+som_grid <- somgrid(xdim=6, ydim=8, topo="hexagonal")
+som_model <- som(Uchi_SOM_matrix, grid=som_grid)
+coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
+par(mfrow=c(1,1))
+for (i in 1:13) {
+  plot(som_model, type="property", property=getCodes(som_model)[,i], 
+       main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}
+par(mfrow=c(1,1))
+```
+
+
+### heatmap
+
+#### TC
+
+```{r}
+# Reading data
+Uchi_heatmap_TC <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(TC,FC)/자료분석/우치/heatmap/TC/Uchi_heatmap_TC.csv",sep=",",header=T)
+Uchi_heatmap_TC_name <- Uchi_heatmap_TC[,1]
+rownames(Uchi_heatmap_TC) <- Uchi_heatmap_TC_name
+Uchi_heatmap_TC <- Uchi_heatmap_TC[,-1]
+Uchi_heatmap_TC_rev <- Uchi_heatmap_TC[nrow(Uchi_heatmap_TC):1,]
+# heatmap
+library(superheat)
+library(RColorBrewer)
+colors <- brewer.pal(5, "Blues")
+superheat(Uchi_heatmap_TC_rev, scale = FALSE, left.label.text.size=3,
+          bottom.label.text.size=3, bottom.label.size = .05,
+          row.dendrogram = FALSE, heat.pal = colors,
+          title = "Water Quality Heatmap, Uchi TC")
+```
+
+#### FC
+
+```{r}
+# Reading data
+Uchi_heatmap_FC <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(TC,FC)/자료분석/우치/heatmap/FC/Uchi_heatmap_FC.csv",sep=",",header=T)
+Uchi_heatmap_FC_name <- Uchi_heatmap_FC[,1]
+rownames(Uchi_heatmap_FC) <- Uchi_heatmap_FC_name
+Uchi_heatmap_FC <- Uchi_heatmap_FC[,-1]
+Uchi_heatmap_FC_rev <- Uchi_heatmap_FC[nrow(Uchi_heatmap_FC):1,]
+# heatmap
+library(superheat)
+library(RColorBrewer)
+colors <- brewer.pal(5, "Blues")
+superheat(Uchi_heatmap_FC_rev, scale = FALSE, left.label.text.size=3,
+          bottom.label.text.size=3, bottom.label.size = .05,
+          row.dendrogram = FALSE, heat.pal = colors,
+          title = "Water Quality Heatmap, Uchi FC")
+```
+
+#### Discharge
+
+```{r}
+# Reading data
+Uchi_heatmap_Discharge <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(TC,FC)/자료분석/우치/heatmap/Discharge/Uchi_heatmap_Discharge.csv",sep=",",header=T)
+Uchi_heatmap_Discharge_name <- Uchi_heatmap_Discharge[,1]
+rownames(Uchi_heatmap_Discharge) <- Uchi_heatmap_Discharge_name
+Uchi_heatmap_Discharge <- Uchi_heatmap_Discharge[,-1]
+Uchi_heatmap_Discharge_rev <- Uchi_heatmap_Discharge[nrow(Uchi_heatmap_Discharge):1,]
+# heatmap
+library(superheat)
+library(RColorBrewer)
+colors <- brewer.pal(5, "Blues")
+superheat(Uchi_heatmap_Discharge_rev, scale = FALSE, left.label.text.size=3,
+          bottom.label.text.size=3, bottom.label.size = .05,
+          row.dendrogram = FALSE, heat.pal = colors,
+          title = "Water Quality Heatmap, Uchi Discharge")
+```
+
+#### Precipitation
+
+```{r}
+# Reading data
+Uchi_heatmap_Precipitation <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(TC,FC)/자료분석/우치/heatmap/Precipitation/Uchi_heatmap_Precipitation.csv",sep=",",header=T)
+Uchi_heatmap_Precipitation_name <- Uchi_heatmap_Precipitation[,1]
+rownames(Uchi_heatmap_Precipitation) <- Uchi_heatmap_Precipitation_name
+Uchi_heatmap_Precipitation <- Uchi_heatmap_Precipitation[,-1]
+Uchi_heatmap_Precipitation_rev <- Uchi_heatmap_Precipitation[nrow(Uchi_heatmap_Precipitation):1,]
+# heatmap
+library(superheat)
+library(RColorBrewer)
+colors <- brewer.pal(5, "Blues")
+superheat(Uchi_heatmap_Precipitation_rev, scale = FALSE, left.label.text.size=3,
+          bottom.label.text.size=3, bottom.label.size = .05,
+          row.dendrogram = FALSE, heat.pal = colors,
+          title = "Water Quality Heatmap, Uchi Precipitation")
+```
+
+#### PO4P
+
+```{r}
+# Reading data
+Uchi_heatmap_PO4P <- read.csv("D:/Workplace/Environmental_Statistics_with_R/논문데이터분석(TC,FC)/자료분석/우치/heatmap/PO4P/Uchi_heatmap_PO4P.csv",sep=",",header=T)
+Uchi_heatmap_PO4P_name <- Uchi_heatmap_PO4P[,1]
+rownames(Uchi_heatmap_PO4P) <- Uchi_heatmap_PO4P_name
+Uchi_heatmap_PO4P <- Uchi_heatmap_PO4P[,-1]
+Uchi_heatmap_PO4P_rev <- Uchi_heatmap_PO4P[nrow(Uchi_heatmap_PO4P):1,]
+# heatmap
+library(superheat)
+library(RColorBrewer)
+colors <- brewer.pal(5, "Blues")
+superheat(Uchi_heatmap_PO4P_rev, scale = FALSE, left.label.text.size=3,
+          bottom.label.text.size=3, bottom.label.size = .05,
+          row.dendrogram = FALSE, heat.pal = colors,
+          title = "Water Quality Heatmap, Uchi PO4P")
+```
+
