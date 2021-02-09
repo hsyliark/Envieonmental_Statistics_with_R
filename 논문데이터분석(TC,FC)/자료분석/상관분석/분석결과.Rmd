@@ -1,0 +1,54 @@
+---
+title: "Correlation Analysis"
+author: "Hwang Seong-Yun"
+date: '2021 2 9 '
+output: html_document
+---
+
+```{r}
+library(mgcv)
+library(ggplot2)
+library(gridExtra)
+library(corrplot)
+library(ggcorrplot)
+```
+
+
+### 광산
+
+```{r}
+gwangsan <- read.csv("C:/Users/stat/Desktop/분석자료/광산.csv",header=T,sep=",")
+X1 <- round(cor(gwangsan, method='spearman'),4) 
+corrplot(X1)
+p.mat1 <- cor_pmat(gwangsan, method='spearman')
+ggcorrplot(X1, hc.order=T, type="lower", lab=T) +
+  ggtitle("Correlation plot(Spearman) for water quality data (Gwangsan)") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+ggcorrplot(X1, hc.order=T, type="lower", p.mat=p.mat1) +
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level (Gwangsan)") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+```
+
+### 우치
+
+```{r}
+uchi <- read.csv("C:/Users/stat/Desktop/분석자료/우치.csv",header=T,sep=",")
+X2 <- round(cor(uchi, method='spearman'),4) 
+corrplot(X2)
+p.mat2 <- cor_pmat(uchi, method='spearman')
+ggcorrplot(X2, hc.order=T, type="lower", lab=T) +
+  ggtitle("Correlation plot(Spearman) for water quality data (Uchi)") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+ggcorrplot(X2, hc.order=T, type="lower", p.mat=p.mat2) +
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level (Uchi)") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+```
+
