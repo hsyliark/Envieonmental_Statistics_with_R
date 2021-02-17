@@ -60,10 +60,10 @@ library(fitdistrplus)
 - 일반적으로 사용되는 Pearson Correlation Analysis는 기본적으로 정규분포(Normal Distribution)을 가정하기 때문에 다양한 분포적 특성과 이상치(Outlier)가 존재하는 환경데이터의 경우에는 각 변수에 대해 오름차순으로 매긴 순위를 사용하는 Spearman Correlation Analysis가 타당하다고 판단됨.
 - https://bioinformaticsandme.tistory.com/58
 - Spearman Correlation Coefficient : $r _{s} = \frac {{\sum _{j=1} ^{n} (r _{xj} - {\bar{r _{x}}} )(r _{yj} - {\bar{r _{y}}} )}}  {\sqrt {\sum _{j=1} ^{n} (r _{xj} - {\bar{r _{x}}} ) ^{2} \sum _{j=1} ^{n} (r _{yj} - {\bar{r _{y}}} ) ^{2}}}$
-- Z test : $Z= \frac {r _{s}} {\sqrt {\frac {1}  {n-1}}} -> N(0,1)$ if  $n>=10$
-- Reject $H_{0}$ if $|Z|>=z_{\frac \alpha {2}}$
-- T test : $T= \frac {r _{s} \sqrt {n-2}} {\sqrt {1-r _{s}^{2}}} -> t _{n-2}$ if $n >= 20$
-- Reject $H_{0}$ if $|T|>=t_{\frac \alpha {2}}(n-2)$  
+- Z test : $Z= \frac {r _{s}} {\sqrt {\frac {1}  {n-1}}} \sim N(0,1)$ if  $n \geq 10$
+- Reject $H_{0}$ if $|Z| \geq z_{\frac \alpha {2}}$
+- T test : $T= \frac {r _{s} \sqrt {n-2}} {\sqrt {1-r _{s}^{2}}} \sim t _{n-2}$ if $n \geq 20$
+- Reject $H_{0}$ if $|T| \geq t_{\frac \alpha {2}}(n-2)$  
 
 #### 2. SOM(Self Organizing Map)
 - 차원축소(dimensionality reduction)와 군집화(clustering)를 동시에 수행하는 기법
@@ -76,24 +76,24 @@ library(fitdistrplus)
 - 4-1) 현재 반복 횟수가 최대 반복 횟수라면 알고리즘을 종료.
 - 4-2) 현재 반복 횟수가 최대 반복 횟수가 아니면 현재 입력 벡터를 처음 입력 벡터로 설정하고 과정 2로 돌아간다.
 - $D _{ij} = \sum _{i=1} ^{n} (w _{ij} -x _{i} ) ^{2}$
-- $w _{ij} =w _{ij} (old)+ \alpha (t)(x _{i} -w _{ij} (old))$
+- $w _{ij} = w _{ij} (old)+ \alpha (t)(x _{i} -w _{ij} (old))$
 
 #### 3. 다중선형회귀분석(Multiple Linear Regression Analysis)
 - 반응변수와 설명변수와의 관계를 살펴보고자 할 때 가장 간단하게 사용할 수 있는 통계적 모형
 - $y _{i} = \beta  _{0} + \beta  _{1} x _{1i} + \beta  _{2} x _{2i} +...+ \beta  _{p} x _{pi} + \epsilon  _{i} ,$
-$\epsilon  _{i} ->i.i.d  N(0, \sigma  ^{2} ) , i=1,2,...,n$
+$\epsilon  _{i} \sim i.i.d  N(0, \sigma  ^{2} ) , i=1,2,...,n$
 
 #### 4. 일반화선형모형(Generalized Linear Model)
 - https://seoncheolpark.github.io/book/_book/14-1-glm-basics.html
 - https://zephyrus1111.tistory.com/26
 - 다중선형회귀분석은 기본적으로 반응변수의 분포가 정규분포(Normal Distribution)임을 가정한다. 그러나 TC, FC 같은 대장균수는 셀 수 있는 변수(counting variable)이고 Chl-a는 양의 실수값이면서 일반적으로 오른쪽으로 꼬리가 긴 분포를 보인다. 이처럼 데이터 내의 반응변수가 항상 정규분포라고 말할 수는 없기 때문에 분포적 특성에 맞는 선형모형을 확장하여 생각한 것이 일반화선형모형이다.
 - $g[E(y )]= \beta  _{0} + \beta  _{1} x _{1} + \beta  _{2} x _{2} +...+ \beta  _{p} x _{p}$
-- Poisson Distribution : $X -> Poisson( \lambda )$
+- Poisson Distribution : $X \sim Poisson( \lambda )$
 - pmf of Poisson Distribution : $P _{X} (X=x)=\frac {e ^{- \lambda } \lambda  ^{x}}  {x!} , x=0,1,2,3,...$
-- Gamma Distribution : $X->Gamma ( \alpha , \beta )$
-- pdf of Gamma Distribution : $f _{X} (x)= \frac{1}  {\gamma ( \alpha ) \beta  ^{\alpha }} x ^{\alpha -1} e ^{-\frac {1}  {\beta }} , x>0$
-- Gamma function : $\gamma ( \alpha )= \int _{0} ^{INF } {x ^{\alpha -1} e ^{-x} dx,x>0}$
-- Binomial Distribution : $X -> Binomial(p)$
+- Gamma Distribution : $X \sim Gamma ( \alpha , \beta )$
+- pdf of Gamma Distribution : $f _{X} (x)= \frac{1}  {\Gamma ( \alpha ) \beta  ^{\alpha }} x ^{\alpha -1} e ^{-\frac {x}  {\beta }} , x>0$
+- Gamma function : $\Gamma ( \alpha )= \int _{0} ^{\infty } {x ^{\alpha -1} e ^{-x} dx,x>0}$
+- Binomial Distribution : $X \sim Binomial(p)$
 - pmf of Binomial Distribution : $P _{X} (X=x)= _{n} C _{x} p ^{x} (1-p) ^{n-x} , x=0,1,2,...,n$
 
 - Log Poisson Model(포아송분포 가정) : $log(y)= \beta  _{0} + \beta  _{1} x _{1} + \beta  _{2} x _{2} +...+ \beta  _{p} x _{p}$
