@@ -1062,6 +1062,457 @@ legend(1830,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
 
 
 
+### 사용데이터 : 광산 지점 데이터 (5일누적)
+
+#### 모니터링 기간 : 2016~2020년 (일별 주단위자료) 
+
+#### 반응변수 : Chla
+
+#### 설명변수 : Flow(유량), Rain(강우), Day(체류시간), Speed(유속), WT(수온), DO, BOD, COD, TOC, TN, NO3N, NH3N, TP, PO4P
+
+#### 상관분석이나 모형적합 시 각 수질항목의 원값을 그대로 사용하여 표현하는 것이 모형의 설명력이나 예측력 비교 등의 측면에서 더 적절할 수 있다고 판단하여 표준화를 하지 않았음.
+
+
+
+
+### Spearman Correlation Analysis
+
+```{r}
+ex1 <- read.csv("C:/Users/HSY/Desktop/csv자료/광산/광산train_5일누적.csv", sep=",", header=T)
+X1 <- round(cor(ex1[,-16], method='spearman'),4) 
+corrplot(X1)
+p.mat1 <- cor_pmat(ex1[,-16], method='spearman')
+ggcorrplot(X1, hc.order=T, type="lower", lab=T) +
+  ggtitle("Correlation plot(Spearman) for water quality data (Gwangsan)") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+ggcorrplot(X1, hc.order=T, type="lower", p.mat=p.mat1) +
+  ggtitle("Correlation plot(Spearman) for water quality data with significance level (Gwangsan)") +   
+  theme(plot.title = element_text(family = "serif", 
+                                  face = "bold", hjust = 0.5, 
+                                  size = 15, color = "black"))
+```
+
+
+
+
+### SOM(Self-Organizing Map) pattern
+
+```{r}
+ex1 <- read.csv("C:/Users/HSY/Desktop/csv자료/광산/광산train_5일누적.csv", sep=",", header=T)
+ex1 <- ex1[,-16]
+ex1 <- as.data.frame(ex1)
+ex1_matrix <- as.matrix(ex1)
+som_grid <- somgrid(xdim=10, ydim=25, topo="hexagonal")
+som_model <- som(ex1_matrix, grid=som_grid)
+coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=4/6, alpha=alpha)[n:1]}
+par(mfrow=c(1,2))
+for (i in 1:15) {
+  plot(som_model, type="property", property=getCodes(som_model)[,i], 
+       main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}
+par(mfrow=c(1,1))
+```
+
+
+
+
+### Dependent(Response) variable : Chla
+
+### Distribution of Chla
+
+```{r}
+ex1 <- read.csv("C:/Users/HSY/Desktop/csv자료/광산/광산train_5일누적.csv", sep=",", header=T)
+plotdist(ex1$Chla)
+descdist(ex1$Chla)  
+```
+
+#### Cullen and Frey graph에서 Observation에 해당하는 파란색 표시가 감마분포(Gamma distribution)와 관련한 선 근처에 있다. 이에 따라 광산지점 관측일 자료의 Chla는 감마분포를 따른다고 가정하는 것이 타당하다.
+
+```{r}
+f1 <- fitdist(ex1$Chla, "gamma")
+summary(f1)
+plot(f1)
+```
+
+
+### Multiple Linear Regression
+
+```{r}
+ex1 <- read.csv("C:/Users/HSY/Desktop/csv자료/광산/광산train_5일누적.csv", sep=",", header=T)
+ex1 <- as.data.frame(ex1)
+fit <- glm(Chla~Flow+Rain+Day+Speed+WT+DO+BOD+COD+TOC+TN+NO3N+NH3N+TP+PO4P,data=ex1,family=gaussian(link="identity"))
+summary(fit) # Deviance explained: 0.6165       
+vif(fit) 
+par(mfrow=c(2,2))
+plot(fit)
+par(mfrow=c(1,1))
+dwtest(Chla~Flow+Rain+Day+Speed+WT+DO+BOD+COD+TOC+TN+NO3N+NH3N+TP+PO4P,data=ex1) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+fit.step <- stepAIC(fit, direction="both", trace=TRUE)
+fit.step # 선택변수 : Rain, Day, Speed, WT, DO, BOD, COD, TOC, NH3N, TP, PO4P 
+summary(fit.step) # Deviance explained: 0.6133       
+vif(fit.step) 
+par(mfrow=c(2,2))
+plot(fit.step)
+par(mfrow=c(1,1))
+dwtest(Chla~Rain+Day+Speed+WT+DO+BOD+COD+TOC+NH3N+TP+PO4P,data=ex1) # 잔차가 양의 자기상관성을 가지고 있음.
+# 다중회귀분석에 대한 기본가정인 잔차(residual)에 대한 정규성, 등분산성, 독립성, 선형성 등을 만족하지 못함.
+```
+
+#### response vs fitted_values (train data (2016-2020))
+
+```{r}
+pred.mlr <- predict(fit.step,newdata=ex1,type="response")
+data.mlr <- data.frame(response=ex1$Chla,fitted_values=pred.mlr,time=ex1$time)
+sqrt(sum((data.mlr$response-data.mlr$fitted_values)^2)/length(data.mlr$response)) # RMSE = 23.14491    
+ggplot(data.mlr, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("[Gwangsan Chla train data] response vs fitted_values (Multiple Linear Regression)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.mlr$time,data.mlr$response,type='o',col='blue',xlab="time",ylab="Chla",main="[Gwangsan Chla train data] response vs fitted_values (Multiple Linear Regression)",ylim=c(-100,500))
+lines(data.mlr$time,data.mlr$fitted_values,type='o',col='red')
+legend(0,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+#### response vs fitted_values (test data (2021))
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/csv자료/광산/광산test_5일누적.csv", sep=",", header=T)
+ex1_1 <- as.data.frame(ex1_1)
+pred.mlr1 <- predict(fit.step,newdata=ex1_1,type="response")
+data.mlr1 <- data.frame(response=ex1_1$Chla,fitted_values=pred.mlr1,time=ex1_1$time)
+sqrt(sum((data.mlr1$response-data.mlr1$fitted_values)^2)/length(data.mlr1$response)) # RMSE = 18.11548 
+ggplot(data.mlr1, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("[Gwangsan Chla test data] response vs fitted_values (Multiple Linear Regression)") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.mlr1$time,data.mlr1$response,type='o',col='blue',xlab="time",ylab="Chla",main="[Gwangsan Chla test data] response vs fitted_values (Multiple Linear Regression)",ylim=c(-100,500))
+lines(data.mlr1$time,data.mlr1$fitted_values,type='o',col='red')
+legend(1830,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+#### MLR은 Chla의 예측값을 음수로 추정해주는 경우가 있기 때문에 적절한 모형이 아님.
+
+
+### Generalized Linear Model (Gamma)
+
+```{r}
+m <- glm(Chla~Flow+Rain+Day+Speed+WT+DO+BOD+COD+TOC+TN+NO3N+NH3N+TP+PO4P,data=ex1,family=Gamma(link="log"))
+summary(m) # Deviance explained : 0.6781  
+vif(m) 
+par(mfrow=c(2,2))
+plot(m)
+par(mfrow=c(1,1))
+```
+
+#### Stepwise variable selection with AIC(Akaike’s Information Criterion)
+
+```{r}
+m.step <- stepAIC(m, direction="both", trace=TRUE)
+m.step # 선택변수 : Flow, Rain, Day, Speed, WT, DO, BOD, COD, NH3N, TP, PO4P
+summary(m.step) # Deviance explained : 0.6757    
+vif(m.step)  
+par(mfrow=c(2,2))
+plot(m.step)
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values (train data (2016-2020))
+
+```{r}
+pred.glm <- predict(m.step,newdata=ex1,type="response")
+data.glm <- data.frame(response=ex1$Chla,fitted_values=pred.glm,time=ex1$time)
+sqrt(sum((data.glm$response-data.glm$fitted_values)^2)/length(data.glm$response)) # RMSE = 24.24480      
+ggplot(data.glm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("[Gwangsan Chla train data] response vs fitted_values (Generalized Linear Model, (Gamma Distribution))") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.glm$time,data.glm$response,type='o',col='blue',xlab="time",ylab="Chla",main="[Gwangsan Chla train data] response vs fitted_values (Generalized Linear Model, (Gamma Distribution))",ylim=c(-100,500))
+lines(data.glm$time,data.glm$fitted_values,type='o',col='red')
+legend(0,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+#### response vs fitted_values (test data (2021))
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/csv자료/광산/광산test_5일누적.csv", sep=",", header=T)
+ex1_1 <- as.data.frame(ex1_1)
+pred.glm1 <- predict(m.step,newdata=ex1_1,type="response")
+data.glm1 <- data.frame(response=ex1_1$Chla,fitted_values=pred.glm1,time=ex1_1$time)
+sqrt(sum((data.glm1$response-data.glm1$fitted_values)^2)/length(data.glm1$response)) # RMSE = 20.55343  
+ggplot(data.glm1, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("[Gwangsan Chla test data] response vs fitted_values (Generalized Linear Model, (Gamma Distribution))") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.glm1$time,data.glm1$fitted_values,type='o',col='red',xlab="time",ylab="Chla",main="[Gwangsan Chla test data] response vs fitted_values (Generalized Linear Model, (Gamma Distribution))",ylim=c(-100,500))
+lines(data.glm1$time,data.glm1$response,type='o',col='blue')
+legend(1830,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+
+### Generalized Additive Model (Gamma)
+
+```{r}
+# GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
+mm <- gam(Chla~s(Flow)+s(Rain)+s(Day)+s(Speed)+s(WT)+s(DO)+s(BOD)+s(COD)+s(TOC)+s(TN)+s(NO3N)+s(NH3N)+s(TP)+s(PO4P),data=ex1,family=Gamma(link="log"),method="REML")
+plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+ggGam(mm)
+summary(mm) # Deviance explained = 79.9%      
+concurvity(mm,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection
+
+```{r}
+mm.shrink <- gam(Chla~s(Flow)+s(Rain)+s(Day)+s(Speed)+s(WT)+s(DO)+s(BOD)+s(COD)+s(TOC)+s(TN)+s(NO3N)+s(NH3N)+s(TP)+s(PO4P),data=ex1,family=Gamma(link="log"),method="REML",select=TRUE)
+plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+ggGam(mm.shrink) # 선택변수 : Flow, Rain, Day, Speed, WT, DO, BOD, COD, TOC, NH3N, TP, PO4P 
+summary(mm.shrink) # Deviance explained = 0.7900   
+concurvity(mm.shrink,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values (train data (2016-2020))
+
+```{r}
+pred.gam <- predict(mm.shrink,newdata=ex1,type="response")
+data.gam <- data.frame(response=ex1$Chla,fitted_values=pred.gam,time=ex1$time)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 19.42164       
+ggplot(data.gam, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("[Gwangsan Chla train data] response vs fitted_values (Generalized Additive Model (Gamma Distribution))") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.gam$time,data.gam$response,type='o',col='blue',xlab="time",ylab="Chla",main="[Gwangsan Chla train data] response vs fitted_values (Generalized Additive Model (Gamma Distribution))",ylim=c(-100,500))
+lines(data.gam$time,data.gam$fitted_values,type='o',col='red')
+legend(0,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+#### response vs fitted_values (test data (2021))
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/csv자료/광산/광산test_5일누적.csv", sep=",", header=T)
+ex1_1 <- as.data.frame(ex1_1)
+pred.gam1 <- predict(mm.shrink,newdata=ex1_1,type="response")
+data.gam1 <- data.frame(response=ex1_1$Chla,fitted_values=pred.gam1,time=ex1_1$time)
+sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/length(data.gam1$response)) # RMSE = 17.03710    
+ggplot(data.gam1, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("[Gwangsan Chla test data] response vs fitted_values (Generalized Additive Model, (Gamma Distribution))") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.gam1$time,data.gam1$fitted_values,type='o',col='red',xlab="time",ylab="Chla",main="[Gwangsan Chla test data] response vs fitted_values (Generalized Additive Model, (Gamma Distribution))",ylim=c(-100,500))
+lines(data.gam1$time,data.gam1$response,type='o',col='blue')
+legend(1830,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+
+
+### Generalized Additive Model (quasi)
+
+```{r}
+# GAM의 경우 추정되는 계수(coefficients)가 데이터의 개수보다 많으면 적합되지 않음.
+mm <- gam(Chla~s(Flow)+s(Rain)+s(Day)+s(Speed)+s(WT)+s(DO)+s(BOD)+s(COD)+s(TOC)+s(TN)+s(NO3N)+s(NH3N)+s(TP)+s(PO4P),data=ex1,family=quasi(link="log"),method="REML")
+plot(mm,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm)[1])
+ggGam(mm)
+summary(mm) # Deviance explained = 0.8000     
+concurvity(mm,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection 
+
+```{r}
+mm.shrink <- gam(Chla~s(Flow)+s(Rain)+s(Day)+s(Speed)+s(WT)+s(DO)+s(BOD)+s(COD)+s(TOC)+s(TN)+s(NO3N)+s(NH3N)+s(TP)+s(PO4P),data=ex1,family=quasi(link="log"),method="REML",select=TRUE)
+plot(mm.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(mm.shrink)[1])
+ggGam(mm.shrink) # 선택변수 : Flow, Rain, Day, Speed, WT, DO, BOD, COD, TOC, TN, NH3N, TP, PO4P 
+summary(mm.shrink) # Deviance explained = 79.8%     
+concurvity(mm.shrink,full=TRUE) # 공선성 존재
+par(mfrow=c(2,2))
+gam.check(mm.shrink) # 적합결여 존재 (기저함수 부족)
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values (train data (2016-2020))
+
+```{r}
+pred.gam <- predict(mm.shrink,newdata=ex1,type="response")
+data.gam <- data.frame(response=ex1$Chla,fitted_values=pred.gam,time=ex1$time)
+sqrt(sum((data.gam$response-data.gam$fitted_values)^2)/length(data.gam$response)) # RMSE = 16.73607     
+ggplot(data.gam, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("[Gwangsan Chla train data] response vs fitted_values (Generalized Additive Model (Quasi Distribution))") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.gam$time,data.gam$response,type='o',col='blue',xlab="time",ylab="Chla",main="[Gwangsan Chla train data] response vs fitted_values (Generalized Additive Model (Quasi Distribution))",ylim=c(-100,500))
+lines(data.gam$time,data.gam$fitted_values,type='o',col='red')
+legend(0,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+#### response vs fitted_values (test data (2021))
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/csv자료/광산/광산test_5일누적.csv", sep=",", header=T)
+ex1_1 <- as.data.frame(ex1_1)
+pred.gam1 <- predict(mm.shrink,newdata=ex1_1,type="response")
+data.gam1 <- data.frame(response=ex1_1$Chla,fitted_values=pred.gam1,time=ex1_1$time)
+sqrt(sum((data.gam1$response-data.gam1$fitted_values)^2)/length(data.gam1$response)) # RMSE = 14.73395    
+ggplot(data.gam1, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("[Gwangsan Chla test data] response vs fitted_values (Generalized Additive Model, (Quasi Distribution))") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.gam1$time,data.gam1$fitted_values,type='o',col='red',xlab="time",ylab="Chla",main="[Gwangsan Chla test data] response vs fitted_values (Generalized Additive Model, (Quasi Distribution))",ylim=c(-100,500))
+lines(data.gam1$time,data.gam1$response,type='o',col='blue')
+legend(1830,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+
+### Time Varying Coefficient Model (Gamma)
+
+```{r}
+vc <- gam(Chla~s(time)+s(time,by=Flow)+s(time,by=Rain)+s(time,by=Day)+s(time,by=Speed)+s(time,by=WT)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=TOC)+s(time,by=TN)+s(time,by=NO3N)+s(time,by=NH3N)+s(time,by=TP)+s(time,by=PO4P),data=ex1,family=Gamma(link="log"),method="REML")
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
+ggGam(vc)
+summary(vc) # Deviance explained = 78.8%        
+par(mfrow=c(2,2))
+gam.check(vc) 
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection 
+
+```{r}
+vc.shrink <- gam(Chla~s(time)+s(time,by=Flow)+s(time,by=Rain)+s(time,by=Day)+s(time,by=Speed)+s(time,by=WT)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=TOC)+s(time,by=TN)+s(time,by=NO3N)+s(time,by=NH3N)+s(time,by=TP)+s(time,by=PO4P),data=ex1,family=Gamma(link="log"),method="REML",select=TRUE)
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
+ggGam(vc.shrink) # 선택변수 : Flow, Rain, Day, Speed, WT, DO, BOD, COD, TOC, NO3N, NH3N, TP, PO4P  
+summary(vc.shrink) # Deviance explained = 77.5%       
+par(mfrow=c(2,2))
+gam.check(vc.shrink) 
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values (train data (2016-2020))
+
+```{r}
+pred.tvcm <- predict(vc.shrink,newdata=ex1,type="response")
+data.tvcm <- data.frame(response=ex1$Chla,fitted_values=pred.tvcm,time=ex1$time)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 17.70033     
+ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("[Gwangsan Chla train data] response vs fitted_values (Time Varying Coefficient Model, (Gamma Distribution))") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.tvcm$time,data.tvcm$response,type='o',col='blue',xlab="time",ylab="Chla",main="[Gwangsan Chla train data] response vs fitted_values (Time Varying Coefficient Model, (Gamma Distribution))",ylim=c(-100,500))
+lines(data.tvcm$time,data.tvcm$fitted_values,type='o',col='red')
+legend(0,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+#### response vs fitted_values (test data (2021))
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/csv자료/광산/광산test_5일누적.csv", sep=",", header=T)
+ex1_1 <- as.data.frame(ex1_1)
+pred.tvcm1 <- predict(vc.shrink,newdata=ex1_1,type="response")
+data.tvcm1 <- data.frame(response=ex1_1$Chla,fitted_values=pred.tvcm1,time=ex1_1$time)
+sqrt(sum((data.tvcm1$response-data.tvcm1$fitted_values)^2)/length(data.tvcm1$response)) # RMSE = 19.34946     
+ggplot(data.tvcm1, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("[Gwangsan Chla test data] response vs fitted_values (Time Varying Coefficient Model, (Gamma Distribution))") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.tvcm1$time,data.tvcm1$fitted_values,type='o',col='red',xlab="time",ylab="Chla",main="[Gwangsan Chla test data] response vs fitted_values (Time Varying Coefficient Model, (Gamma Distribution))",ylim=c(-100,500))
+lines(data.tvcm1$time,data.tvcm1$response,type='o',col='blue')
+legend(1830,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+
+
+### Time Varying Coefficient Model (quasi)
+
+```{r}
+vc <- gam(Chla~s(time)+s(time,by=Flow)+s(time,by=Rain)+s(time,by=Day)+s(time,by=Speed)+s(time,by=WT)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=TOC)+s(time,by=TN)+s(time,by=NO3N)+s(time,by=NH3N)+s(time,by=TP)+s(time,by=PO4P),data=ex1,family=quasi(link="log"),method="REML")
+plot(vc,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc)[1],ylim=c(-40,40))
+ggGam(vc)
+summary(vc) # Deviance explained = 86%      
+par(mfrow=c(2,2))
+gam.check(vc) 
+par(mfrow=c(1,1))
+```
+
+#### Shrinkage variable selection 
+
+```{r}
+vc.shrink <- gam(Chla~s(time)+s(time,by=Flow)+s(time,by=Rain)+s(time,by=Day)+s(time,by=Speed)+s(time,by=WT)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=TOC)+s(time,by=TN)+s(time,by=NO3N)+s(time,by=NH3N)+s(time,by=TP)+s(time,by=PO4P),data=ex1,family=quasi(link="log"),method="REML",select=TRUE)
+plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
+ggGam(vc.shrink) # 선택변수 : Flow, Day, Speed, WT, DO, BOD, COD, TOC, NO3N, NH3N, TP, PO4P  
+summary(vc.shrink) # Deviance explained = 84.4%     
+par(mfrow=c(2,2))
+gam.check(vc.shrink) 
+par(mfrow=c(1,1))
+```
+
+#### response vs fitted_values (train data (2016-2020))
+
+```{r}
+pred.tvcm <- predict(vc.shrink,newdata=ex1,type="response")
+data.tvcm <- data.frame(response=ex1$Chla,fitted_values=pred.tvcm,time=ex1$time)
+sqrt(sum((data.tvcm$response-data.tvcm$fitted_values)^2)/length(data.tvcm$response)) # RMSE = 14.71169      
+ggplot(data.tvcm, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("[Gwangsan Chla train data] response vs fitted_values (Time Varying Coefficient Model, (Quasi Distribution))") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.tvcm$time,data.tvcm$response,type='o',col='blue',xlab="time",ylab="Chla",main="[Gwangsan Chla train data] response vs fitted_values (Time Varying Coefficient Model, (Quasi Distribution))",ylim=c(-100,500))
+lines(data.tvcm$time,data.tvcm$fitted_values,type='o',col='red')
+legend(0,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+#### response vs fitted_values (test data (2021))
+
+```{r}
+ex1_1 <- read.csv("C:/Users/HSY/Desktop/csv자료/광산/광산test_5일누적.csv", sep=",", header=T)
+ex1_1 <- as.data.frame(ex1_1)
+pred.tvcm1 <- predict(vc.shrink,newdata=ex1_1,type="response")
+data.tvcm1 <- data.frame(response=ex1_1$Chla,fitted_values=pred.tvcm1,time=ex1_1$time)
+sqrt(sum((data.tvcm1$response-data.tvcm1$fitted_values)^2)/length(data.tvcm1$response)) # RMSE = 18.75029   
+ggplot(data.tvcm1, aes(x=response, y=fitted_values)) +
+  geom_point() + geom_rug() +
+  ggtitle("[Gwangsan Chla test data] response vs fitted_values (Time Varying Coefficient Model, (Quasi Distribution))") +
+  geom_abline(intercept=0,slope=1,color='blue',size=1.5)
+par(mfrow=c(1,1))
+plot(data.tvcm1$time,data.tvcm1$fitted_values,type='o',col='red',xlab="time",ylab="Chla",main="[Gwangsan Chla test data] response vs fitted_values (Time Varying Coefficient Model, (Quasi Distribution))",ylim=c(-100,500))
+lines(data.tvcm1$time,data.tvcm1$response,type='o',col='blue')
+legend(1830,500,c("fitted_values","response"),lwd=c(1,1),col=c("red","blue"))
+```
+
+
+#### 최종선택된 모형의 설명력(Deviance explained) : 0.6133(다중선형회귀모형), 0.6757(일반화선형모형(Gamma)), 0.7900(일반화가법모형(Gamma)), 0.7980(일반화가법모형(quasi)), 0.7750(시간에 따른 계수변화모형(Gamma)), 0.8440(시간에 따른 계수변화모형(quasi)) 
+
+#### train data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 23.14491(다중선형회귀모형), 24.24480(일반화선형모형(Gamma)), 19.42164(일반화가법모형(Gamma)), 16.73607(일반화가법모형(quasi)), 17.70033(시간에 따른 계수변화모형(Gamma)), 14.71169(시간에 따른 계수변화모형(quasi))
+
+#### test data 관련 최종선택된 모형의 예측력(Root Mean Squared Error) : 18.11548(다중선형회귀모형), 20.55343(일반화선형모형(Gamma)), 17.03710(일반화가법모형(Gamma)), 14.73395(일반화가법모형(quasi)), 19.34946(시간에 따른 계수변화모형(Gamma)), 18.75029(시간에 따른 계수변화모형(quasi))
+
+#### MLR의 경우 적절한 확률분포를 가정하고 있지 않고 있고 Chla의 예측값을 음수로 추정해주는 과오를 범하고 있기 때문에 최적의 모형이라고 할 수는 없다. 그리고 GLM, GAM, TVCM의 경우 예측값을 과대 또는 과소추정하는 경우가 있어서 RMSE의 기준으로 과소평가를 받을 수 있다. 그리고 MLR은 모형평가 시 제외하는 것이 좋다고 판단된다.
+
+#### 여러가지 사항을 고려했을 때 광산 Chla 예측에 대한 최적의 모형은 GAM(quasi)와 TVCM(quasi)이라고 판단됨. (MLR은 평가 제외)
 
 
 
