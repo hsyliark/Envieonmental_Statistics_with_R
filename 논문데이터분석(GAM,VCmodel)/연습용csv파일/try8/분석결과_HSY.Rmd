@@ -480,7 +480,7 @@ par(mfrow=c(1,1))
 ```{r}
 vc.shrink <- gam(Chla~s(time)+s(time,by=Flow)+s(time,by=Rain)+s(time,by=Day)+s(time,by=Speed)+s(time,by=WT)+s(time,by=DO)+s(time,by=BOD)+s(time,by=COD)+s(time,by=TOC)+s(time,by=TN)+s(time,by=NO3N)+s(time,by=NH3N)+s(time,by=TP)+s(time,by=PO4P),data=ex1,family=Gamma(link="log"),method="REML",select=TRUE)
 plot(vc.shrink,residuals=TRUE,pch=1,shade=TRUE,seWithMean=TRUE,shift=coef(vc.shrink)[1],ylim=c(-40,40))
-ggGam(vc.shrink) # 선택변수 : 
+ggGam(vc.shrink) # 선택변수 : Flow, Rain, Day, Speed, WT, DO, BOD, COD, TOC, NO3N, TP, PO4P 
 summary(vc.shrink) # Deviance explained = 74.1%     
 par(mfrow=c(2,2))
 gam.check(vc.shrink) 
