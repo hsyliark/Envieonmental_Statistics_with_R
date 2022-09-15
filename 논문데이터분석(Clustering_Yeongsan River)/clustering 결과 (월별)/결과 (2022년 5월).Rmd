@@ -1,0 +1,77 @@
+---
+title: "Clustering (2022 May)"
+author: "Hwang Seong-Yun"
+date: '2022 9 15 '
+output: html_document
+---
+
+## SOM cluster
+### reference1 : https://data-make.tistory.com/91
+### reference2 : https://www.statmethods.net/advstats/cluster.html
+
+```{r}
+water <- read.csv("C:/Users/HSY/Desktop/영산강 수질악화 관련 데이터 정리_결과 포함(220915)/월별 평균 자료/2022년 5월.csv", sep=",", header=T)
+water_name <- water[,1]
+water <- water[,-1]
+rownames(water) <- water_name
+```
+
+### Distance matrix
+
+```{r}
+water_scale <- scale(water)
+d <- dist(water_scale, method="euclidean")
+as.matrix(d)
+```
+
+### Decide number of clusters
+
+#### find the optimal number of clusters using Total within-cluster sum of squares
+
+```{r}
+tot_withinss <- c()
+for (i in 1:7){
+  set.seed(1004) # for reproducibility 
+  kmeans_cluster <- kmeans(water_scale, centers = i, iter.max = 1000)
+  tot_withinss[i] <- kmeans_cluster$tot.withinss}
+plot(c(1:7), tot_withinss, type="b", 
+     main="Optimal number of clusters", 
+     xlab="Number of clusters", 
+     ylab="Total within-cluster sum of squares")
+fit <- hclust(d, method="ward.D")
+plot(fit)
+rect.hclust(fit, k=3)
+```
+
+### SOM cluster
+
+```{r}
+library(SOMbrero)
+library(kohonen)
+```
+
+#### Normalization of data
+
+```{r}
+water_scale <- data.frame(scale(water))
+water_scale_matrix <- as.matrix(water_scale)
+```
+
+#### Training the SOM model
+
+```{r}
+som_grid <- somgrid(xdim=1, ydim=3, topo="hexagonal")
+som_model1 <- som(water_scale_matrix, grid=som_grid)
+som_model2 <- trainSOM(x.data=water_scale, dimension=c(1,3),
+                       nb.save=10, maxit=2000, scaling="none",
+                       radius.type="letremy")
+```
+
+#### Visualization
+
+```{r}
+table(som_model2$clustering)
+plot(som_model1, main="feature distribution")
+plot(som_model2, what="obs", type="names", print.title=T, scale=c(1,1))
+```
+
