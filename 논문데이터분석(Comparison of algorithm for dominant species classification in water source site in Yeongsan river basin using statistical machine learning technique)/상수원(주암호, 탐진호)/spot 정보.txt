@@ -1,0 +1,26 @@
+주암호 댐앞 : J1 / 주암호 신평 : J2 --> 주암댐
+탐진호 댐앞 : T1 / 탐진호 유치 : T2 --> 탐진강4
+
+우점종 : dominant species
+남조류 : blue-green algae
+규조류 : diatom
+녹조류 : green algae
+기타조류 : other
+
+탁도 : turbidity
+투명도 : transparency
+
+우점종 판단 : 세포수 총합을 바탕으로
+
+연구목적 
+1) 영산강 수계 내에서 시민들에게 물을 제공하는 상수원으로서 중요한 역할을 하는 
+주암호와 탐진호 지점에 대한 조류 우점종을 분류(예측)하기 위함.
+특히, 남조류와 녹조류는 미관적인 측면, 건강적인 측면에 좋지 않은 영향을 미치므로
+조류 우점종을 정확히 분류(예측)하는 것에 대한 연구는 의미가 있다고 보여짐.
+2) 2017년부터 2021년까지의 주별 측정자료를 훈련자료(training data),
+그리고 2022년 주별 측정자료를 검증자료(test data)로 두고 
+다양한 machine learning (statistical method 포함) 기반 분류기법의 성능을 평가.
+평가기준은 오분류율(misclassification rate)을 바탕으로 함.
+(적용알고리즘 : Decision Tree, Random Forest, Support Vector Machine,
+Gradient Boosting, Multivariate Logistic Regression with Generalized Additive Model,
+Deep Neural Network, Discriminant Analysis etc...) 
