@@ -1,0 +1,3 @@
+https://srdas.github.io/DLBook/DeepLearningWithR.html#using-mxnet
+
+https://cran.r-project.org/web/packages/deepNN/deepNN.pdf
