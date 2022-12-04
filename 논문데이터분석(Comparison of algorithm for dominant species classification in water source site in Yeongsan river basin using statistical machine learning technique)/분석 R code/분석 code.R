@@ -30,14 +30,25 @@ table(train$dominant)
 table(test$dominant)
 
 
+# train : 2017~2020, test : 2021
+train <- T2[T2$year == 2017 | T2$year == 2018 | T2$year == 2019 | T2$year == 2020,]
+test <- T2[T2$year == 2021,]
+
+table(train$dominant)
+table(test$dominant)
+
+
 ### Pattern analysis with Self Organizing Map
+
+data_all <- read.csv("C:/조류관련 자료/상수원(주암호, 탐진호)/csv 파일(조류 우점종 분류)/data_all.csv")
+
 library(kohonen)
 
 set.seed(1234)
 
-data_all_matrix <- as.matrix(T2[,4:20])
+data_all_matrix <- as.matrix(data_all[,4:20])
 
-som_grid <- somgrid(xdim=10, ydim=28, topo="hexagonal")
+som_grid <- somgrid(xdim=32, ydim=32, topo="hexagonal")
 som_model <- som(data_all_matrix, grid=som_grid)
 
 coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=2/3, alpha=alpha)[n:1]}
@@ -207,7 +218,7 @@ cvplot(xgbcv_model)
 
 # Variable Importance with best iteration
 imp_model <- xgboost(data = X, label = as.numeric(y)-1, num_class = levels(y) %>% length,
-                nrounds = 10, objective = 'multi:softprob', verbose = F)
+                nrounds = 8, objective = 'multi:softprob', verbose = F)
 imp <- xgb.importance(model = imp_model)
 imp
 xgb.plot.importance(imp)
