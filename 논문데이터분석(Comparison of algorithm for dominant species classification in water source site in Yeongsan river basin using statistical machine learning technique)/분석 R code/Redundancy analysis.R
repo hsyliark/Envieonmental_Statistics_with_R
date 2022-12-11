@@ -50,3 +50,6 @@ data(dune)
 data(dune.env)
 dune.Manure <- rda(dune ~ Manure, dune.env)
 plot(dune.Manure) 
+
+# reference : https://popgen.nescent.org/2018-03-27_RDA_GEA.html
+
