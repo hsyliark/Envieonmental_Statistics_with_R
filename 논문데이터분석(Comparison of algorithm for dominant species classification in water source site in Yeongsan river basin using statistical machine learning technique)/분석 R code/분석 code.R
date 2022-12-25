@@ -387,8 +387,6 @@ library(deepNN)
 # package 'neuralnet'
 library(neuralnet)
 
-softmax <- function(x) exp(x)/sum(exp(x))
-
 set.seed(1234)
 
 dnn_model <- neuralnet(dominant ~ BOD + COD + T_N + T_P + TOC +
@@ -397,8 +395,9 @@ dnn_model <- neuralnet(dominant ~ BOD + COD + T_N + T_P + TOC +
                          flow2 + reservoir, data = train,
                        hidden = c(3,3),
                        linear.output = FALSE,
-                       err.fct = "ce",
-                       act.fct = "logistic")
+                       algorithm = "backprop",
+                       learningrate = 0.01,
+                       err.fct = "ce")
 
 plot(dnn_model)
 predictions_dnn <- predict(dnn_model, newdata = test)
@@ -422,3 +421,20 @@ install.packages("drat", repos="https://cran.rstudio.com")
 drat:::addRepo("dmlc")
 install.packages("mxnet")
 
+# package 'nnet'
+library(nnet)
+
+set.seed(1234)
+
+train_y <- as.matrix(train[,21])
+train_X <- as.matrix(train[,4:20])
+test_y <- as.matrix(test[,21])
+test_X <- as.matrix(test[,4:20])
+
+dnn_model <- nnet(dominant ~ BOD + COD + T_N + T_P + TOC +
+                    SS + EC + pH + DO + temperature + turbidity +
+                    transparency + Chl_a + low + flow1 +
+                    flow2 + reservoir, data = train,
+                  size=c(3,3))
+
+predictions_dnn <- predict(dnn_model, test, type="class")
