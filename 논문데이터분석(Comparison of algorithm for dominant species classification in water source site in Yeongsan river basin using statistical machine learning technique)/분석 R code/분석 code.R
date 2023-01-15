@@ -59,7 +59,7 @@ for (i in 1:17) {
        main=colnames(getCodes(som_model))[i], palette.name=coolBlueHotRed)}
 par(mfrow=c(1,1))
 
-
+# Confusion Matrix : https://zetawiki.com/wiki/R_confusionMatrix()
 
 ### Decision tree
 # reference : https://woosa7.github.io/R-Classification-Decision-Tree/
@@ -75,7 +75,14 @@ tree_model
 plot(tree_model)
 plot(tree_model, type = "simple")
 pred_tree <- predict(tree_model, newdata = test)
-confusionMatrix(pred_tree, test$dominant) 
+cm <- confusionMatrix(pred_tree, test$dominant) 
+cm
+cm$overall["Accuracy"]
+cm$byClass["Sensitivity"]
+cm$byClass["Specificity"]
+cm$byClass["Specificity"]
+cm$byClass["Precision"]
+cm$byClass["Recall"]
 mean(pred_tree != test$dominant) # misclassification rate
 
 
@@ -92,7 +99,14 @@ plot(bag_model$trees[[10]])
 text(bag_model$trees[[10]])
 
 pred_bag <- as.factor(predict(bag_model, newdata=test)$class)
-confusionMatrix(pred_bag, test$dominant) 
+cm <- confusionMatrix(pred_bag, test$dominant) 
+cm
+cm$overall["Accuracy"]
+cm$byClass["Sensitivity"]
+cm$byClass["Specificity"]
+cm$byClass["Specificity"]
+cm$byClass["Precision"]
+cm$byClass["Recall"]
 mean(pred_bag != test$dominant) # misclassification rate
 
 
@@ -109,7 +123,14 @@ plot(ada_model$trees[[10]])
 text(ada_model$trees[[10]])
 
 pred_ada <- as.factor(predict(ada_model, newdata=test)$class)
-confusionMatrix(pred_ada, test$dominant) 
+cm <- confusionMatrix(pred_ada, test$dominant)
+cm
+cm$overall["Accuracy"]
+cm$byClass["Sensitivity"]
+cm$byClass["Specificity"]
+cm$byClass["Specificity"]
+cm$byClass["Precision"]
+cm$byClass["Recall"]
 mean(pred_ada != test$dominant) # misclassification rate
 
 
@@ -139,7 +160,14 @@ for (i in 1:nrow(test)) {
 }
 pred_gbm <- as.factor(pred_gbm)  
 
-confusionMatrix(pred_gbm, test$dominant)  
+cm <- confusionMatrix(pred_gbm, test$dominant) 
+cm
+cm$overall["Accuracy"]
+cm$byClass["Sensitivity"]
+cm$byClass["Specificity"]
+cm$byClass["Specificity"]
+cm$byClass["Precision"]
+cm$byClass["Recall"]
 mean(as.character(pred_gbm) != as.character(test$dominant)) # misclassification rate
 
 
@@ -165,7 +193,14 @@ legend("topright", colnames(forest_model$err.rate),col=1:5,cex=0.8,fill=1:5)
 par(mar=c(5,4,4,2))
 
 pred_forest <- predict(forest_model, newdata = test, type = 'class')
-confusionMatrix(pred_forest, test$dominant) 
+cm <- confusionMatrix(pred_forest, test$dominant)
+cm
+cm$overall["Accuracy"]
+cm$byClass["Sensitivity"]
+cm$byClass["Specificity"]
+cm$byClass["Specificity"]
+cm$byClass["Precision"]
+cm$byClass["Recall"]
 mean(pred_forest != test$dominant) # misclassification rate
 
 
@@ -218,7 +253,7 @@ cvplot(xgbcv_model)
 
 # Variable Importance with best iteration
 imp_model <- xgboost(data = X, label = as.numeric(y)-1, num_class = levels(y) %>% length,
-                nrounds = 8, objective = 'multi:softprob', verbose = F)
+                nrounds = 10, objective = 'multi:softprob', verbose = F)
 imp <- xgb.importance(model = imp_model)
 imp
 xgb.plot.importance(imp)
@@ -229,7 +264,7 @@ xgb_train <- xgb.DMatrix(data = data.matrix(train[,4:20]), label = as.numeric(tr
 xgb_test <- xgb.DMatrix(data = data.matrix(test[,4:20]), label = as.numeric(test[,21])-1)
 
 xgb_model <- xgb.train(data = xgb_train, 
-                       nrounds= 8,  # Best iteration
+                       nrounds= 10,  # Best iteration
                        objective= "multi:softprob", num_class=4,  
                        eval_metric= "mlogloss")
 pred_xgbm <- predict(xgb_model, newdata = xgb_test, reshape=T)
@@ -245,7 +280,14 @@ for (i in 1:nrow(test)) {
 }
 pred_xgb <- as.factor(pred_xgb)
 
-confusionMatrix(pred_xgb, test$dominant) 
+cm <- confusionMatrix(pred_xgb, test$dominant)
+cm
+cm$overall["Accuracy"]
+cm$byClass["Sensitivity"]
+cm$byClass["Specificity"]
+cm$byClass["Specificity"]
+cm$byClass["Precision"]
+cm$byClass["Recall"]
 mean(pred_xgb != test$dominant) # misclassification rate
 
 
@@ -275,7 +317,14 @@ ggplot(lda.data.test, aes(LD1, LD2)) +
   geom_point(aes(color = dominant))
 pred_lda <- predictions_lda$class
 
-confusionMatrix(pred_lda, test$dominant) 
+cm <- confusionMatrix(pred_lda, test$dominant) 
+cm
+cm$overall["Accuracy"]
+cm$byClass["Sensitivity"]
+cm$byClass["Specificity"]
+cm$byClass["Specificity"]
+cm$byClass["Precision"]
+cm$byClass["Recall"]
 mean(pred_lda != test$dominant) # misclassification rate
 
 # 2) Quadratic discriminant analysis (QDA): More flexible than LDA. Here, there is no assumption that the covariance matrix of classes is the same.
@@ -312,7 +361,14 @@ fda_model <- fda(dominant ~ BOD + COD + T_N + T_P + TOC +
 fda_model
 pred_fda <- fda_model %>% predict(test)
 
-confusionMatrix(pred_fda, test$dominant) 
+cm <- confusionMatrix(pred_fda, test$dominant) 
+cm
+cm$overall["Accuracy"]
+cm$byClass["Sensitivity"]
+cm$byClass["Specificity"]
+cm$byClass["Specificity"]
+cm$byClass["Precision"]
+cm$byClass["Recall"]
 mean(pred_fda != test$dominant) # misclassification rate 
 
 # 5) Regularized discriminant anlysis (RDA): Regularization (or shrinkage) improves the estimate of the covariance matrices in situations where the number of predictors is larger than the number of samples in the training data. This leads to an improvement of the discriminant analysis.
@@ -325,7 +381,14 @@ rda_model
 predictions_rda <- rda_model %>% predict(test)
 pred_rda <- predictions_rda[["class"]]
 
-confusionMatrix(pred_rda, test$dominant) 
+cm <- confusionMatrix(pred_rda, test$dominant) 
+cm
+cm$overall["Accuracy"]
+cm$byClass["Sensitivity"]
+cm$byClass["Specificity"]
+cm$byClass["Specificity"]
+cm$byClass["Precision"]
+cm$byClass["Recall"]
 mean(pred_rda != test$dominant) # misclassification rate 
 
 
@@ -341,7 +404,14 @@ svm_model <- svm(dominant ~ BOD + COD + T_N + T_P + TOC +
 summary(svm_model)
 pred_svm <- predict(svm_model, newdata = test)
 
-confusionMatrix(pred_svm, test$dominant)  
+cm <- confusionMatrix(pred_svm, test$dominant) 
+cm
+cm$overall["Accuracy"]
+cm$byClass["Sensitivity"]
+cm$byClass["Specificity"]
+cm$byClass["Specificity"]
+cm$byClass["Precision"]
+cm$byClass["Recall"]
 mean(pred_svm != test$dominant) # misclassification rate
 
 
@@ -413,7 +483,14 @@ for (i in 1:nrow(test)) {
 }
 pred_dnn <- as.factor(pred_dnn)
 
-confusionMatrix(pred_dnn, test$dominant) 
+cm <- confusionMatrix(pred_dnn, test$dominant) 
+cm
+cm$overall["Accuracy"]
+cm$byClass["Sensitivity"]
+cm$byClass["Specificity"]
+cm$byClass["Specificity"]
+cm$byClass["Precision"]
+cm$byClass["Recall"]
 mean(pred_dnn != test$dominant) # misclassification rate
 
 # package 'mxnet'
