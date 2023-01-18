@@ -20,8 +20,10 @@ library(ggplot2)
 ggplot(CT2_melt, aes(x=month, y=cells, group=algae, color=algae)) +
   geom_line(size=1.5) +
   theme(axis.text.x=element_text(angle=90, hjust=1)) +
-  labs(x ="month", y = "mean of cells")
-
-
-
-
+  labs(x ="month", y = "mean of cells") +
+  theme(axis.text.x = element_text(size = 12, face='bold'),
+        axis.text.y = element_text(size = 12, face='bold'),
+        axis.title.x = element_text(size=20,face='bold'),
+        axis.title.y = element_text(size=20,face='bold'),
+        legend.title = element_text(size = 20, face = "bold"),
+        legend.text = element_text(size = 12, face = "bold"))
