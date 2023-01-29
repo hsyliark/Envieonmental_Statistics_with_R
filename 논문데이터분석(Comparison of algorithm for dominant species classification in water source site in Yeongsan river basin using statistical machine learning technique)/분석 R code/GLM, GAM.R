@@ -9,8 +9,9 @@ data.frame(treatment, outcome, counts) # showing data
 # reference : https://rfriend.tistory.com/490
 glm.D93 <- glm(counts ~ outcome + treatment, family = poisson(link=log)) # Poisson Regression Model (Variance = Mean)
 summary(glm.D93)
-vif(glm.D93)
-step(glm.D93,direction="both") # stepwise regression
+step.glm.D93 <- step(glm.D93,direction="both") # stepwise regression
+library(car)
+vif(step.glm.D93)
 
 glm.D94 <- glm(counts ~ outcome + treatment, family = negative.binomial(2))
 
@@ -18,8 +19,8 @@ glm.D94 <- glm(counts ~ outcome + treatment, family = negative.binomial(2))
 library(MASS)
 glm.D94 <- glm.nb(counts ~ outcome + treatment, link=log) # Negative Binomial Regression Model (Variance > Mean)
 summary(glm.D94)
-step(glm.D94,direction="both")
-vif(glm.D94)
+step.glm.D94 <- step(glm.D94,direction="both")
+vif(step.glm.D94)
 
 
 
@@ -43,12 +44,13 @@ ggplot(zinb, aes(count)) + geom_histogram()
 zip_model <- zeroinfl(count ~ child + camper + persons, data = zinb, link="logit", dist="poisson")
 summary(zip_model)
 library(mpath)
-be.zeroinfl(zip_model, data=zinb, dist="poisson", alpha=0.05, trace=TRUE) # stepwise regression
+step.zip_model <- be.zeroinfl(zip_model, data=zinb, dist="poisson", alpha=0.05, trace=TRUE) # stepwise regression
+vif(step.zip_model)
 
 zin_model <- zeroinfl(count ~ child + camper + persons, data = zinb, link="logit", dist="negbin")
 summary(zin_model)
-be.zeroinfl(zin_model, data=zinb, dist="negbin", alpha=0.05, trace=TRUE) # stepwise regression
-
+step.zin_model <- be.zeroinfl(zin_model, data=zinb, dist="negbin", alpha=0.05, trace=TRUE) # stepwise regression
+vif(step.zin_model)
 
 
 # Generalized Additive Model
@@ -60,8 +62,10 @@ data(kyphosis)
 kyphosis_a <- kyphosis[,2:3]
 gam.D93 <- gam::gam(Start ~ s(Age) + s(Number), data=kyphosis, family=poisson, link=log)
 summary(gam.D93)
-step.Gam(gam.D93,direction="both",scope=gam.scope(kyphosis_a)) # stepwise regression in GAM
+step.gam.D93 <- step.Gam(gam.D93,direction="both",scope=gam.scope(kyphosis_a)) # stepwise regression in GAM
+vif(step.gam.D93)
 
 gam.D94 <- gam::gam(Start ~ s(Age) + s(Number), data=kyphosis, family=nb, link=log)
 summary(gam.D94)
-step.Gam(gam.D94,direction="both",scope=gam.scope(kyphosis_a))
+step.gam.D94 <- step.Gam(gam.D94,direction="both",scope=gam.scope(kyphosis_a))
+vif(step.gam.D94)
