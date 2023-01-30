@@ -18,7 +18,7 @@ spot$spot <- as.factor(spot$spot)
 library(ggplot2)
 
 ggplot(spot, aes(x=spot, y=reservoir, fill=spot)) + geom_boxplot() +
-  labs(x ="spot", y = "reservoir") +
+  labs(x ="spot", y = "reservoir(10,000§©)") +
   theme(axis.text.x = element_text(size = 12, face='bold'),
         axis.text.y = element_text(size = 12, face='bold'),
         axis.title.x = element_text(size=20,face='bold'),

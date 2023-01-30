@@ -459,10 +459,10 @@ library(neuralnet)
 
 set.seed(1234)
 
-dnn_model <- neuralnet(dominant ~ BOD + COD + T_N + T_P + TOC +
+dnn_model <- neuralnet(dominant ~ BOD + COD + TN + TP + TOC +
                          SS + EC + pH + DO + temperature + turbidity +
-                         transparency + Chl_a + low + flow1 +
-                         flow2 + reservoir, data = train,
+                         transparency + Chla + LowWaterLevel + inflow +
+                         discharge + reservoir, data = train,
                        hidden = c(3,3),
                        linear.output = FALSE,
                        algorithm = "backprop",

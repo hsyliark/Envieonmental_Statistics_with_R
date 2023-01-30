@@ -1,27 +1,42 @@
-counts <- c(18,17,15,20,10,20,25,13,12)
-outcome <- gl(3,1,9)
-treatment <- gl(3,3)
-data.frame(treatment, outcome, counts) # showing data 
+cell_all <- read.csv("C:/Users/User/Desktop/논문데이터/cell_all.csv",sep=",",header=T)
+cell_all <- cell_all[cell_all$spot=="J1" | cell_all$spot=="J2",]
+cell_all <- cell_all[cell_all$spot=="J1",]
 
+X <- cell_all[,8:24]
+X_scale <- scale(X)
+cell_all_scale <- cbind(cell_all[,1:7],X_scale)
 
 # Generalized Linear Model
 
 # reference : https://rfriend.tistory.com/490
-glm.D93 <- glm(counts ~ outcome + treatment, family = poisson(link=log)) # Poisson Regression Model (Variance = Mean)
+glm.D93 <- glm(blue ~ BOD + COD + TN + TP + TOC +
+                 SS + EC + pH + DO + temperature +
+                 turbidity + transparency + Chla + LowWaterLevel + inflow +
+                 discharge + reservoir, data=cell_all, family = poisson(link=log)) # Poisson Regression Model (Variance = Mean)
 summary(glm.D93)
 step.glm.D93 <- step(glm.D93,direction="both") # stepwise regression
 library(car)
 vif(step.glm.D93)
+predict(step.glm.D93, newdata=cell_all, type="response")
 
-glm.D94 <- glm(counts ~ outcome + treatment, family = negative.binomial(2))
+
+
+
+glm.D94 <- glm(blue ~ BOD + COD + TN + TP + TOC +
+                 SS + EC + pH + DO + temperature +
+                 turbidity + transparency + Chla + LowWaterLevel + inflow +
+                 discharge + reservoir, data=cell_all, family = negative.binomial(2))
 
 # reference : https://www.youtube.com/watch?v=Scr2uQqLkjI
 library(MASS)
-glm.D94 <- glm.nb(counts ~ outcome + treatment, link=log) # Negative Binomial Regression Model (Variance > Mean)
+glm.D94 <- glm.nb(blue ~ BOD + COD + TN + TP + TOC +
+                    SS + EC + pH + DO + temperature +
+                    turbidity + transparency + Chla + LowWaterLevel + inflow +
+                    discharge + reservoir, data=cell_all, link=log) # Negative Binomial Regression Model (Variance > Mean)
 summary(glm.D94)
 step.glm.D94 <- step(glm.D94,direction="both")
 vif(step.glm.D94)
-
+predict(step.glm.D94, newdata=cell_all, type="response")
 
 
 # Zero-Inflated
@@ -30,27 +45,28 @@ library(ggplot2)
 library(pscl)
 library(boot)
 
-zinb <- read.csv("https://stats.idre.ucla.edu/stat/data/fish.csv")
-zinb <- within(zinb, {
-  nofish <- factor(nofish)
-  livebait <- factor(livebait)
-  camper <- factor(camper)
-})
+ggplot(cell_all, aes(blue)) + geom_histogram()
 
-summary(zinb)
-
-ggplot(zinb, aes(count)) + geom_histogram()
-
-zip_model <- zeroinfl(count ~ child + camper + persons, data = zinb, link="logit", dist="poisson")
+zip_model <- zeroinfl(blue ~ BOD + COD + TN + TP + TOC +
+                        SS + EC + pH + DO + temperature +
+                        turbidity + transparency + Chla + LowWaterLevel + inflow +
+                        discharge + reservoir, data=cell_all, link="logit", dist="poisson")
 summary(zip_model)
 library(mpath)
 step.zip_model <- be.zeroinfl(zip_model, data=zinb, dist="poisson", alpha=0.05, trace=TRUE) # stepwise regression
 vif(step.zip_model)
+predict(step.zip_model, newdata=cell_all, type="response")
 
-zin_model <- zeroinfl(count ~ child + camper + persons, data = zinb, link="logit", dist="negbin")
+zin_model <- zeroinfl(blue ~ BOD + COD + TN + TP + TOC +
+                        SS + EC + pH + DO + temperature +
+                        turbidity + transparency + Chla + LowWaterLevel + inflow +
+                        discharge + reservoir, data=cell_all, link="logit", dist="negbin")
 summary(zin_model)
 step.zin_model <- be.zeroinfl(zin_model, data=zinb, dist="negbin", alpha=0.05, trace=TRUE) # stepwise regression
 vif(step.zin_model)
+predict(step.zin_model, newdata=cell_all, type="response")
+
+
 
 
 # Generalized Additive Model
@@ -58,14 +74,21 @@ vif(step.zin_model)
 library(mgcv)
 library(gam)
 
-data(kyphosis)
-kyphosis_a <- kyphosis[,2:3]
-gam.D93 <- gam::gam(Start ~ s(Age) + s(Number), data=kyphosis, family=poisson, link=log)
+cell_all_a <- cell_all[,8:24]
+gam.D93 <- gam::gam(blue ~ s(BOD) + s(COD) + s(TN) + s(TP) + s(TOC) +
+                      s(SS) + s(EC) + s(pH) + s(DO) + s(temperature) +
+                      s(turbidity) + s(transparency) + s(Chla) + s(LowWaterLevel) + s(inflow) +
+                      s(discharge) + s(reservoir), data=cell_all, family=poisson, link=log)
 summary(gam.D93)
-step.gam.D93 <- step.Gam(gam.D93,direction="both",scope=gam.scope(kyphosis_a)) # stepwise regression in GAM
+step.gam.D93 <- step.Gam(gam.D93,direction="both",scope=gam.scope(cell_all_a)) # stepwise regression in GAM
 vif(step.gam.D93)
+predict(step.gam.D93, newdata=cell_all, type="response")
 
-gam.D94 <- gam::gam(Start ~ s(Age) + s(Number), data=kyphosis, family=nb, link=log)
+gam.D94 <- gam::gam(blue ~ s(BOD) + s(COD) + s(TN) + s(TP) + s(TOC) +
+                      s(SS) + s(EC) + s(pH) + s(DO) + s(temperature) +
+                      s(turbidity) + s(transparency) + s(Chla) + s(LowWaterLevel) + s(inflow) +
+                      s(discharge) + s(reservoir), data=cell_all, family=nb, link=log)
 summary(gam.D94)
-step.gam.D94 <- step.Gam(gam.D94,direction="both",scope=gam.scope(kyphosis_a))
+step.gam.D94 <- step.Gam(gam.D94,direction="both",scope=gam.scope(cell_all_a))
 vif(step.gam.D94)
+predict(step.gam.D94, newdata=cell_all, type="response")

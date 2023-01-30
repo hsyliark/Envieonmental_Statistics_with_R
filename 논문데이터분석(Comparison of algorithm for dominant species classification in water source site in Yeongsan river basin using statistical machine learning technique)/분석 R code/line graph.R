@@ -14,13 +14,13 @@ CT2_melt <- melt(CT2_reshape,
                  id.vars = 'month',
                  variable.name = "algae",
                  value.name = "cells") 
-CT2_melt$month <- as.factor(CT2_melt$month)
+CT2_melt$month <- as.factor(CT1_melt$month)
 
 library(ggplot2)
 ggplot(CT2_melt, aes(x=month, y=cells, group=algae, color=algae)) +
   geom_line(size=1.5) +
   theme(axis.text.x=element_text(angle=90, hjust=1)) +
-  labs(x ="month", y = "mean of cells") +
+  labs(x ="month", y = "mean of cells(cells/mL)") +
   theme(axis.text.x = element_text(size = 12, face='bold'),
         axis.text.y = element_text(size = 12, face='bold'),
         axis.title.x = element_text(size=20,face='bold'),
