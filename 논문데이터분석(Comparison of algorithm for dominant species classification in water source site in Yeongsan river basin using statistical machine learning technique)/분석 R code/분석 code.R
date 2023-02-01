@@ -3,11 +3,11 @@ T2 <- read.csv("C:/조류관련 자료/상수원(주암호, 탐진호)/csv 파일(조류 우점종 분�
 
 dom <- rep(NA,nrow(T2))
 for (i in 1:nrow(T2)) {
-  if (T2$dominant[i] == "blue") {
+  if (T2$dominant[i] == "Cyanophytes") {
     dom[i] <- 1}
-  else if (T2$dominant[i] == "diatom") {
+  else if (T2$dominant[i] == "Diatoms") {
     dom[i] <- 2}
-  else if (T2$dominant[i] == "green") {
+  else if (T2$dominant[i] == "Chlorophytes") {
     dom[i] <- 3}
   else {dom[i] <- 4}
 }
@@ -67,10 +67,10 @@ par(mfrow=c(1,1))
 library(party)
 library(caret)
 
-tree_model <- ctree(dominant ~ BOD + COD + T_N + T_P + TOC +
-                      SS + EC + pH + DO + temperature + turbidity +
-                      transparency + Chl_a + low + flow1 +
-                      flow2 + reservoir, data = train)
+tree_model <- ctree(dominant ~ BOD + COD + TN + TP + TOC +
+                      SS + EC + pH + DO + Temperature + Turbidity +
+                      Transparency + Chla + LowWaterLevel + Inflow +
+                      Discharge + Reservoir, data = train)
 tree_model
 plot(tree_model)
 plot(tree_model, type = "simple")
@@ -90,10 +90,10 @@ mean(pred_tree != test$dominant) # misclassification rate
 # reference : https://todayisbetterthanyesterday.tistory.com/53
 library(adabag)
 
-bag_model <- bagging(dominant ~ BOD + COD + T_N + T_P + TOC +
-                       SS + EC + pH + DO + temperature + turbidity +
-                       transparency + Chl_a + low + flow1 +
-                       flow2 + reservoir, data = train, mfinal=1000)
+bag_model <- bagging(dominant ~ BOD + COD + TN + TP + TOC +
+                       SS + EC + pH + DO + Temperature + Turbidity +
+                       Transparency + Chla + LowWaterLevel + Inflow +
+                       Discharge + Reservoir, data = train, mfinal=1000)
 bag_model$importance
 plot(bag_model$trees[[10]])
 text(bag_model$trees[[10]])
@@ -114,10 +114,10 @@ mean(pred_bag != test$dominant) # misclassification rate
 # reference : https://todayisbetterthanyesterday.tistory.com/53
 library(adabag)
 
-ada_model <- boosting(dominant ~ BOD + COD + T_N + T_P + TOC +
-                        SS + EC + pH + DO + temperature + turbidity +
-                        transparency + Chl_a + low + flow1 +
-                        flow2 + reservoir, data = train, boos=TRUE, mfinal=1000)
+ada_model <- boosting(dominant ~ BOD + COD + TN + TP + TOC +
+                        SS + EC + pH + DO + Temperature + Turbidity +
+                        Transparency + Chla + LowWaterLevel + Inflow +
+                        Discharge + Reservoir, data = train, boos=TRUE, mfinal=1000)
 ada_model$importance
 plot(ada_model$trees[[10]])
 text(ada_model$trees[[10]])
@@ -139,10 +139,10 @@ mean(pred_ada != test$dominant) # misclassification rate
 # reference(Gradient Boosting) : https://3months.tistory.com/368
 # reference : https://datascienceplus.com/gradient-boosting-in-r/
 library(gbm)
-gbm_model <- gbm(dominant ~ BOD + COD + T_N + T_P + TOC +
-                   SS + EC + pH + DO + temperature + turbidity +
-                   transparency + Chl_a + low + flow1 +
-                   flow2 + reservoir, data = train,
+gbm_model <- gbm(dominant ~ BOD + COD + TN + TP + TOC +
+                   SS + EC + pH + DO + Temperature + Turbidity +
+                   Transparency + Chla + LowWaterLevel + Inflow +
+                   Discharge + Reservoir, data = train,
                  distribution = "multinomial", n.trees = 1000,
                  shrinkage = 0.01, interaction.depth = 4)
 summary(gbm_model)
@@ -151,12 +151,12 @@ prd_g <- predictions_gbm[,,1]
 pred_gbm <- rep(NA,nrow(test))
 for (i in 1:nrow(test)) {
   if (which(prd_g[i,] == max(prd_g[i,])) == 1) {
-    pred_gbm[i] <- "blue"}
+    pred_gbm[i] <- "Cyanophytes"}
   else if (which(prd_g[i,] == max(prd_g[i,])) == 2) {
-    pred_gbm[i] <- "diatom"}
+    pred_gbm[i] <- "Diatoms"}
   else if (which(prd_g[i,] == max(prd_g[i,])) == 3) {
-    pred_gbm[i] <- "green"}
-  else {pred_gbm[i] <- "others"}
+    pred_gbm[i] <- "Chlorophytes"}
+  else {pred_gbm[i] <- "Others"}
 }
 pred_gbm <- as.factor(pred_gbm)  
 
@@ -175,24 +175,24 @@ mean(as.character(pred_gbm) != as.character(test$dominant)) # misclassification 
 # reference : https://data-make.tistory.com/81
 library(randomForest)
 
-forest_model <- randomForest(dominant ~ BOD + COD + T_N + T_P + TOC +
-                               SS + EC + pH + DO + temperature + turbidity +
-                               transparency + Chl_a + low + flow1 +
-                               flow2 + reservoir, data = train,
+RandomForest_T2 <- randomForest(dominant ~ BOD + COD + TN + TP + TOC +
+                               SS + EC + pH + DO + Temperature + Turbidity +
+                               Transparency + Chla + LowWaterLevel + Inflow +
+                               Discharge + Reservoir, data = train,
                              ntree = 1000)
-forest_model
-forest_model$predict
-forest_model$importance
+RandomForest_T2
+RandomForest_T2$predict
+RandomForest_T2$importance
 layout(matrix(c(1,2),nrow=1),width=c(4,1)) 
 
 par(mar=c(5,4,4,7)) 
-plot(forest_model)
+plot(RandomForest_T2)
 par(mar=c(5,4,4,1),new=T) 
 plot(c(0,1),type="n", axes=F, xlab="", ylab="")
-legend("topright", colnames(forest_model$err.rate),col=1:5,cex=0.8,fill=1:5)
+legend("topright", colnames(RandomForest_T2$err.rate),col=1:5,cex=0.8,fill=1:5)
 par(mar=c(5,4,4,2))
 
-pred_forest <- predict(forest_model, newdata = test, type = 'class')
+pred_forest <- predict(RandomForest_T2, newdata = test, type = 'class')
 cm <- confusionMatrix(pred_forest, test$dominant)
 cm
 cm$overall["Accuracy"]
@@ -271,12 +271,12 @@ pred_xgbm <- predict(xgb_model, newdata = xgb_test, reshape=T)
 pred_xgb <- rep(NA,nrow(test))
 for (i in 1:nrow(test)) {
   if (which(pred_xgbm[i,] == max(pred_xgbm[i,])) == 1) {
-    pred_xgb[i] <- "blue"}
+    pred_xgb[i] <- "Cyanophytes"}
   else if (which(pred_xgbm[i,] == max(pred_xgbm[i,])) == 2) {
-    pred_xgb[i] <- "diatom"}
+    pred_xgb[i] <- "Diatoms"}
   else if (which(pred_xgbm[i,] == max(pred_xgbm[i,])) == 3) {
-    pred_xgb[i] <- "green"}
-  else {pred_xgb[i] <- "others"}
+    pred_xgb[i] <- "Chlorophytes"}
+  else {pred_xgb[i] <- "Others"}
 }
 pred_xgb <- as.factor(pred_xgb)
 
@@ -298,10 +298,10 @@ library(caret)
 
 # 1) Linear discriminant analysis (LDA): Uses linear combinations of predictors to predict the class of a given observation. Assumes that the predictor variables (p) are normally distributed and the classes have identical variances (for univariate analysis, p = 1) or identical covariance matrices (for multivariate analysis, p > 1).
 library(MASS)
-lda_model <- lda(dominant ~ BOD + COD + T_N + T_P + TOC +
-                   SS + EC + pH + DO + temperature + turbidity +
-                   transparency + Chl_a + low + flow1 +
-                   flow2 + reservoir, data = train)
+lda_model <- lda(dominant ~ BOD + COD + TN + TP + TOC +
+                   SS + EC + pH + DO + Temperature + Turbidity +
+                   Transparency + Chla + LowWaterLevel + Inflow +
+                   Discharge + Reservoir, data = train)
 lda_model
 plot(lda_model)
 
@@ -329,10 +329,10 @@ mean(pred_lda != test$dominant) # misclassification rate
 
 # 2) Quadratic discriminant analysis (QDA): More flexible than LDA. Here, there is no assumption that the covariance matrix of classes is the same.
 library(MASS)
-qda_model <- qda(dominant ~ BOD + COD + T_N + T_P + TOC +
-                   SS + EC + pH + DO + temperature + turbidity +
-                   transparency + Chl_a + low + flow1 +
-                   flow2 + reservoir, data = train)
+qda_model <- qda(dominant ~ BOD + COD + TN + TP + TOC +
+                   SS + EC + pH + DO + Temperature + Turbidity +
+                   Transparency + Chla + LowWaterLevel + Inflow +
+                   Discharge + Reservoir, data = train)
 qda_model
 predictions_qda <- qda_model %>% predict(test)
 pred_qda <- predictions_qda$class
@@ -342,10 +342,10 @@ mean(pred_qda != test$dominant) # misclassification rate
 
 # 3) Mixture discriminant analysis (MDA): Each class is assumed to be a Gaussian mixture of subclasses.
 library(mda)
-mda_model <- mda(dominant ~ BOD + COD + T_N + T_P + TOC +
-                   SS + EC + pH + DO + temperature + turbidity +
-                   transparency + Chl_a + low + flow1 +
-                   flow2 + reservoir, data = train)
+mda_model <- mda(dominant ~ BOD + COD + TN + TP + TOC +
+                   SS + EC + pH + DO + Temperature + Turbidity +
+                   Transparency + Chla + LowWaterLevel + Inflow +
+                   Discharge + Reservoir, data = train)
 mda_model
 pred_mda <- mda_model %>% predict(test)
 
@@ -354,10 +354,10 @@ mean(pred_mda != test$dominant)
 
 # 4) Flexible Discriminant Analysis (FDA): Non-linear combinations of predictors is used such as splines.
 library(mda)
-fda_model <- fda(dominant ~ BOD + COD + T_N + T_P + TOC +
-                   SS + EC + pH + DO + temperature + turbidity +
-                   transparency + Chl_a + low + flow1 +
-                   flow2 + reservoir, data = train)
+fda_model <- fda(dominant ~ BOD + COD + TN + TP + TOC +
+                   SS + EC + pH + DO + Temperature + Turbidity +
+                   Transparency + Chla + LowWaterLevel + Inflow +
+                   Discharge + Reservoir, data = train)
 fda_model
 pred_fda <- fda_model %>% predict(test)
 
@@ -373,10 +373,10 @@ mean(pred_fda != test$dominant) # misclassification rate
 
 # 5) Regularized discriminant anlysis (RDA): Regularization (or shrinkage) improves the estimate of the covariance matrices in situations where the number of predictors is larger than the number of samples in the training data. This leads to an improvement of the discriminant analysis.
 library(klaR)
-rda_model <- rda(dominant ~ BOD + COD + T_N + T_P + TOC +
-                   SS + EC + pH + DO + temperature + turbidity +
-                   transparency + Chl_a + low + flow1 +
-                   flow2 + reservoir, data = train)
+rda_model <- rda(dominant ~ BOD + COD + TN + TP + TOC +
+                   SS + EC + pH + DO + Temperature + Turbidity +
+                   Transparency + Chla + LowWaterLevel + Inflow +
+                   Discharge + Reservoir, data = train)
 rda_model
 predictions_rda <- rda_model %>% predict(test)
 pred_rda <- predictions_rda[["class"]]
@@ -396,10 +396,10 @@ mean(pred_rda != test$dominant) # misclassification rate
 # reference : https://blog.naver.com/PostView.nhn?blogId=pmw9440&logNo=221586667065
 # reference : https://ratsgo.github.io/machine%20learning/2017/05/23/SVM/
 library(e1071)
-svm_model <- svm(dominant ~ BOD + COD + T_N + T_P + TOC +
-                   SS + EC + pH + DO + temperature + turbidity +
-                   transparency + Chl_a + low + flow1 +
-                   flow2 + reservoir, data = train,  
+svm_model <- svm(dominant ~ BOD + COD + TN + TP + TOC +
+                   SS + EC + pH + DO + Temperature + Turbidity +
+                   Transparency + Chla + LowWaterLevel + Inflow +
+                   Discharge + Reservoir, data = train,  
                  type = "C-classification", kernel = "radial")
 summary(svm_model)
 pred_svm <- predict(svm_model, newdata = test)
@@ -418,10 +418,10 @@ mean(pred_svm != test$dominant) # misclassification rate
 ### Generalized Additive Multinomial Logistic Regression
 # 1) Multinomial Logistic Regression
 library(nnet)
-mlr_model <- multinom(dominant ~ BOD + COD + T_N + T_P + TOC +
-                        SS + EC + pH + DO + temperature + turbidity +
-                        transparency + Chl_a + low + flow1 +
-                        flow2 + reservoir, data = train)
+mlr_model <- multinom(dominant ~ BOD + COD + TN + TP + TOC +
+                        SS + EC + pH + DO + Temperature + Turbidity +
+                        Transparency + Chla + LowWaterLevel + Inflow +
+                        Discharge + Reservoir, data = train)
 summary(mlr_model)
 pred_mlr <- predict(mlr_model, newdata=test)
 
@@ -460,9 +460,9 @@ library(neuralnet)
 set.seed(1234)
 
 dnn_model <- neuralnet(dominant ~ BOD + COD + TN + TP + TOC +
-                         SS + EC + pH + DO + temperature + turbidity +
-                         transparency + Chla + LowWaterLevel + inflow +
-                         discharge + reservoir, data = train,
+                         SS + EC + pH + DO + Temperature + Turbidity +
+                         Transparency + Chla + LowWaterLevel + Inflow +
+                         Discharge + Reservoir, data = train,
                        hidden = c(3,3),
                        linear.output = FALSE,
                        algorithm = "backprop",
@@ -474,12 +474,12 @@ predictions_dnn <- predict(dnn_model, newdata = test)
 pred_dnn <- rep(NA,nrow(test))
 for (i in 1:nrow(test)) {
   if (which(predictions_dnn[i,] == max(predictions_dnn[i,])) == 1) {
-    pred_dnn[i] <- "blue"}
+    pred_dnn[i] <- "Cyanophytes"}
   else if (which(predictions_dnn[i,] == max(predictions_dnn[i,])) == 2) {
-    pred_dnn[i] <- "diatom"}
+    pred_dnn[i] <- "Diatoms"}
   else if (which(predictions_dnn[i,] == max(predictions_dnn[i,])) == 3) {
-    pred_dnn[i] <- "green"}
-  else {pred_dnn[i] <- "others"}
+    pred_dnn[i] <- "Chlorophytes"}
+  else {pred_dnn[i] <- "Others"}
 }
 pred_dnn <- as.factor(pred_dnn)
 
