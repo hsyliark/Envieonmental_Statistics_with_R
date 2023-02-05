@@ -8,6 +8,10 @@ library(psych)
 describe(T2$Chl_a, trim = 0.05)
 shapiro.test(T2$Chl_a)
 
+library(tseries)
+
+jarque.bera.test(T2$Reservoir)
+
 table(T2$dominant)
 
 spot1 <- rbind(J1,J2)

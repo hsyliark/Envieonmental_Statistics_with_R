@@ -2,22 +2,31 @@ cell_all <- read.csv("C:/Users/User/Desktop/논문데이터/cell_all.csv",sep=",",hea
 cell_all <- cell_all[cell_all$spot=="J1" | cell_all$spot=="J2",]
 cell_all <- cell_all[cell_all$spot=="J1",]
 
-X <- cell_all[,8:24]
+X <- cell_all[,9:25]
 X_scale <- scale(X)
-cell_all_scale <- cbind(cell_all[,1:7],X_scale)
+cell_all_scale <- cbind(cell_all[,1:8],X_scale)
+
+train <- cell_all_scale[cell_all_scale$year != 2022,] 
+test <- cell_all_scale[cell_all_scale$year == 2022,]
+
+
+Cyanophytes <- test$Cyanophytes
+date <- test$date ; spot <- test$spot
 
 # Generalized Linear Model
 
 # reference : https://rfriend.tistory.com/490
-glm.D93 <- glm(blue ~ BOD + COD + TN + TP + TOC +
-                 SS + EC + pH + DO + temperature +
-                 turbidity + transparency + Chla + LowWaterLevel + inflow +
-                 discharge + reservoir, data=cell_all_scale, family = poisson(link=log)) # Poisson Regression Model (Variance = Mean)
+glm.D93 <- glm(Cyanophytes ~ BOD + COD + TN + TP + TOC +
+                 SS + EC + pH + DO + Temperature +
+                 Turbidity + Transparency + Chla + LowWaterLevel + Inflow +
+                 Discharge + Reservoir, data=train, family = poisson(link=log)) # Poisson Regression Model (Variance = Mean)
 summary(glm.D93)
 step.glm.D93 <- step(glm.D93,direction="both") # stepwise regression
+summary(step.glm.D93)
 library(car)
 vif(step.glm.D93)
-predict(step.glm.D93, newdata=cell_all_scale, type="response")
+PRM <- predict(step.glm.D93, newdata=test, type="response")
+PRM
 
 
 
@@ -26,19 +35,21 @@ predict(step.glm.D93, newdata=cell_all_scale, type="response")
 
 # reference : https://www.youtube.com/watch?v=Scr2uQqLkjI
 library(MASS)
-glm.D94 <- glm.nb(blue ~ BOD + COD + TN + TP + TOC +
-                    SS + EC + pH + DO + temperature +
-                    turbidity + transparency + Chla + LowWaterLevel + inflow +
-                    discharge + reservoir, data=cell_all_scale, link=log) # Negative Binomial Regression Model (Variance > Mean)
+glm.D94 <- glm.nb(Cyanophytes ~ BOD + COD + TN + TP + TOC +
+                    SS + EC + pH + DO + Temperature +
+                    Turbidity + Transparency + Chla + LowWaterLevel + Inflow +
+                    Discharge + Reservoir, data=train, link=log) # Negative Binomial Regression Model (Variance > Mean)
 
-glm.D94 <- glm(blue ~ BOD + COD + TN + TP + TOC +
-                 SS + EC + pH + DO + temperature +
-                 turbidity + transparency + Chla + LowWaterLevel + inflow +
-                 discharge + reservoir, data=cell_all_scale, family = negative.binomial(1000))
+glm.D94 <- glm(Cyanophytes ~ BOD + COD + TN + TP + TOC +
+                 SS + EC + pH + DO + Temperature +
+                 Turbidity + Transparency + Chla + LowWaterLevel + Inflow +
+                 Discharge + Reservoir, data=train, family = negative.binomial(1000))
 summary(glm.D94)
 step.glm.D94 <- step(glm.D94,direction="both")
+summary(step.glm.D94)
 vif(step.glm.D94)
-predict(step.glm.D94, newdata=cell_all_scale, type="response")
+NBRM <- predict(step.glm.D94, newdata=test, type="response")
+NBRM
 
 
 # Zero-Inflated
@@ -47,27 +58,30 @@ library(ggplot2)
 library(pscl)
 library(boot)
 
-ggplot(cell_all_scale, aes(blue)) + geom_histogram()
+ggplot(cell_all_scale, aes(Cyanophytes)) + geom_histogram()
 
-zip_model <- zeroinfl(blue ~ BOD + COD + TN + TP + TOC +
-                        SS + EC + pH + DO + temperature +
-                        turbidity + transparency + Chla + LowWaterLevel + inflow +
-                        discharge + reservoir, data=cell_all_scale, link="logit", dist="poisson")
+zip_model <- zeroinfl(Cyanophytes ~ BOD + COD + TN + TP + TOC +
+                        SS + EC + pH + DO + Temperature +
+                        Turbidity + Transparency + Chla + LowWaterLevel + Inflow +
+                        Discharge + Reservoir, data=train, link="logit", dist="poisson")
 summary(zip_model)
 library(mpath)
-step.zip_model <- be.zeroinfl(zip_model, data=cell_all_scale, dist="poisson", alpha=0.05, trace=TRUE) # stepwise regression
+step.zip_model <- be.zeroinfl(zip_model, data=train, dist="poisson", alpha=0.05, trace=TRUE) # stepwise regression
+summary(step.zip_model)
 vif(step.zip_model)
-predict(step.zip_model, newdata=cell_all_scale, type="response")
+ZIPM <- predict(step.zip_model, newdata=test, type="response")
+ZIPM
 
-zin_model <- zeroinfl(blue ~ BOD + COD + TN + TP + TOC +
-                        SS + EC + pH + DO + temperature +
-                        turbidity + transparency + Chla + LowWaterLevel + inflow +
-                        discharge + reservoir, data=cell_all_scale, link="logit", dist="negbin")
+zin_model <- zeroinfl(Cyanophytes ~ BOD + COD + TN + TP + TOC +
+                        SS + EC + pH + DO + Temperature +
+                        Turbidity + Transparency + Chla + LowWaterLevel + Inflow +
+                        Discharge + Reservoir, data=train, link="logit", dist="negbin")
 summary(zin_model)
-step.zin_model <- be.zeroinfl(zin_model, data=cell_all_scale, dist="negbin", alpha=0.05, trace=TRUE) # stepwise regression
+step.zin_model <- be.zeroinfl(zin_model, data=train, dist="negbin", alpha=0.05, trace=TRUE) # stepwise regression
+summary(step.zin_model)
 vif(step.zin_model)
-predict(step.zin_model, newdata=cell_all_scale, type="response")
-
+ZINBM <- predict(step.zin_model, newdata=test, type="response")
+ZINBM
 
 
 
@@ -76,21 +90,118 @@ predict(step.zin_model, newdata=cell_all_scale, type="response")
 library(mgcv)
 library(gam)
 
-cell_all_scale_a <- cell_all_scale[,8:24]
-gam.D93 <- gam::gam(blue ~ s(BOD) + s(COD) + s(TN) + s(TP) + s(TOC) +
-                      s(SS) + s(EC) + s(pH) + s(DO) + s(temperature) +
-                      s(turbidity) + s(transparency) + s(Chla) + s(LowWaterLevel) + s(inflow) +
-                      s(discharge) + s(reservoir), data=cell_all_scale, family=poisson, link=log)
+train_a <- train[,9:25]
+gam.D93 <- gam::gam(Cyanophytes ~ s(BOD) + s(COD) + s(TN) + s(TP) + s(TOC) +
+                      s(SS) + s(EC) + s(pH) + s(DO) + s(Temperature) +
+                      s(Turbidity) + s(Transparency) + s(Chla) + s(LowWaterLevel) + s(Inflow) +
+                      s(Discharge) + s(Reservoir), data=train, family=poisson, link=log)
 summary(gam.D93)
-step.gam.D93 <- step.Gam(gam.D93,direction="both",scope=gam.scope(cell_all_scale_a)) # stepwise regression in GAM
+step.gam.D93 <- step.Gam(gam.D93,direction="both",scope=gam.scope(train_a)) # stepwise regression in GAM
+summary(step.gam.D93)
 vif(step.gam.D93)
-predict(step.gam.D93, newdata=cell_all_scale, type="response")
+GAPM <- predict(step.gam.D93, newdata=test, type="response")
+GAPM
 
-gam.D94 <- gam::gam(blue ~ s(BOD) + s(COD) + s(TN) + s(TP) + s(TOC) +
-                      s(SS) + s(EC) + s(pH) + s(DO) + s(temperature) +
-                      s(turbidity) + s(transparency) + s(Chla) + s(LowWaterLevel) + s(inflow) +
-                      s(discharge) + s(reservoir), data=cell_all_scale, family=nb, link=log)
+gam.D94 <- gam::gam(Cyanophytes ~ s(BOD) + s(COD) + s(TN) + s(TP) + s(TOC) +
+                      s(SS) + s(EC) + s(pH) + s(DO) + s(Temperature) +
+                      s(Turbidity) + s(Transparency) + s(Chla) + s(LowWaterLevel) + s(Inflow) +
+                      s(Discharge) + s(Reservoir), data=train, family=nb, link=log)
 summary(gam.D94)
-step.gam.D94 <- step.Gam(gam.D94,direction="both",scope=gam.scope(cell_all_scale_a))
+vif(gam.D94)
+step.gam.D94 <- step.Gam(gam.D94,direction="both",scope=gam.scope(train_a))
 vif(step.gam.D94)
-predict(step.gam.D94, newdata=cell_all_scale, type="response")
+predict(step.gam.D94, newdata=test, type="response")
+GANBM <- predict(gam.D94, newdata=test, type="response")
+GANBM
+
+
+# observed vs predicted
+res <- data.frame(date=date, spot=spot, Cyanophytes=Cyanophytes, 
+                  PRM=PRM, NBRM=NBRM, ZIPM=ZIPM, ZINBM=ZINBM,
+                  GAPM=GAPM, GANBM=GANBM)
+res_J1 <- res[res$spot == "J1",c(-2)]
+res_J2 <- res[res$spot == "J2",c(-2)]
+res_T1 <- res[res$spot == "T1",c(-2)]
+res_T2 <- res[res$spot == "T2",c(-2)]
+
+library(reshape2)
+res_J1_melt <- melt(res_J1,
+                 id.vars = 'date',
+                 variable.name = "model",
+                 value.name = "cells") 
+res_J1_melt$date <- as.factor(res_J1_melt$date)
+
+res_J2_melt <- melt(res_J2,
+                    id.vars = 'date',
+                    variable.name = "model",
+                    value.name = "cells") 
+res_J2_melt$date <- as.factor(res_J2_melt$date)
+
+res_T1_melt <- melt(res_T1,
+                    id.vars = 'date',
+                    variable.name = "model",
+                    value.name = "cells") 
+res_T1_melt$date <- as.factor(res_T1_melt$date)
+
+res_T2_melt <- melt(res_T2,
+                    id.vars = 'date',
+                    variable.name = "model",
+                    value.name = "cells") 
+res_T2_melt$date <- as.factor(res_T2_melt$date)
+
+library(ggplot2)
+ggplot(res_J1_melt, aes(x=date, y=cells, group=model, color=model)) +
+  geom_line(size=1) +
+  coord_cartesian(ylim = c(0, 1000)) +
+  ggtitle("J1 spot") +
+  theme(axis.text.x=element_text(angle=90, hjust=1)) +
+  labs(x ="date", y = "Predicted value of cell count(cells/mL)") +
+  theme(axis.text.x = element_text(size = 12, face='bold'),
+        axis.text.y = element_text(size = 12, face='bold'),
+        title = element_text(size=20, face='bold'), 
+        axis.title.x = element_text(size=20,face='bold'),
+        axis.title.y = element_text(size=20,face='bold'),
+        legend.title = element_text(size = 20, face = "bold"),
+        legend.text = element_text(size = 12, face = "bold"))
+
+ggplot(res_J2_melt, aes(x=date, y=cells, group=model, color=model)) +
+  geom_line(size=1) +
+  coord_cartesian(ylim = c(0, 2000)) +
+  ggtitle("J2 spot") +
+  theme(axis.text.x=element_text(angle=90, hjust=1)) +
+  labs(x ="date", y = "Predicted value of cell count(cells/mL)") +
+  theme(axis.text.x = element_text(size = 12, face='bold'),
+        axis.text.y = element_text(size = 12, face='bold'),
+        title = element_text(size=20, face='bold'),
+        axis.title.x = element_text(size=20,face='bold'),
+        axis.title.y = element_text(size=20,face='bold'),
+        legend.title = element_text(size = 20, face = "bold"),
+        legend.text = element_text(size = 12, face = "bold"))
+
+ggplot(res_T1_melt, aes(x=date, y=cells, group=model, color=model)) +
+  geom_line(size=1) +
+  coord_cartesian(ylim = c(0, 2500)) +
+  ggtitle("T1 spot") +
+  theme(axis.text.x=element_text(angle=90, hjust=1)) +
+  labs(x ="date", y = "Predicted value of cell count(cells/mL)") +
+  theme(axis.text.x = element_text(size = 12, face='bold'),
+        axis.text.y = element_text(size = 12, face='bold'),
+        title = element_text(size=20, face='bold'),
+        axis.title.x = element_text(size=20,face='bold'),
+        axis.title.y = element_text(size=20,face='bold'),
+        legend.title = element_text(size = 20, face = "bold"),
+        legend.text = element_text(size = 12, face = "bold"))
+
+ggplot(res_T2_melt, aes(x=date, y=cells, group=model, color=model)) +
+  geom_line(size=1) +
+  coord_cartesian(ylim = c(0, 3000)) +
+  ggtitle("T2 spot") +
+  theme(axis.text.x=element_text(angle=90, hjust=1)) +
+  labs(x ="date", y = "Predicted value of cell count(cells/mL)") +
+  theme(axis.text.x = element_text(size = 12, face='bold'),
+        axis.text.y = element_text(size = 12, face='bold'),
+        title = element_text(size=20, face='bold'),
+        axis.title.x = element_text(size=20,face='bold'),
+        axis.title.y = element_text(size=20,face='bold'),
+        legend.title = element_text(size = 20, face = "bold"),
+        legend.text = element_text(size = 12, face = "bold"))
