@@ -2,15 +2,16 @@ J1 <- read.csv("C:/Users/User/Desktop/논문데이터/J1 spot.csv",sep=",",header=T)
 J2 <- read.csv("C:/Users/User/Desktop/논문데이터/J2 spot.csv",sep=",",header=T)
 T1 <- read.csv("C:/Users/User/Desktop/논문데이터/T1 spot.csv",sep=",",header=T)
 T2 <- read.csv("C:/Users/User/Desktop/논문데이터/T2 spot.csv",sep=",",header=T)
+cell_all <- read.csv("C:/Users/User/Desktop/논문데이터/cell_all.csv",sep=",",header=T)
 
 library(psych)
 
-describe(T2$Chl_a, trim = 0.05)
-shapiro.test(T2$Chl_a)
+describe(cell_all$BOD, trim = 0.05)
+shapiro.test(cell_all$BOD)
 
 library(tseries)
 
-jarque.bera.test(T2$Reservoir)
+jarque.bera.test(cell_all$Reservoir)
 
 table(T2$dominant)
 
@@ -33,7 +34,7 @@ ggplot(spot, aes(x=spot, y=Reservoir, fill=spot)) + geom_boxplot() +
 library(ggcorrplot)
 
 # Compute a correlation matrix
-corr <- cor(T2[,c(4:20)], method="spearman")
+corr <- cor(cell_all[,c(9:25)], method="spearman")
 
 # Compute a matrix of correlation p-values
 p.mat <- cor_pmat(corr)
@@ -41,6 +42,11 @@ p.mat <- cor_pmat(corr)
 ggcorrplot(corr, hc.order = TRUE, type = "lower",
            lab = TRUE)
 ggcorrplot(corr, hc.order = TRUE,
+           type = "lower", p.mat = p.mat)
+
+ggcorrplot(corr, hc.order = TRUE, method = "circle",  type = "lower",
+           lab = TRUE)
+ggcorrplot(corr, hc.order = TRUE, method = "circle",
            type = "lower", p.mat = p.mat)
 
 
