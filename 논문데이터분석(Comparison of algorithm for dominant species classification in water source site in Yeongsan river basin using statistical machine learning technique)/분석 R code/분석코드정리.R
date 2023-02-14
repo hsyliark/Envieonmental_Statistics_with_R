@@ -4,6 +4,9 @@ T1 <- read.csv("C:/Users/User/Desktop/논문데이터/T1 spot.csv",sep=",",header=T)
 T2 <- read.csv("C:/Users/User/Desktop/논문데이터/T2 spot.csv",sep=",",header=T)
 cell_all <- read.csv("C:/Users/User/Desktop/논문데이터/cell_all.csv",sep=",",header=T)
 
+cell_all <- cell_all[cell_all$year != 2022,]
+
+
 library(psych)
 
 describe(cell_all$BOD, trim = 0.05)
@@ -11,6 +14,7 @@ shapiro.test(cell_all$BOD)
 
 library(tseries)
 
+describe(cell_all$Reservoir, trim = 0.05)
 jarque.bera.test(cell_all$Reservoir)
 
 table(T2$dominant)
@@ -48,6 +52,31 @@ ggcorrplot(corr, hc.order = TRUE, method = "circle",  type = "lower",
            lab = TRUE)
 ggcorrplot(corr, hc.order = TRUE, method = "circle",
            type = "lower", p.mat = p.mat)
+
+
+# reference : https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html
+library(corrplot)
+library(ggcorrplot)
+
+# Compute a correlation matrix
+corr <- cor(cell_all[,c(9:25)], method="spearman")
+
+# Compute a matrix of correlation p-values
+p.mat <- cor_pmat(corr)
+testRes = cor.mtest(mtcars, conf.level = 0.95)
+
+corrplot.mixed(corr, order = 'AOE')
+corrplot(corr, order = 'AOE', addCoef.col = 'black', tl.pos = 'd',
+         cl.pos = 'n', col = COL2('RdBu', 10))
+corrplot(corr, order = 'hclust', addrect = 2)
+corrplot(corr, method = 'square', diag = FALSE, order = 'hclust', addCoef.col = 'black',
+         addrect = 3, rect.col = 'black', rect.lwd = 3, tl.pos = 'd')
+corrplot(corr, method = 'shade', order = 'AOE', addCoef.col = 'black',
+         diag = FALSE)
+corrplot(corr, method = 'square', order = 'FPC', type = 'lower', 
+         addCoef.col = 'black', diag = FALSE)
+corrplot(corr, method = 'square', order = 'FPC', type = 'lower', 
+         p.mat = p.mat, diag = FALSE)
 
 
 
