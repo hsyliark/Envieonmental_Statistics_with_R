@@ -24,6 +24,48 @@ spot2 <- rbind(T1,T2)
 spot <- rbind(spot1,spot2)
 spot$spot <- as.factor(spot$spot)
 
+
+# reference : https://r-coder.com/boxplot-r/
+
+par(mfrow=c(1,1))
+
+# Histogram
+hist(cell_all$BOD, probability = TRUE, ylab = "", col = "grey", main = "")
+
+# Axis
+axis(1)
+
+# Density
+lines(density(cell_all$BOD), col = "red", lwd = 2)
+
+# Add boxplot
+par(new = TRUE)
+boxplot(cell_all$BOD, horizontal = TRUE, axes = FALSE,
+        lwd = 2, col = rgb(0, 1, 1, alpha = 0.15))
+
+
+library(ggplot2)
+library(dplyr)
+library(reshape2)
+
+cell_all[,9:25] %>% 
+  melt() %>%
+  ggplot(aes(x = value, y = -0.5, fill = variable)) +
+  geom_boxplot() + xlab("Value of measured variables") + ylab("Density") + 
+  geom_density(aes(x = value),adjust = 1/2, alpha = 0.1, inherit.aes = FALSE) +
+  facet_wrap(~variable, ncol=4, scales = 'free') +
+  theme(strip.background=element_rect(colour="black",
+                                      fill="whitesmoke"),
+        axis.text.x = element_text(size = 14, face='bold'),
+        axis.text.y = element_text(size = 14, face='bold'),
+        axis.title.x = element_text(size = 15,face='bold'),
+        axis.title.y = element_text(size = 15,face='bold'),
+        legend.title = element_text(size = 15, face = "bold"),
+        legend.text = element_text(size = 15, face = "bold"))
+  
+
+
+
 library(ggplot2)
 
 ggplot(spot, aes(x=spot, y=Reservoir, fill=spot)) + geom_boxplot() +

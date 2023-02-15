@@ -56,10 +56,10 @@ plot(dune.Manure)
 
 # reference : https://r.qcbs.ca/workshop10/book-en/redundancy-analysis.html
 
-data1 <- read.csv("C:/Users/User/Desktop/논문데이터/redundancy analysis 1 season.csv",sep=",",header=T)
-data2 <- read.csv("C:/Users/User/Desktop/논문데이터/redundancy analysis 2 season.csv",sep=",",header=T) 
+data1 <- read.csv("C:/Users/User/Desktop/논문데이터/redundancy analysis 1 average.csv",sep=",",header=T)
+data2 <- read.csv("C:/Users/User/Desktop/논문데이터/redundancy analysis 2 average.csv",sep=",",header=T) 
 
-species_model <- rda(data1[,-c(1,2)] ~ BOD + COD + TN + TP + TOC +
+species_model <- rda(data1[,-c(1,2,3)] ~ BOD + COD + TN + TP + TOC +
                        SS + EC + pH + DO + Temperature + Turbidity +
                        Transparency + Chla + LowWaterLevel + Inflow +
                        Discharge + Reservoir, data=data2)
@@ -92,8 +92,8 @@ plot(species_model,
      type = "none", # this excludes the plotting of any points from the results
      frame = FALSE,
      # set axis limits
-     xlim = c(-3,3), 
-     ylim = c(-2,9),
+     xlim = c(-70,10), 
+     ylim = c(-20,60),
      # label the plot (title, and axes)
      main = "RDA result (shows similarities between objects in the algae species)",
      xlab = paste0("RDA1 (", perc[1], "%)"), 
@@ -108,12 +108,12 @@ points(sc_si,
        cex = 1.2) # size
 # add arrows for effects of the explanatory variables
 arrows(0,0, # start them from (0,0)
-       sc_bp[,1]*7, sc_bp[,2]*7, # end them at the score value
+       sc_bp[,1]*100, sc_bp[,2]*100, # end them at the score value
        col = "brown", 
        lwd = 1)
 # add text labels for arrows
-text(x = (sc_bp[,1] - 0.05)*7, # adjust text coordinate to avoid overlap with arrow tip
-     y = (sc_bp[,2] - 0.05)*7, 
+text(x = (sc_bp[,1] - 0.05)*100, # adjust text coordinate to avoid overlap with arrow tip
+     y = (sc_bp[,2] - 0.05)*100, 
      labels = rownames(sc_bp), 
      col = "red", 
      cex = 1, 
