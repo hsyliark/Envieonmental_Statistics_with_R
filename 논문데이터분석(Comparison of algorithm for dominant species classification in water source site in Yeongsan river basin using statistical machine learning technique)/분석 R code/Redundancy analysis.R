@@ -56,10 +56,14 @@ plot(dune.Manure)
 
 # reference : https://r.qcbs.ca/workshop10/book-en/redundancy-analysis.html
 
-data1 <- read.csv("C:/Users/User/Desktop/논문데이터/redundancy analysis 1 average.csv",sep=",",header=T)
-data2 <- read.csv("C:/Users/User/Desktop/논문데이터/redundancy analysis 2 average.csv",sep=",",header=T) 
+data1 <- read.csv("C:/Users/User/Desktop/논문데이터/analysis data 1.csv",sep=",",header=T)
+data2 <- read.csv("C:/Users/User/Desktop/논문데이터/analysis data 2.csv",sep=",",header=T) 
+rownames(data1) <- data1$code
+data1 <- data1[,-1]
+rownames(data2) <- data2$code
+data2 <- data2[,-1]
 
-species_model <- rda(data1[,-c(1,2,3)] ~ BOD + COD + TN + TP + TOC +
+species_model <- rda(data1 ~ BOD + COD + TN + TP + TOC +
                        SS + EC + pH + DO + Temperature + Turbidity +
                        Transparency + Chla + LowWaterLevel + Inflow +
                        Discharge + Reservoir, data=data2)
@@ -92,10 +96,10 @@ plot(species_model,
      type = "none", # this excludes the plotting of any points from the results
      frame = FALSE,
      # set axis limits
-     xlim = c(-70,10), 
-     ylim = c(-20,60),
+     xlim = c(-30,5), 
+     ylim = c(-5,20),
      # label the plot (title, and axes)
-     main = "RDA result (shows similarities between objects in the algae species)",
+     main = "RDA result (season, site, year)",
      xlab = paste0("RDA1 (", perc[1], "%)"), 
      ylab = paste0("RDA2 (", perc[2], "%)") 
 )
@@ -106,14 +110,20 @@ points(sc_si,
        col = "black", # outline colour
        bg = "steelblue", # fill colour
        cex = 1.2) # size
+# add text labels for site
+text((sc_si + c(0.1, 0.2)), # adjust text coordinates to avoid overlap with points 
+     labels = rownames(sc_si), 
+     col = "forestgreen", 
+     font = 2, # bold
+     cex = 1)
 # add arrows for effects of the explanatory variables
 arrows(0,0, # start them from (0,0)
-       sc_bp[,1]*100, sc_bp[,2]*100, # end them at the score value
+       sc_bp[,1]*30, sc_bp[,2]*30, # end them at the score value
        col = "brown", 
        lwd = 1)
 # add text labels for arrows
-text(x = (sc_bp[,1] - 0.05)*100, # adjust text coordinate to avoid overlap with arrow tip
-     y = (sc_bp[,2] - 0.05)*100, 
+text(x = (sc_bp[,1] - 0.05)*30, # adjust text coordinate to avoid overlap with arrow tip
+     y = (sc_bp[,2] - 0.05)*30, 
      labels = rownames(sc_bp), 
      col = "red", 
      cex = 1, 
