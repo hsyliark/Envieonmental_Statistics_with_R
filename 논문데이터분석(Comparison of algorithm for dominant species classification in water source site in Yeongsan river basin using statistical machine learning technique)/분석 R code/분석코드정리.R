@@ -1,8 +1,8 @@
-J1 <- read.csv("C:/Users/User/Desktop/³í¹®µ¥ÀÌÅÍ/J1 spot.csv",sep=",",header=T)
-J2 <- read.csv("C:/Users/User/Desktop/³í¹®µ¥ÀÌÅÍ/J2 spot.csv",sep=",",header=T)
-T1 <- read.csv("C:/Users/User/Desktop/³í¹®µ¥ÀÌÅÍ/T1 spot.csv",sep=",",header=T)
-T2 <- read.csv("C:/Users/User/Desktop/³í¹®µ¥ÀÌÅÍ/T2 spot.csv",sep=",",header=T)
-cell_all <- read.csv("C:/Users/User/Desktop/³í¹®µ¥ÀÌÅÍ/cell_all.csv",sep=",",header=T)
+J1 <- read.csv("C:/Users/User/Desktop/?í¹®??????/J1 spot.csv",sep=",",header=T)
+J2 <- read.csv("C:/Users/User/Desktop/?í¹®??????/J2 spot.csv",sep=",",header=T)
+T1 <- read.csv("C:/Users/User/Desktop/?í¹®??????/T1 spot.csv",sep=",",header=T)
+T2 <- read.csv("C:/Users/User/Desktop/?í¹®??????/T2 spot.csv",sep=",",header=T)
+cell_all <- read.csv("C:/Users/User/Desktop/?í¹®??????/cell_all.csv",sep=",",header=T)
 
 cell_all <- cell_all[cell_all$year != 2022,]
 
@@ -69,7 +69,7 @@ cell_all[,9:25] %>%
 library(ggplot2)
 
 ggplot(spot, aes(x=spot, y=Reservoir, fill=spot)) + geom_boxplot() +
-  labs(x ="spot", y = "Reservoir(10,000§©)") +
+  labs(x ="spot", y = "Reservoir(10,000??)") +
   theme(axis.text.x = element_text(size = 12, face='bold'),
         axis.text.y = element_text(size = 12, face='bold'),
         axis.title.x = element_text(size=20,face='bold'),
@@ -124,7 +124,37 @@ corrplot(corr, method = 'square', order = 'FPC', type = 'lower',
 
 library(kohonen)
 
-data_all_matrix <- as.matrix(T2[,c(4:20)])
+data_all_ma# reference : http://www.sthda.com/english/wiki/ggplot2-barplots-quick-start-guide-r-software-and-data-visualizationt
+library(ggplot2)
+
+var1 <- c("a.BOD","b.COD","c.TN","d.TP","e.TOC",
+          "f.SS","g.EC","h.pH","i.DO","j.Temperature",
+          "k.Turbidity","l.Transparency","m.Chla","n.LowWaterLevel","o.Inflow",
+          "p.Discharge","q.Reservoir")
+var2 <- c(6.687975,9.914455,15.680119,11.415743,8.702956,
+          15.944473,15.563142,10.174798,60.984920,109.916273,
+          23.336505,10.917926,12.806143,13.674825,11.867803,
+          25.094874,15.867041)
+dat.imp <- data.frame(variable=var1, VarImp=var2)
+dat.imp$variable <- as.factor(dat.imp$variable)
+ggplot(data=dat.imp, aes(x=variable, y=VarImp, fill=VarImp)) +
+  geom_bar(stat="identity")+
+  labs(x ="measured variable", y = "Variable Importance based Mean Decrease Gini",
+       fill = "Variable Importance") +
+  theme(axis.text.x=element_text(angle=45, hjust=1)) +
+  theme(axis.text.x = element_text(size = 12, face='bold'),
+        axis.text.y = element_text(size = 12, face='bold'),
+        axis.title.x = element_text(size=15,face='bold'),
+        axis.title.y = element_text(size=15,face='bold'),
+        legend.title = element_text(size = 12, face = "bold"),
+        legend.text = element_text(size = 12, face = "bold")) +
+  geom_text(aes(y=VarImp, label=VarImp), vjust=1.3, 
+            color="green", size=3.5)
+
+
+
+
+rix <- as.matrix(T2[,c(4:20)])
 
 set.seed(1234)
 
