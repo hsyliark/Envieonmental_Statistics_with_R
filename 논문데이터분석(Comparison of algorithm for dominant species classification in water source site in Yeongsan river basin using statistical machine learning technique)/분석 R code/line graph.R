@@ -16,8 +16,11 @@ CT2_melt <- melt(CT2_reshape,
                  value.name = "cells") 
 CT2_melt$month <- as.factor(CT2_melt$month)
 
+
+write.csv(CT2_melt, "C:/Users/User/Desktop/논문데이터/CT2_melt.csv")
+
 library(ggplot2)
-ggplot(CT2_melt, aes(x=month, y=cells, group=algae, color=algae)) +
+ggplot(CJ1_melt, aes(x=month, y=cells, group=algae, color=algae)) +
   geom_line(size=1.5) +
   theme(axis.text.x=element_text(angle=90, hjust=1)) +
   labs(x ="month", y = "mean of cell count(cells/mL)") +
