@@ -248,6 +248,7 @@ svm_pred_JS
 # Deep Neural Network (DNN)
 library(keras)
 library(dplyr)
+library(ggplot2)
 reticulate::py_install("pydot", pip = TRUE)
 reticulate::conda_install(packages = "graphviz")
 # Seungchon weir
@@ -262,7 +263,7 @@ dnn_SC <- keras_model_sequential() %>%
 dnn_SC %>% compile(
   loss="mse",
   optimizer="adam", 
-  metrics=list("mean_absolute_error"))
+  metrics=list("mean_squared_error","mean_absolute_error"))
 dnn_SC %>% summary()
 dnn_SC %>% fit(train_x_SC, train_y_SC, epochs=100, verbose=1)
 dnn_pred_SC <- dnn_SC %>% predict(test_x_SC)
@@ -279,7 +280,7 @@ dnn_JS <- keras_model_sequential() %>%
 dnn_JS %>% compile(
   loss="mse",
   optimizer="adam", 
-  metrics=list("mean_absolute_error"))
+  metrics=list("mean_squared_error","mean_absolute_error"))
 dnn_JS %>% summary()
 dnn_JS %>% fit(train_x_JS, train_y_JS, epochs=100, verbose=1)
 dnn_pred_JS <- dnn_JS %>% predict(test_x_JS)
@@ -305,7 +306,8 @@ cnn_SC <- keras_model_sequential() %>%
   layer_dense(units=1, activation="linear")
 cnn_SC %>% compile(
   loss="mse",
-  optimizer="adam")
+  optimizer="adam",
+  metrics=list("mean_squared_error","mean_absolute_error"))
 cnn_SC %>% summary()
 cnn_SC %>% fit(train_x_SC, train_y_SC, epochs=100, batch_size=16, verbose=1)
 cnn_pred_SC <- cnn_SC %>% predict(test_x_SC)
@@ -327,7 +329,8 @@ cnn_JS <- keras_model_sequential() %>%
   layer_dense(units=1, activation="linear")
 cnn_JS %>% compile(
   loss="mse",
-  optimizer="adam")
+  optimizer="adam",
+  metrics=list("mean_squared_error","mean_absolute_error"))
 cnn_JS %>% summary()
 cnn_JS %>% fit(train_x_JS, train_y_JS, epochs=100, batch_size=16, verbose=1)
 cnn_pred_JS <- cnn_JS %>% predict(test_x_JS)
