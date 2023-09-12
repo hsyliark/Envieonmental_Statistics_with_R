@@ -69,13 +69,14 @@ fw_SC <- fitdist(SC_train$Chla, "weibull")
 fg_SC <- fitdist(SC_train$Chla, "gamma")
 fe_SC <- fitdist(SC_train$Chla, "exp")
 gofstat(list(fw_SC, fg_SC, fe_SC))
+denscomp(list(fw_SC, fg_SC, fe_SC), legendtext = c("Weibull", "Gamma", "Exponential"))
 # Juksan weir
 descdist(JS_train$Chla, boot=1000)
 fw_JS <- fitdist(JS_train$Chla, "weibull")
 fg_JS <- fitdist(JS_train$Chla, "gamma")
 fe_JS <- fitdist(JS_train$Chla, "exp")
 gofstat(list(fw_JS, fg_JS, fe_JS))
-
+denscomp(list(fw_JS, fg_JS, fe_JS), legendtext = c("Weibull", "Gamma", "Exponential"))
 
 ## Statistical Models
 
