@@ -19,10 +19,17 @@ library(psych)
 describe(SC_train[,6:24], trim = 0.05) 
 describe(JS_train[,6:24], trim = 0.05) 
 
-# Normality test for time-series data (Jarque-Bera test)
+# Normality test for time-series data 
+# (Jarque-Bera test / H0 : Normality)
 library(tseries)
 jarque.bera.test(SC_train$BOD)
 jarque.bera.test(JS_train$BOD)
+
+# Normality test for time-series data 
+# (Lobato and Velasco's test / H0 : The given data follows a Gaussian process)
+library(nortsTest)
+lobato.test(SC_train$BOD)
+lobato.test(JS_train$BOD)
 
 # Boxplot with Density curve
 library(ggplot2)
@@ -246,6 +253,8 @@ summary(best_svm.JS)
 svm_pred_JS <- predict(object=best_svm.JS$best.model, newdata=JS_test[,6:24])
 svm_pred_JS
 
+## Deep Learning Algorithm
+
 # Deep Neural Network (DNN)
 library(keras)
 library(dplyr)
@@ -258,15 +267,17 @@ train_y_SC <- SC_train[,18]
 test_x_SC <- data.matrix(SC_test[,c(6:17,19:24)]) # define predictor and response variables in testing set
 test_y_SC <- SC_test[,18]
 dnn_SC <- keras_model_sequential() %>% 
-  layer_dense(units=64, activation="relu", input_shape=18) %>% 
-  layer_dense(units=32, activation="relu") %>% 
+  layer_dense(units=64, activation="relu", input_shape=18) %>%
+  layer_dense(units=32, activation="relu") %>%
+  layer_dense(units=16, activation="relu") %>%
+  layer_dropout(0.2) %>%
   layer_dense(units=1, activation="linear")
 dnn_SC %>% compile(
   loss="mse",
   optimizer="adam", 
   metrics=list("mean_squared_error","mean_absolute_error"))
 dnn_SC %>% summary()
-dnn_SC %>% fit(train_x_SC, train_y_SC, epochs=100, verbose=1)
+dnn_SC %>% fit(train_x_SC, train_y_SC, epochs=100, validation_split=0.2, verbose=1)
 dnn_pred_SC <- dnn_SC %>% predict(test_x_SC)
 dnn_pred_SC
 # Juksan weir
@@ -275,15 +286,17 @@ train_y_JS <- JS_train[,18]
 test_x_JS <- data.matrix(JS_test[,c(6:17,19:24)]) # define predictor and response variables in testing set
 test_y_JS <- JS_test[,18]
 dnn_JS <- keras_model_sequential() %>% 
-  layer_dense(units=64, activation="relu", input_shape=18) %>% 
-  layer_dense(units=32, activation="relu") %>% 
+  layer_dense(units=64, activation="relu", input_shape=18) %>%
+  layer_dense(units=32, activation="relu") %>%
+  layer_dense(units=16, activation="relu") %>%
+  layer_dropout(0.2) %>%
   layer_dense(units=1, activation="linear")
 dnn_JS %>% compile(
   loss="mse",
   optimizer="adam", 
   metrics=list("mean_squared_error","mean_absolute_error"))
 dnn_JS %>% summary()
-dnn_JS %>% fit(train_x_JS, train_y_JS, epochs=100, verbose=1)
+dnn_JS %>% fit(train_x_JS, train_y_JS, epochs=100, validation_split=0.2, verbose=1)
 dnn_pred_JS <- dnn_JS %>% predict(test_x_JS)
 dnn_pred_JS
 
@@ -302,15 +315,19 @@ in_dim_SC <- c(dim(train_x_SC)[2:3])
 cnn_SC <- keras_model_sequential() %>%
   layer_conv_1d(filters=64, kernel_size=2,
                 input_shape=in_dim_SC, activation="relu") %>%
+  layer_conv_1d(filters=32, kernel_size=3, activation='relu') %>%
+  layer_max_pooling_1d(pool_size=2) %>%
+  layer_dropout(0.2) %>%
   layer_flatten() %>%
   layer_dense(units=32, activation="relu") %>%
+  layer_dropout(0.2) %>%
   layer_dense(units=1, activation="linear")
 cnn_SC %>% compile(
   loss="mse",
   optimizer="adam",
   metrics=list("mean_squared_error","mean_absolute_error"))
 cnn_SC %>% summary()
-cnn_SC %>% fit(train_x_SC, train_y_SC, epochs=100, batch_size=16, verbose=1)
+cnn_SC %>% fit(train_x_SC, train_y_SC, epochs=100, batch_size=16, validation_split=0.2, verbose=1)
 cnn_pred_SC <- cnn_SC %>% predict(test_x_SC)
 cnn_pred_SC
 # Juksan weir
@@ -324,16 +341,20 @@ test_x_JS <- array(test_x_JS, dim=c(nrow(test_x_JS), 18, 1))
 in_dim_JS <- c(dim(train_x_JS)[2:3])
 cnn_JS <- keras_model_sequential() %>%
   layer_conv_1d(filters=64, kernel_size=2,
-                input_shape=in_dim_JS, activation="relu") %>%
+                input_shape=in_dim_SC, activation="relu") %>%
+  layer_conv_1d(filters=32, kernel_size=3, activation='relu') %>%
+  layer_max_pooling_1d(pool_size=2) %>%
+  layer_dropout(0.2) %>%
   layer_flatten() %>%
   layer_dense(units=32, activation="relu") %>%
+  layer_dropout(0.2) %>%
   layer_dense(units=1, activation="linear")
 cnn_JS %>% compile(
   loss="mse",
   optimizer="adam",
   metrics=list("mean_squared_error","mean_absolute_error"))
 cnn_JS %>% summary()
-cnn_JS %>% fit(train_x_JS, train_y_JS, epochs=100, batch_size=16, verbose=1)
+cnn_JS %>% fit(train_x_JS, train_y_JS, epochs=100, batch_size=16, validation_split=0.2, verbose=1)
 cnn_pred_JS <- cnn_JS %>% predict(test_x_JS)
 cnn_pred_JS
 
@@ -346,9 +367,15 @@ res_JS <- data.frame(Chla=JS_test$Chla, GLM=GGLM_JS, GAM=GGAM_JS,
                      TVCM=TVCMG_JS, XGBoost=XGBoost_pred_JS,
                      SVM=svm_pred_JS, DNN=dnn_pred_JS,
                      CNN=cnn_pred_JS)
-MSE <- function(y,yhat) {sum((y-yhat)^2)/length(y)}
+RMSE <- function(y,yhat) {sqrt(sum((y-yhat)^2)/length(y))}
 MAE <- function(y,yhat) {sum(abs(y-yhat))/length(y)}
 MAPE <- function(y,yhat) {(100/length(y))*sum(abs((y-yhat)/y))}
-MSE(res_SC$Chla, res_SC$GLM)
+RMSE(res_SC$Chla, res_SC$GLM)
 write.csv(res_SC, file="C:/Users/User/Desktop/res_SC.csv")
 write.csv(res_SC, file="C:/Users/User/Desktop/res_JS.csv")
+
+# with python
+
+res_SC <- read.csv("C:/Users/User/Desktop/res_SC.csv", sep=",", header=T)
+res_JS <- read.csv("C:/Users/User/Desktop/res_JS.csv", sep=",", header=T)
+
