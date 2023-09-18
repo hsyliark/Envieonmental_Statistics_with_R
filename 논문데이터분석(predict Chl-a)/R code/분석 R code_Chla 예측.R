@@ -341,7 +341,7 @@ test_x_JS <- array(test_x_JS, dim=c(nrow(test_x_JS), 18, 1))
 in_dim_JS <- c(dim(train_x_JS)[2:3])
 cnn_JS <- keras_model_sequential() %>%
   layer_conv_1d(filters=64, kernel_size=2,
-                input_shape=in_dim_SC, activation="relu") %>%
+                input_shape=in_dim_JS, activation="relu") %>%
   layer_conv_1d(filters=32, kernel_size=3, activation='relu') %>%
   layer_max_pooling_1d(pool_size=2) %>%
   layer_dropout(0.2) %>%
