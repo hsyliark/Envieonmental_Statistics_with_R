@@ -370,12 +370,34 @@ res_JS <- data.frame(Chla=JS_test$Chla, GLM=GGLM_JS, GAM=GGAM_JS,
 RMSE <- function(y,yhat) {sqrt(sum((y-yhat)^2)/length(y))}
 MAE <- function(y,yhat) {sum(abs(y-yhat))/length(y)}
 MAPE <- function(y,yhat) {(100/length(y))*sum(abs((y-yhat)/y))}
-RMSE(res_SC$Chla, res_SC$GLM)
+RMSE(res_SC$a_Chla, res_SC$b_GLM)
 write.csv(res_SC, file="C:/Users/User/Desktop/res_SC.csv")
-write.csv(res_SC, file="C:/Users/User/Desktop/res_JS.csv")
+write.csv(res_JS, file="C:/Users/User/Desktop/res_JS.csv")
 
 # with python
 
 res_SC <- read.csv("C:/Users/User/Desktop/res_SC.csv", sep=",", header=T)
 res_JS <- read.csv("C:/Users/User/Desktop/res_JS.csv", sep=",", header=T)
 
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(lubridate)
+
+res_SC_melt <- res_SC %>%
+  gather(key="variable", value="value", -date)
+ggplot(res_SC_melt, aes(x = ymd(date), y = value, group = variable)) +
+  theme(axis.text.x = element_text(angle=90)) +
+  geom_line(aes(color = variable), size = 1) +
+  ggtitle("Result(Seungchon weir)") +
+  xlab("date") + ylab("Chlorophyll-a(Observed vs Predicted)") +
+  theme_minimal()
+
+res_JS_melt <- res_JS %>%
+  gather(key="variable", value="value", -date)
+ggplot(res_JS_melt, aes(x = ymd(date), y = value, group = variable)) +
+  theme(axis.text.x = element_text(angle=90)) +
+  geom_line(aes(color = variable), size = 1) +
+  ggtitle("Result(Juksan weir)") +
+  xlab("date") + ylab("Chlorophyll-a(Observed vs Predicted)") +
+  theme_minimal()
