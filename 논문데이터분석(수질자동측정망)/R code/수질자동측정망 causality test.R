@@ -176,6 +176,8 @@ coint.test(YB_hour$TN, YB_hour$pct, output=T)
 coint.test(YB_hour$TP, YB_hour$pct, output=T)
 coint.test(YB_hour$Chla, YB_hour$pct, output=T)
 
+#----------------------------------------------------------------
+
 coint.test(NJ_day$WT, NJ_day$pct, output=T)
 coint.test(NJ_day$pH, NJ_day$pct, output=T)
 coint.test(NJ_day$EC, NJ_day$pct, output=T)
@@ -195,3 +197,45 @@ coint.test(NJ_hour$TOC, NJ_hour$pct, output=T)
 coint.test(NJ_hour$TN, NJ_hour$pct, output=T)
 coint.test(NJ_hour$TP, NJ_hour$pct, output=T)
 coint.test(NJ_hour$Chla, NJ_hour$pct, output=T)
+
+#----------------------------------------------------------------
+
+coint.test(YB_day_rainy$WT, YB_day_rainy$pct, output=T)
+coint.test(YB_day_rainy$pH, YB_day_rainy$pct, output=T)
+coint.test(YB_day_rainy$EC, YB_day_rainy$pct, output=T)
+coint.test(YB_day_rainy$DO, YB_day_rainy$pct, output=T)
+coint.test(YB_day_rainy$TOC, YB_day_rainy$pct, output=T)
+coint.test(YB_day_rainy$TN, YB_day_rainy$pct, output=T)
+coint.test(YB_day_rainy$TP, YB_day_rainy$pct, output=T)
+coint.test(YB_day_rainy$Chla, YB_day_rainy$pct, output=T)
+
+coint.test(YB_day_norainy$WT, YB_day_norainy$pct, output=T)
+coint.test(YB_day_norainy$pH, YB_day_norainy$pct, output=T)
+coint.test(YB_day_norainy$EC, YB_day_norainy$pct, output=T)
+coint.test(YB_day_norainy$DO, YB_day_norainy$pct, output=T)
+coint.test(YB_day_norainy$TOC, YB_day_norainy$pct, output=T)
+coint.test(YB_day_norainy$TN, YB_day_norainy$pct, output=T)
+coint.test(YB_day_norainy$TP, YB_day_norainy$pct, output=T)
+coint.test(YB_day_norainy$Chla, YB_day_norainy$pct, output=T)
+
+#----------------------------------------------------------------
+
+coint.test(NJ_day_rainy$WT, NJ_day_rainy$pct, output=T)
+coint.test(NJ_day_rainy$pH, NJ_day_rainy$pct, output=T)
+coint.test(NJ_day_rainy$EC, NJ_day_rainy$pct, output=T)
+coint.test(NJ_day_rainy$DO, NJ_day_rainy$pct, output=T)
+coint.test(NJ_day_rainy$TB, NJ_day_rainy$pct, output=T)
+coint.test(NJ_day_rainy$TOC, NJ_day_rainy$pct, output=T)
+coint.test(NJ_day_rainy$TN, NJ_day_rainy$pct, output=T)
+coint.test(NJ_day_rainy$TP, NJ_day_rainy$pct, output=T)
+coint.test(NJ_day_rainy$Chla, NJ_day_rainy$pct, output=T)
+
+coint.test(NJ_day_norainy$WT, NJ_day_norainy$pct, output=T)
+coint.test(NJ_day_norainy$pH, NJ_day_norainy$pct, output=T)
+coint.test(NJ_day_norainy$EC, NJ_day_norainy$pct, output=T)
+coint.test(NJ_day_norainy$DO, NJ_day_norainy$pct, output=T)
+coint.test(NJ_day_norainy$TB, NJ_day_norainy$pct, output=T)
+coint.test(NJ_day_norainy$TOC, NJ_day_norainy$pct, output=T)
+coint.test(NJ_day_norainy$TN, NJ_day_norainy$pct, output=T)
+coint.test(NJ_day_norainy$TP, NJ_day_norainy$pct, output=T)
+coint.test(NJ_day_norainy$Chla, NJ_day_norainy$pct, output=T)
