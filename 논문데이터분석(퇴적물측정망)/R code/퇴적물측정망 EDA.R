@@ -1,6 +1,9 @@
 sediment <- read.csv("C:/Users/User/Desktop/sediment_read.csv", sep=",", header=T, fileEncoding="CP949") 
 sediment <- na.omit(sediment)
 
+sediment_train <- sediment[sediment$year < 2021,]
+sediment_test <- sediment[sediment$year >= 2021,]
+
 
 ## Loading data
 
@@ -30,11 +33,13 @@ library(tseries)
 jarque.bera.test(SC_train$BOD)
 jarque.bera.test(JS_train$BOD)
 
+
 # Normality test for time-series data 
 # (Lobato and Velasco's test / H0 : The given data follows a Gaussian process)
 library(nortsTest)
 lobato.test(SC_train$BOD)
 lobato.test(JS_train$BOD)
+
 
 # Boxplot with Density curve
 library(ggplot2)
@@ -56,6 +61,14 @@ ggplot(data=melt.JS, aes(x=value)) +
   xlab("Value of measured variables") + ylab("Density") +
   ggtitle("Boxplot with Density curve (Juksan weir)")
 
+melt.SM <- melt(sediment_train[,8:32])
+ggplot(data=melt.SM, aes(x=value)) + 
+  geom_boxplot(aes(y=-0.5, col=variable)) +
+  stat_density(aes(x=value, fill=variable), inherit.aes=F) +
+  facet_wrap(~variable, scales = "free") +
+  xlab("Value of measured variables") + ylab("Density") +
+  ggtitle("Boxplot with Density curve (sediment data)")
+
 # Correlation analysis
 library(ggcorrplot)
 # Seungchon weir
@@ -72,6 +85,33 @@ ggcorrplot(cor_JS, type="lower", p.mat=p_JS, lab=T,
            outline.color="white",
            legend.title="Spearman",
            title="Correlation Analysis (Juksan weir)")
+
+library(ggstatsplot)
+ggstatsplot::ggcorrmat(
+  data = sediment_train[,8:32],
+  type = "nonparametric", # parametric for Pearson, nonparametric for Spearman's correlation
+  colors = c("darkred", "white", "steelblue") # change default colors
+)
+
+library(corrplot)
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+cor_SM <- round(cor(sediment_train[,8:32], method="spearman"), 2)
+p_mat <- cor_pmat(sediment_train[,8:32], method="spearman")
+
+ggcorrplot(cor_SM, type="lower", p.mat=p_mat, lab=T,
+           outline.color="white",
+           legend.title="Spearman",
+           title="Correlation Analysis (sediment data)")
+library(ggcorrplot)
+corrplot(sediment_train[,8:32], method = "color", col = col(200),  
+         type = "upper", order = "hclust", 
+         addCoef.col = "black", # Add coefficient of correlation
+         tl.col = "darkblue", tl.srt = 45, #Text label color and rotation
+         # Combine with significance level
+         p.mat = p_mat, sig.level = 0.01,  
+         # hide correlation coefficient on the principal diagonal
+         diag = FALSE 
+)
 
 # Finding best probability distribution for estimate Chl-a
 library(fitdistrplus)
