@@ -1,7 +1,7 @@
 ### For data by day
 
 ## Loading data
-water_day <- read.csv("C:/Users/User/Desktop/2024 환경기초조사사업/데이터 수집/일자료/2012-2023 일자료.csv", 
+water_day <- read.csv("C:/2024 저널 논문/2024 환경기초조사사업/데이터 수집/일자료/2012-2023 일자료.csv", 
                       sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
 
 ## Correlation analysis
@@ -47,11 +47,17 @@ par(mfrow=c(1,1))
 
 
 
-
 ### For data by year average
 
 ## PCA
-water <- read.csv("C:/Users/User/Desktop/2024 환경기초조사사업/데이터 수집/연평균/2023년 평균.csv", 
+
+# by day
+water_day <- read.csv("C:/2024 저널 논문/2024 환경기초조사사업/데이터 수집/일자료/2012-2023 일자료.csv", 
+                      sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
+water_day[,5:18]
+
+# by year average
+water <- read.csv("C:/2024 저널 논문/2024 환경기초조사사업/데이터 수집/연평균/2012년 평균.csv", 
                      sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
 water_name <- water[,1]
 water <- water[,-1]
@@ -67,7 +73,7 @@ KMO(water)
 cortest.bartlett(cor(water, method="spearman"), n=nrow(water))
 
 # Number of principal components 
-water_pca <- prcomp(water, center=T, scale.=T)
+water_pca <- prcomp(water_day[,5:18], center=T, scale.=T)
 water_pca
 screeplot(water_pca, type="l")
 biplot(water_pca, main="Biplot")
@@ -78,11 +84,14 @@ library(ggfortify)
 autoplot(water_pca, data=water, label=TRUE, label.size=5,
          loadings=TRUE, loadings.colour='blue',
          loadings.label=TRUE, loadings.label.size=5)
+autoplot(water_pca, data=water_day[,5:18], label=FALSE, label.size=5,
+         loadings=TRUE, loadings.colour='blue',
+         loadings.label=TRUE, loadings.label.size=5)
 
 # Component matrix 
 PCA <- principal(water, nfactor=3, rotate="none", score=T) # The factor is the number of PC
 PCA
-PCA_rot <- principal(water, nfactor=5, rotate="varimax", score=T) # varimax rotate 
+PCA_rot <- principal(water, nfactor=4, rotate="varimax", score=T) # varimax rotate 
 PCA_rot
 biplot(PCA_rot)
 
