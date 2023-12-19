@@ -1,19 +1,19 @@
 ### For data by day
 
 ## Loading data
-water_day <- read.csv("C:/2024 저널 논문/2024 환경기초조사사업/데이터 수집/일자료/2012-2023 일자료.csv", 
+water_day <- read.csv("C:/2024 저널 논문/2024 환경기초조사사업/데이터 수집/231219/일자료/2013-2023 day.csv", 
                       sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
 
 ## Correlation analysis
 # reference : https://rpubs.com/Alema/1000474
 
 # Correlation
-round(cor(water_day[,5:18]),3) # pearson
-round(cor(water_day[,5:18], method="spearman"),3) # spearman
+round(cor(water_day),3) # pearson
+round(cor(water_day, method="spearman"),3) # spearman
 
 library(ggcorrplot)
 
-corr <- round(cor(water_day[,5:18], method="spearman"),3)
+corr <- round(cor(water_day, method="spearman"),3)
 p_mat <- cor_pmat(corr)
 ggcorrplot(corr, hc.order = TRUE, type = "lower", lab = TRUE)
 ggcorrplot(corr, hc.order = TRUE, type = "lower", p.mat = p_mat)
@@ -21,7 +21,7 @@ ggcorrplot(corr, hc.order = TRUE, type = "lower", p.mat = p_mat)
 library(ggstatsplot)
 
 ggstatsplot::ggcorrmat(
-  data = water_day[,5:18],
+  data = water_day,
   type = "nonparametric", # parametric for Pearson, nonparametric for Spearman's correlation
   colors = c("darkred", "white", "steelblue") # change default colors
 )
@@ -31,9 +31,9 @@ ggstatsplot::ggcorrmat(
 
 library(kohonen)
 
-water_day_matrix <- as.matrix(water_day[,5:18])
+water_day_matrix <- as.matrix(water_day)
 
-som_grid <- somgrid(xdim=80, ydim=80, topo="hexagonal")
+som_grid <- somgrid(xdim=100, ydim=100, topo="hexagonal")
 som_model <- som(water_day_matrix, grid=som_grid)
 
 coolBlueHotRed <- function(n, alpha=1) {rainbow(n, end=2/3, alpha=alpha)[n:1]}
@@ -51,13 +51,8 @@ par(mfrow=c(1,1))
 
 ## PCA
 
-# by day
-water_day <- read.csv("C:/2024 저널 논문/2024 환경기초조사사업/데이터 수집/일자료/2012-2023 일자료.csv", 
-                      sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
-water_day[,5:18]
-
 # by year average
-water <- read.csv("C:/2024 저널 논문/2024 환경기초조사사업/데이터 수집/연평균/2012년 평균.csv", 
+water <- read.csv("C:/2024 저널 논문/2024 환경기초조사사업/데이터 수집/231219/연평균/2023 year.csv", 
                      sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
 water_name <- water[,1]
 water <- water[,-1]
@@ -73,7 +68,7 @@ KMO(water)
 cortest.bartlett(cor(water, method="spearman"), n=nrow(water))
 
 # Number of principal components 
-water_pca <- prcomp(water_day[,5:18], center=T, scale.=T)
+water_pca <- prcomp(water, center=T, scale.=T)
 water_pca
 screeplot(water_pca, type="l")
 biplot(water_pca, main="Biplot")
@@ -82,9 +77,6 @@ water_pca$sdev^2 # Eigenvalue with respect to principal components
 
 library(ggfortify)
 autoplot(water_pca, data=water, label=TRUE, label.size=5,
-         loadings=TRUE, loadings.colour='blue',
-         loadings.label=TRUE, loadings.label.size=5)
-autoplot(water_pca, data=water_day[,5:18], label=FALSE, label.size=5,
          loadings=TRUE, loadings.colour='blue',
          loadings.label=TRUE, loadings.label.size=5)
 
@@ -108,7 +100,7 @@ as.matrix(d)[1:5,1:5]
 # Apply Distance matrix model
 fit <- hclust(d, method="ward.D")
 plot(fit)
-rect.hclust(fit, k=2)
+rect.hclust(fit, k=3)
 
 # Decide number of clusters
 library(NbClust)
@@ -122,12 +114,23 @@ rect.hclust(fit, k=3)
 library(factoextra)
 # K-means clustering
 set.seed(1004)
-km.res <- kmeans(water_scale, centers=2)
+km.res <- kmeans(water_scale, centers=3)
+km.res[["cluster"]]
 # Visualize silhouhette information
 library(cluster)
 sil <- silhouette(km.res$cluster, dist(water_scale, method="euclidean"))
 fviz_silhouette(sil)
 
+
+## Gaussian Mixture Model
+# reference : https://search.r-project.org/CRAN/refmans/ClusterR/html/GMM.html
+
+# Install packages
+library(ClusterR)
+dat <- as.matrix(water_scale)
+dat <- center_scale(dat)
+gmm <- GMM(dat, 3, dist_mode="maha_dist", seed_mode="random_subset", 
+           km_iter=10, em_iter=10)
 
 ## SOM cluster
 # reference : https://woosa7.github.io/R-Clustering-Kmens-SOM/
@@ -141,10 +144,10 @@ water_scale <- data.frame(scale(water))
 water_scale_matrix <- as.matrix(water_scale)
 
 # Training the SOM model
-som_grid <- somgrid(xdim=2, ydim=1, topo="hexagonal")
+som_grid <- somgrid(xdim=3, ydim=1, topo="hexagonal")
 som_model1 <- som(water_scale_matrix, grid=som_grid)
 str(som_model1)
-som_model2 <- trainSOM(x.data=water_scale, dimension=c(2,1),
+som_model2 <- trainSOM(x.data=water_scale, dimension=c(3,1),
                        nb.save=10, maxit=2000, scaling="none",
                        radius.type="letremy")
 str(som_model2)
