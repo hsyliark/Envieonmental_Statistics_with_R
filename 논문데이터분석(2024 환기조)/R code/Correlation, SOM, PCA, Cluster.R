@@ -1,7 +1,7 @@
 ### For data by day
 
 ## Loading data
-water_day <- read.csv("C:/2024 ���� ����/2024 ȯ�����������/������ ����/231219/���ڷ�/2013-2023 day.csv", 
+water_day <- read.csv("C:/Users/Hi/Desktop/2024 환경기초조사사업/데이터 수집/231219/일자료/2013-2023 day.csv",             
                       sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
 
 ## Correlation analysis
@@ -52,8 +52,8 @@ par(mfrow=c(1,1))
 ## PCA
 
 # by year average
-water <- read.csv("C:/2024 ���� ����/2024 ȯ�����������/������ ����/231219/�����/2023 year.csv", 
-                     sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
+water <- read.csv("C:/Users/Hi/Desktop/2024 환경기초조사사업/데이터 수집/231219/연평균/2023 year.csv",  
+                  sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
 water_name <- water[,1]
 water <- water[,-1]
 rownames(water) <- water_name
@@ -169,3 +169,79 @@ clusters <- superClass(model, k=5)
 summary(clusters)
 plot(clusters)
 plot(clusters, type="dendro3d")
+
+
+## PCA after clustering
+k1 <- read.csv("C:/Users/Hi/Desktop/2024 환경기초조사사업/데이터 수집/231227/CA/K-means/k1_2023.csv",  
+                  sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
+k1_name <- k1[,1]
+k1 <- k1[,-1]
+rownames(k1) <- k1_name
+
+k2 <- read.csv("C:/Users/Hi/Desktop/2024 환경기초조사사업/데이터 수집/231227/CA/K-means/k2_2023.csv",  
+               sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
+k2_name <- k2[,1]
+k2 <- k2[,-1]
+rownames(k2) <- k2_name
+
+k3 <- read.csv("C:/Users/Hi/Desktop/2024 환경기초조사사업/데이터 수집/231227/CA/K-means/k3_2023.csv",  
+               sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
+k3_name <- k3[,1]
+k3 <- k3[,-1]
+rownames(k3) <- k3_name
+
+g1 <- read.csv("C:/Users/Hi/Desktop/2024 환경기초조사사업/데이터 수집/231227/CA/GMM/g1_2023.csv",  
+               sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
+g1_name <- g1[,1]
+g1 <- g1[,-1]
+rownames(g1) <- g1_name
+
+g2 <- read.csv("C:/Users/Hi/Desktop/2024 환경기초조사사업/데이터 수집/231227/CA/GMM/g2_2023.csv",  
+               sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
+g2_name <- g2[,1]
+g2 <- g2[,-1]
+rownames(g2) <- g2_name
+
+g3 <- read.csv("C:/Users/Hi/Desktop/2024 환경기초조사사업/데이터 수집/231227/CA/GMM/g3_2023.csv",  
+               sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
+g3_name <- g3[,1]
+g3 <- g3[,-1]
+rownames(g3) <- g3_name
+
+s1 <- read.csv("C:/Users/Hi/Desktop/2024 환경기초조사사업/데이터 수집/231227/CA/SOM/s1_2023.csv",  
+               sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
+s1_name <- s1[,1]
+s1 <- s1[,-1]
+rownames(s1) <- s1_name
+
+s2 <- read.csv("C:/Users/Hi/Desktop/2024 환경기초조사사업/데이터 수집/231227/CA/SOM/s2_2023.csv",  
+               sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
+s2_name <- s2[,1]
+s2 <- s2[,-1]
+rownames(s2) <- s2_name
+
+s3 <- read.csv("C:/Users/Hi/Desktop/2024 환경기초조사사업/데이터 수집/231227/CA/SOM/s3_2023.csv",  
+               sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
+s3_name <- s3[,1]
+s3 <- s3[,-1]
+rownames(s3) <- s3_name
+
+# Number of principal components 
+s3_pca <- prcomp(s3, center=T, scale.=T)
+s3_pca
+screeplot(s3_pca, type="l")
+biplot(s3_pca, main="Biplot")
+summary(s3_pca)
+s3_pca$sdev^2 # Eigenvalue with respect to principal components
+
+library(ggfortify)
+autoplot(s3_pca, data=s3, label=TRUE, label.size=5,
+         loadings=TRUE, loadings.colour='blue',
+         loadings.label=TRUE, loadings.label.size=5)
+
+# Component matrix 
+PCA <- principal(s3, nfactor=3, rotate="none", score=T) # The factor is the number of PC
+PCA
+PCA_rot <- principal(s3, nfactor=5, rotate="varimax", score=T) # varimax rotate 
+PCA_rot
+biplot(PCA_rot)
