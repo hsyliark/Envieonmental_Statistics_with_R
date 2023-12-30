@@ -52,7 +52,7 @@ par(mfrow=c(1,1))
 ## PCA
 
 # by year average
-water <- read.csv("C:/Users/Hi/Desktop/2024 환경기초조사사업/데이터 수집/231219/연평균/2023 year.csv",  
+water <- read.csv("C:/Users/Hi/Desktop/2024 환경기초조사사업/데이터 수집/240102/st1.csv",
                   sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
 water_name <- water[,1]
 water <- water[,-1]
@@ -83,7 +83,7 @@ autoplot(water_pca, data=water, label=TRUE, label.size=5,
 # Component matrix 
 PCA <- principal(water, nfactor=3, rotate="none", score=T) # The factor is the number of PC
 PCA
-PCA_rot <- principal(water, nfactor=4, rotate="varimax", score=T) # varimax rotate 
+PCA_rot <- principal(water, nfactor=3, rotate="varimax", score=T) # varimax rotate 
 PCA_rot
 biplot(PCA_rot)
 
@@ -100,7 +100,7 @@ as.matrix(d)[1:5,1:5]
 # Apply Distance matrix model
 fit <- hclust(d, method="ward.D")
 plot(fit)
-rect.hclust(fit, k=3)
+rect.hclust(fit, k=4)
 
 # Decide number of clusters
 library(NbClust)
@@ -114,7 +114,7 @@ rect.hclust(fit, k=3)
 library(factoextra)
 # K-means clustering
 set.seed(1004)
-km.res <- kmeans(water_scale, centers=3)
+km.res <- kmeans(water_scale, centers=4)
 km.res[["cluster"]]
 # Visualize silhouhette information
 library(cluster)
@@ -129,7 +129,7 @@ fviz_silhouette(sil)
 library(ClusterR)
 dat <- as.matrix(water_scale)
 dat <- center_scale(dat)
-gmm <- GMM(dat, 3, dist_mode="maha_dist", seed_mode="random_subset", 
+gmm <- GMM(dat, 4, dist_mode="maha_dist", seed_mode="random_subset", 
            km_iter=10, em_iter=10)
 
 ## SOM cluster
@@ -144,10 +144,10 @@ water_scale <- data.frame(scale(water))
 water_scale_matrix <- as.matrix(water_scale)
 
 # Training the SOM model
-som_grid <- somgrid(xdim=3, ydim=1, topo="hexagonal")
+som_grid <- somgrid(xdim=4, ydim=1, topo="hexagonal")
 som_model1 <- som(water_scale_matrix, grid=som_grid)
 str(som_model1)
-som_model2 <- trainSOM(x.data=water_scale, dimension=c(3,1),
+som_model2 <- trainSOM(x.data=water_scale, dimension=c(4,1),
                        nb.save=10, maxit=2000, scaling="none",
                        radius.type="letremy")
 str(som_model2)
@@ -169,6 +169,20 @@ clusters <- superClass(model, k=5)
 summary(clusters)
 plot(clusters)
 plot(clusters, type="dendro3d")
+
+## Density plot with group
+st3 <- read.csv("C:/Users/Hi/Desktop/2024 환경기초조사사업/데이터 수집/240102/st3 group.csv",
+                  sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
+st3_name <- st3[,1]
+st3 <- st3[,-1]
+rownames(st3) <- st3_name
+st3$K_means <- as.factor(st3$K_means)
+st3$GMM <- as.factor(st3$GMM)
+st3$SOM <- as.factor(st3$SOM)
+
+library(ggplot2)
+ggplot(st3, aes(x=NH3N, fill=SOM)) +
+  geom_density(alpha=0.4)
 
 
 ## PCA after clustering
