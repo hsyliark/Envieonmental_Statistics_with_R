@@ -1,7 +1,7 @@
 ### For data by day
 
 ## Loading data
-water_day <- read.csv("C:/Users/Hi/Desktop/2024 í™˜ê²½ê¸°ì´ˆì¡°ì‚¬ì‚¬ì—…/ë°ì´í„° ìˆ˜ì§‘/231214/ì¼ìë£Œ/2012-2023 ì¼ìë£Œ.csv",             
+water_day <- read.csv("C:/Users/Hi/Desktop/2024 ?™˜ê²½ê¸°ì´ˆì¡°?‚¬?‚¬?—…/?°?´?„° ?ˆ˜ì§?/231214/?¼?ë£?/2012-2023 ?¼?ë£?.csv",             
                       sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
 
 ## Correlation analysis
@@ -52,7 +52,7 @@ par(mfrow=c(1,1))
 ## PCA
 
 # by year average
-water <- read.csv("C:/Users/Hi/Desktop/2024 í™˜ê²½ê¸°ì´ˆì¡°ì‚¬ì‚¬ì—…/ë°ì´í„° ìˆ˜ì§‘/240204/average 2019-2023.csv",
+water <- read.csv("C:/2024 Àú³Î ³í¹®/2024 È¯°æ±âÃÊÁ¶»ç»ç¾÷/µ¥ÀÌÅÍ ¼öÁı/240205/average 2019-2023_correct.csv",
                   sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
 water_name <- water[,1]
 water <- water[,-1]
@@ -180,7 +180,7 @@ fviz_nbclust(water_scale,
              barcolor = "steelblue",
              linecolor = "steelblue",
              print.summary = TRUE)
-pam.res <- pam(water_scale, k=5)
+pam.res <- pam(water_scale, k=6)
 print(pam.res)
 # visualizing PAM clusters
 fviz_cluster(pam.res, data = water_scale,
@@ -231,10 +231,10 @@ water_scale <- data.frame(scale(water))
 water_scale_matrix <- as.matrix(water_scale)
 
 # Training the SOM model
-som_grid <- somgrid(xdim=4, ydim=1, topo="hexagonal")
+som_grid <- somgrid(xdim=5, ydim=1, topo="hexagonal")
 som_model1 <- som(water_scale_matrix, grid=som_grid)
 str(som_model1)
-som_model2 <- trainSOM(x.data=water_scale, dimension=c(4,1),
+som_model2 <- trainSOM(x.data=water_scale, dimension=c(5,1),
                        nb.save=10, maxit=2000, scaling="none",
                        radius.type="letremy")
 str(som_model2)
@@ -255,7 +255,7 @@ plot(clusters)
 plot(clusters, type="dendro3d")
 
 ## Density plot with group
-water$cluster <- c(5,2,3,3,2,1,4,1,4,1,5,2,4)
+water$cluster <- c(5,5,2,2,3,1,4,1,4,1,4,3,4)
 water$cluster <- as.factor(water$cluster)
 
 library(ggplot2)
