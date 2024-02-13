@@ -52,7 +52,7 @@ par(mfrow=c(1,1))
 ## PCA
 
 # by year average
-water <- read.csv("C:/2024 Àú³Î ³í¹®/2024 È¯°æ±âÃÊÁ¶»ç»ç¾÷/µ¥ÀÌÅÍ ¼öÁı/240207/average 2019-2023_correct.csv",
+water <- read.csv("C:/Users/í™”í•™ê³¼3/Desktop/240213 ë°ì´í„° ë¶„ì„/Data for CA_WQ_live.csv",
                   sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
 water_name <- water[,1]
 water <- water[,-1]
@@ -132,7 +132,7 @@ fviz_nbclust(water_scale,
 d <- dist(water_scale, method="euclidean")
 fit <- hclust(d, method="ward.D")
 plot(fit)
-rect.hclust(fit, k=2)
+rect.hclust(fit, k=5)
 
 ## fviz_silhouette: Visualize Silhouette Information from Clustering
 library(factoextra)
@@ -146,7 +146,7 @@ fviz_nbclust(water_scale,
              barcolor = "steelblue",
              linecolor = "steelblue",
              print.summary = TRUE)
-km.res <- kmeans(water_scale, centers=2)
+km.res <- kmeans(water_scale, centers=5)
 km.res[["cluster"]]
 # Visualize silhouhette information
 library(cluster)
@@ -180,7 +180,7 @@ fviz_nbclust(water_scale,
              barcolor = "steelblue",
              linecolor = "steelblue",
              print.summary = TRUE)
-pam.res <- pam(water_scale, k=2)
+pam.res <- pam(water_scale, k=6)
 print(pam.res)
 # visualizing PAM clusters
 fviz_cluster(pam.res, data = water_scale,
@@ -215,7 +215,7 @@ opt_gmm <- Optimal_Clusters_GMM(
   dist_mode = "maha_dist", seed_mode = "random_subset",
   km_iter = 10, em_iter = 10, var_floor = 1e-10, 
   plot_data = T)
-gmm <- GMM(dat, 2, dist_mode="maha_dist", seed_mode="random_subset", 
+gmm <- GMM(dat, 5, dist_mode="maha_dist", seed_mode="random_subset", 
            km_iter=10, em_iter=10)
 gmm[["Log_likelihood"]]
 
@@ -231,10 +231,10 @@ water_scale <- data.frame(scale(water))
 water_scale_matrix <- as.matrix(water_scale)
 
 # Training the SOM model
-som_grid <- somgrid(xdim=2, ydim=1, topo="hexagonal")
+som_grid <- somgrid(xdim=5, ydim=1, topo="hexagonal")
 som_model1 <- som(water_scale_matrix, grid=som_grid)
 str(som_model1)
-som_model2 <- trainSOM(x.data=water_scale, dimension=c(2,1),
+som_model2 <- trainSOM(x.data=water_scale, dimension=c(5,1),
                        nb.save=10, maxit=2000, scaling="none",
                        radius.type="letremy")
 str(som_model2)
@@ -260,8 +260,8 @@ water$cluster <- as.factor(water$cluster)
 
 library(ggplot2)
 # BOD, COD, SS, TN, NO3N, NH3N, TP, PO4P, Chla, TOC
-# animal, manure, land
-ggplot(water, aes(x=land, fill=cluster)) +
+# animal, manure, land, wateruse
+ggplot(water, aes(x=wateruse, fill=cluster)) +
   geom_density(alpha=0.4)
 
 
