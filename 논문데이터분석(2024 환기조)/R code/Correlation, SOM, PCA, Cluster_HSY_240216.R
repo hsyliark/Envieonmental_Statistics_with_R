@@ -52,12 +52,16 @@ par(mfrow=c(1,1))
 ## PCA
 
 # by year average
-water <- read.csv("C:/Users/화학과3/Desktop/240213 데이터 분석/Data for CA_WQ_live.csv",
+water <- read.csv("C:/Users/화학과3/Desktop/240216 데이터 분석/Data for CA_WQ_live.csv",
                   sep=",", header=T, fileEncoding = "CP949", encoding = "UTF-8")
 water_name <- water[,1]
 water <- water[,-1]
+water <- water[,-12]
 water_scale <- data.frame(scale(water))
 rownames(water) <- water_name
+
+water_add <- water[c(1,2,7,9,11,13),]
+water_add_scale <- data.frame(scale(water_add))
 
 # Descriptive statistics
 library(psych)
@@ -132,7 +136,7 @@ fviz_nbclust(water_scale,
 d <- dist(water_scale, method="euclidean")
 fit <- hclust(d, method="ward.D")
 plot(fit)
-rect.hclust(fit, k=5)
+rect.hclust(fit, k=3)
 
 ## fviz_silhouette: Visualize Silhouette Information from Clustering
 library(factoextra)
@@ -180,7 +184,7 @@ fviz_nbclust(water_scale,
              barcolor = "steelblue",
              linecolor = "steelblue",
              print.summary = TRUE)
-pam.res <- pam(water_scale, k=6)
+pam.res <- pam(water_scale, k=5)
 print(pam.res)
 # visualizing PAM clusters
 fviz_cluster(pam.res, data = water_scale,
@@ -231,10 +235,10 @@ water_scale <- data.frame(scale(water))
 water_scale_matrix <- as.matrix(water_scale)
 
 # Training the SOM model
-som_grid <- somgrid(xdim=5, ydim=1, topo="hexagonal")
+som_grid <- somgrid(xdim=4, ydim=1, topo="hexagonal")
 som_model1 <- som(water_scale_matrix, grid=som_grid)
 str(som_model1)
-som_model2 <- trainSOM(x.data=water_scale, dimension=c(5,1),
+som_model2 <- trainSOM(x.data=water_scale, dimension=c(4,1),
                        nb.save=10, maxit=2000, scaling="none",
                        radius.type="letremy")
 str(som_model2)
@@ -255,7 +259,7 @@ plot(clusters)
 plot(clusters, type="dendro3d")
 
 ## Density plot with group
-water$cluster <- c(5,5,2,2,3,1,4,1,4,1,5,3,4)
+water$cluster <- c(4,5,2,2,3,1,2,1,4,1,5,3,4)
 water$cluster <- as.factor(water$cluster)
 
 library(ggplot2)
