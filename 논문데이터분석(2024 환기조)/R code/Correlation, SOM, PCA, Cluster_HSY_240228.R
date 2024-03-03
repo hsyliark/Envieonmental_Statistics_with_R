@@ -59,6 +59,13 @@ water <- water[,-1]
 water <- water[,-12]
 water_scale <- data.frame(scale(water))
 rownames(water) <- water_name
+rownames(water_scale) <- water_name
+
+clus1 <- water[c(6,8,10),]
+clus2 <- water[c(3,4),]
+clus3 <- water[c(5,12),]
+clus4 <- water[c(1,7,9,13),]
+clus5 <- water[c(2,11),]
 
 water_add <- water[c(1,2,7,9,11,13),]
 water_add_scale <- data.frame(scale(water_add))
