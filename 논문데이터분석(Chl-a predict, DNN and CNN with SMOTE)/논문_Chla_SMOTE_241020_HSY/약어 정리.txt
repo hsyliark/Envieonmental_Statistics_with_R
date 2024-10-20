@@ -1,0 +1,6 @@
+WT : Water Temperature
+WL : Water Level 수위
+WS : Water Storage 저수량
+RF : Rainfall 강우량
+TI : Total Inflow 총유입량
+TD : Total Discharage 총방류량
