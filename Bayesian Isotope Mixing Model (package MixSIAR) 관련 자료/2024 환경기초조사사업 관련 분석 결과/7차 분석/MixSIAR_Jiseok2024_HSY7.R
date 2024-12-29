@@ -1,7 +1,7 @@
 library(MixSIAR)
 
 # Load mix data
-mix <- load_mix_data(filename="C:/Users/User/Desktop/R MixSIAR 분석결과 정리_영산강/2024 환경기초조사사업 관련/BIMM 적합결과/7차 분석/ver2/Jiseok2024_consumer_ver2_site.csv",
+mix <- load_mix_data(filename="C:/Users/User/Desktop/R MixSIAR 분석결과 정리_영산강/2024 환경기초조사사업 관련/BIMM 적합결과/7차 분석/ver1/Jiseok2024_consumer_ver1_site.csv",
                      iso_names=c("BIX","FI"),
                      factors=c("site"),
                      fac_random=c(FALSE),
@@ -9,14 +9,14 @@ mix <- load_mix_data(filename="C:/Users/User/Desktop/R MixSIAR 분석결과 정리_영�
                      cont_effects=NULL)
 
 # Load source data
-source <- load_source_data(filename="C:/Users/User/Desktop/R MixSIAR 분석결과 정리_영산강/2024 환경기초조사사업 관련/BIMM 적합결과/7차 분석/ver2/Jiseok2024_sources_raw_ver2.csv",
+source <- load_source_data(filename="C:/Users/User/Desktop/R MixSIAR 분석결과 정리_영산강/2024 환경기초조사사업 관련/BIMM 적합결과/7차 분석/ver1/Jiseok2024_sources_raw_ver1.csv",
                            source_factors=NULL,
                            conc_dep=FALSE,
                            data_type="raw",
                            mix)
 
 # Load discrimination/TDF data
-discr <- load_discr_data(filename="C:/Users/User/Desktop/R MixSIAR 분석결과 정리_영산강/2024 환경기초조사사업 관련/BIMM 적합결과/7차 분석/ver2/Jiseok2024_discrimination_no_ver2.csv", 
+discr <- load_discr_data(filename="C:/Users/User/Desktop/R MixSIAR 분석결과 정리_영산강/2024 환경기초조사사업 관련/BIMM 적합결과/7차 분석/ver1/Jiseok2024_discrimination_no_ver1.csv", 
                          mix)
 
 # Make isospace plot
@@ -33,7 +33,7 @@ plot_prior(alpha.prior=1,source)
 
 # Define model structure and write JAGS model file
 model_filename <- "MixSIAR_model.txt"
-resid_err <- TRUE
+resid_err <- FALSE
 process_err <- TRUE
 write_JAGS_model(model_filename, resid_err, process_err, mix, source)
 

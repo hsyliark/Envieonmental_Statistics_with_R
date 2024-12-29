@@ -1,11 +1,11 @@
 library(MixSIAR)
 
 # Load mix data
-mix <- load_mix_data(filename="C:/Users/User/Desktop/R MixSIAR 분석결과 정리_영산강/2024 환경기초조사사업 관련/BIMM 적합결과/6차 분석/ver1/Jiseok2024_consumer_ver1_site.csv",
+mix <- load_mix_data(filename="C:/Users/User/Desktop/R MixSIAR 분석결과 정리_영산강/2024 환경기초조사사업 관련/BIMM 적합결과/6차 분석/ver1/Jiseok2024_consumer_ver1.csv",
                      iso_names=c("d15N","d18O"),
-                     factors=c("site"),
-                     fac_random=c(FALSE),
-                     fac_nested=c(FALSE),
+                     factors=c("site","round"),
+                     fac_random=c(FALSE,TRUE),
+                     fac_nested=c(FALSE,FALSE),
                      cont_effects=NULL)
 
 # Load source data

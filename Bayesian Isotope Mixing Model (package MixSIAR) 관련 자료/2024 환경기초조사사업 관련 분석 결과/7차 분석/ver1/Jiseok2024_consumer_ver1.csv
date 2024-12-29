@@ -431,75 +431,75 @@ BIX,FI,site,round
 0.72,1.26,JS-34,round12
 0.7,1.34,JS-35,round12
 0.72,1.29,JS-36,round12
-,,JS-01,round13
-,,JS-02,round13
-,,JS-03,round13
-,,JS-04,round13
-,,JS-05,round13
-,,JS-06,round13
-,,JS-07,round13
-,,JS-08,round13
-,,JS-09,round13
-,,JS-10,round13
-,,JS-11,round13
-,,JS-12,round13
-,,JS-13,round13
-,,JS-14,round13
-,,JS-15,round13
-,,JS-16,round13
-,,JS-17,round13
-,,JS-18,round13
-,,JS-19,round13
-,,JS-20,round13
-,,JS-21,round13
-,,JS-22,round13
-,,JS-23,round13
-,,JS-24,round13
-,,JS-25,round13
-,,JS-26,round13
-,,JS-27,round13
-,,JS-28,round13
-,,JS-29,round13
-,,JS-30,round13
-,,JS-31,round13
-,,JS-32,round13
-,,JS-33,round13
-,,JS-34,round13
-,,JS-35,round13
-,,JS-36,round13
-,,JS-01,round14
-,,JS-02,round14
-,,JS-03,round14
-,,JS-04,round14
-,,JS-05,round14
-,,JS-06,round14
-,,JS-07,round14
-,,JS-08,round14
-,,JS-09,round14
-,,JS-10,round14
-,,JS-11,round14
-,,JS-12,round14
-,,JS-13,round14
-,,JS-14,round14
-,,JS-15,round14
-,,JS-16,round14
-,,JS-17,round14
-,,JS-18,round14
-,,JS-19,round14
-,,JS-20,round14
-,,JS-21,round14
-,,JS-22,round14
-,,JS-23,round14
-,,JS-24,round14
-,,JS-25,round14
-,,JS-26,round14
-,,JS-27,round14
-,,JS-28,round14
-,,JS-29,round14
-,,JS-30,round14
-,,JS-31,round14
-,,JS-32,round14
-,,JS-33,round14
-,,JS-34,round14
-,,JS-35,round14
-,,JS-36,round14
+0.65 ,1.23 ,JS-01,round13
+0.68 ,1.25 ,JS-02,round13
+0.67 ,1.27 ,JS-03,round13
+0.65 ,1.25 ,JS-04,round13
+0.67 ,1.30 ,JS-05,round13
+0.68 ,1.28 ,JS-06,round13
+0.69 ,1.33 ,JS-07,round13
+0.70 ,1.26 ,JS-08,round13
+0.73 ,1.36 ,JS-09,round13
+0.71 ,1.28 ,JS-10,round13
+0.71 ,1.34 ,JS-11,round13
+0.82 ,1.36 ,JS-12,round13
+0.73 ,1.35 ,JS-13,round13
+0.74 ,1.31 ,JS-14,round13
+0.73 ,1.31 ,JS-15,round13
+0.75 ,1.31 ,JS-16,round13
+0.75 ,1.31 ,JS-17,round13
+0.71 ,1.32 ,JS-18,round13
+0.75 ,1.35 ,JS-19,round13
+0.79 ,1.29 ,JS-20,round13
+0.81 ,1.33 ,JS-21,round13
+0.88 ,1.39 ,JS-22,round13
+0.84 ,1.35 ,JS-23,round13
+0.79 ,1.34 ,JS-24,round13
+0.82 ,1.38 ,JS-25,round13
+0.77 ,1.39 ,JS-26,round13
+0.77 ,1.39 ,JS-27,round13
+0.80 ,1.40 ,JS-28,round13
+0.86 ,1.34 ,JS-29,round13
+0.71 ,1.26 ,JS-30,round13
+0.83 ,1.35 ,JS-31,round13
+0.74 ,1.32 ,JS-32,round13
+0.79 ,1.34 ,JS-33,round13
+0.81 ,1.35 ,JS-34,round13
+0.76 ,1.32 ,JS-35,round13
+0.83 ,1.34 ,JS-36,round13
+0.68 ,1.33 ,JS-01,round14
+0.67 ,1.29 ,JS-02,round14
+0.69 ,1.27 ,JS-03,round14
+0.70 ,1.33 ,JS-04,round14
+0.67 ,1.24 ,JS-05,round14
+0.69 ,1.39 ,JS-06,round14
+0.71 ,1.34 ,JS-07,round14
+0.75 ,1.36 ,JS-08,round14
+0.73 ,1.32 ,JS-09,round14
+0.71 ,1.42 ,JS-10,round14
+0.74 ,1.33 ,JS-11,round14
+0.77 ,1.36 ,JS-12,round14
+0.78 ,1.33 ,JS-13,round14
+0.77 ,1.34 ,JS-14,round14
+0.80 ,1.33 ,JS-15,round14
+0.79 ,1.37 ,JS-16,round14
+0.75 ,1.33 ,JS-17,round14
+0.73 ,1.31 ,JS-18,round14
+0.76 ,1.31 ,JS-19,round14
+0.79 ,1.38 ,JS-20,round14
+0.88 ,1.41 ,JS-21,round14
+1.09 ,1.46 ,JS-22,round14
+0.87 ,1.35 ,JS-23,round14
+0.80 ,1.33 ,JS-24,round14
+0.87 ,1.37 ,JS-25,round14
+0.79 ,1.35 ,JS-26,round14
+0.88 ,1.36 ,JS-27,round14
+0.84 ,1.38 ,JS-28,round14
+0.83 ,1.33 ,JS-29,round14
+0.85 ,1.54 ,JS-30,round14
+0.85 ,1.35 ,JS-31,round14
+0.84 ,1.40 ,JS-32,round14
+1.01 ,1.49 ,JS-33,round14
+0.91 ,1.43 ,JS-34,round14
+0.85 ,1.37 ,JS-35,round14
+0.84 ,1.37 ,JS-36,round14
